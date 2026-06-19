@@ -1,0 +1,28 @@
+{
+	"name": "Xdrive",
+	"version": "1.0.0",
+	"description": "",
+	"license": "ISC",
+	"author": "Hamza Chera",
+	"type": "module",
+	"main": "app.js",
+	"scripts": {},
+	"dependencies": {
+		"@prisma/adapter-pg": "^7.8.0",
+		"@prisma/client": "^6.19.3",
+		"@quixo3/prisma-session-store": "^3.1.21",
+		"bcryptjs": "^3.0.3",
+		"dotenv": "^17.4.2",
+		"ejs": "^6.0.1",
+		"express": "^5.2.1",
+		"express-session": "^1.19.0",
+		"express-validator": "^7.3.2",
+		"passport": "^0.7.0",
+		"passport-local": "^1.0.0",
+		"pg": "^8.22.0"
+	},
+	"devDependencies": {
+		"prisma": "^6.19.3",
+		"sass": "^1.101.0"
+	}
+}
