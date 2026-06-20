@@ -2,7 +2,7 @@ import passport from "passport";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { Strategy as LocalStrategy } from "passport-local";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
 export function sessionMiddleware() {
 	return session({
@@ -60,4 +60,3 @@ export const isAuth = (req, res, next) => {
 		res.status(401).redirect("/login");
 	}
 };
-
