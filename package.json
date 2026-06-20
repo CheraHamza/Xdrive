@@ -6,7 +6,9 @@
 	"author": "Hamza Chera",
 	"type": "module",
 	"main": "app.js",
-	"scripts": {},
+	"scripts": {
+		"sass": "sass --watch sass:public/css"
+	},
 	"dependencies": {
 		"@prisma/adapter-pg": "^7.8.0",
 		"@prisma/client": "^6.19.3",
@@ -22,6 +24,8 @@
 		"pg": "^8.22.0"
 	},
 	"devDependencies": {
+		"connect-livereload": "^0.6.1",
+		"livereload": "^0.10.3",
 		"prisma": "^6.19.3",
 		"sass": "^1.101.0"
 	}
