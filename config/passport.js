@@ -3,6 +3,7 @@ import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { Strategy as LocalStrategy } from "passport-local";
 import { prisma } from "../lib/prisma.js";
+import bcrypt from "bcryptjs";
 
 export function sessionMiddleware() {
 	return session({
@@ -53,10 +54,31 @@ passport.use(
 	),
 );
 
+passport.serializeUser((user, done) => {
+	done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+	try {
+		const user = await prisma.user.findUnique({ where: { id } });
+		done(null, user);
+	} catch (err) {
+		done(err);
+	}
+});
+
 export const isAuth = (req, res, next) => {
 	if (req.isAuthenticated()) {
 		next();
 	} else {
 		res.status(401).redirect("/login");
+	}
+};
+
+export const isAnonymous = (req, res, next) => {
+	if (!req.isAuthenticated()) {
+		next();
+	} else {
+		res.redirect("/");
 	}
 };
