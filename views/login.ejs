@@ -4,42 +4,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title>Xdrive - <%= title %></title>
+  <link rel="icon" type="image/svg+xml" href="icons/light-logo.svg">
   <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
-  <div class="login-wrapper">
+  <div class="page-container login-page">
 
     <div class="logo-composite">
       <img class="logo" src="/icons/dark-logo.svg" alt="logo">
       <div>
         <h1 class="bold huge">Xdrive</h1>
-        <p class="label gray small">Cloud Storage</p>
+        <p class="text-label gray small">Cloud Storage</p>
       </div>
     </div>
 
-    <div class="login-form-wrapper">
+    <div class="form-wrapper">
 
-      <div class="login-form-header">
-        <h2 class="big medium">Sign in to Xdrive</h2>
-        <p class="label gray small">Welcome back. Please enter your details.</p>
+      <div class="form-header">
+        <h2 class="big medium">Log in to Xdrive</h2>
+        <p class="text-label gray small">Welcome back. Please enter your details.</p>
       </div>
 
 
       <form action="/login" method="post">
         <div class="input-wrapper email">
-          <label class="label small gray" for="email">EMAIL</label>
-          <input id="email" name="email" type="email" placeholder="e.g. user@xdrive.com">
+          <label class="text-label small gray" for="email">EMAIL</label>
+          <input id="email" name="email" type="email" placeholder="user@xdrive.com">
         </div>
         <div class="input-wrapper password">
-          <label class="label small gray" for="password">PASSWORD</label>
-          <input  id="password" name="password" type="password">
+          <label class="text-label small gray" for="password">PASSWORD</label>
+          <input id="password" name="password" type="password" placeholder="Min. 8 characters">
         </div>
-        <button type="submit" class="login-button label normal">Log in</button>
+        <button type="submit" class="submit-button text-label normal">Log in</button>
       </form>
 
-      <p class="signup-prompt label small gray">Don't have an account? <a href="">Sign up</a></p>
+      <p class="signup-prompt text-label small gray">Don't have an account? <a href="/signup">Sign up</a></p>
     </div>
 
   </div>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xdrive - <%= title %></title>
+  <link rel="icon" type="image/svg+xml" href="icons/light-logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="page-container signup-page">
+
+    <div class="hero-section">
+      <div class="logo-composite">
+        <img class="logo" src="/icons/dark-logo.svg" alt="logo">
+        <div>
+          <h1 class="bold huge">Xdrive</h1>
+          <p class="text-label gray small">Cloud Storage</p>
+        </div>
+      </div>
+
+      <p class="small text-label">Personal cloud storage for your important <span>(but tiny)</span> files.</p>
+    </div>
+
+
+
+    <div class="form-wrapper">
+
+      <div class="form-header">
+        <h2 class="big medium">Create your account</h2>
+        <p class="text-label gray small">Join to claim your personal cloud storage.</p>
+      </div>
+
+
+      <form action="/signup" method="post">
+        <div class="input-wrapper name">
+          <label class="text-label small gray" for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Full Name">
+        </div>
+        <div class="input-wrapper email">
+          <label class="text-label small gray" for="email">EMAIL</label>
+          <input id="email" name="email" type="email" placeholder="user@xdrive.com">
+        </div>
+        <div class="input-wrapper password">
+          <label class="text-label small gray" for="password">PASSWORD</label>
+          <input id="password" name="password" type="password" placeholder="Min. 8 characters">
+        </div>
+        <div class="input-wrapper password">
+          <label class="text-label small gray" for="confirm-password">CONFIRM PASSWORD</label>
+          <input id="confirm-password" name="confirm-password" type="password" placeholder="Min. 8 characters">
+        </div>
+        <button type="submit" class="submit-button text-label normal">Create account</button>
+      </form>
+
+      <p class="signup-prompt text-label small gray">Already have an account? <a href="/login">Log in</a></p>
+    </div>
+
+  </div>
+
+</body>
+
+</html>
