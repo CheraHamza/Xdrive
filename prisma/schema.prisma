@@ -40,6 +40,6 @@ enum Type {
 model Session {
   id       String    @id
   sid      String    @unique
-  data     Json
-  expireAt DateTime?
+  data     String
+  expiresAt DateTime
 }
