@@ -1,0 +1,18 @@
+@use "../abstracts/variables" as var;
+
+a {
+	color: var.$light-blue;
+	text-decoration: none;
+	transition: color 0.1s ease-in-out;
+
+	&:hover,
+	&:focus {
+		color: var.$white;
+	}
+}
+
+
+@mixin icon($size) {
+    width: $size;
+    height: $size;
+}

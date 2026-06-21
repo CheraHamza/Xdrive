@@ -1,0 +1,82 @@
+@use "../abstracts/variables" as var;
+@use "../components/buttons" as btns;
+
+
+input {
+	width: 100%;
+
+	color: var.$white;
+	background-color: var.$dark-gray;
+
+	border: solid 1px #92949738;
+	border-radius: 5px;
+	outline: none;
+
+	padding-inline: 15px;
+	padding-block: 15px;
+	padding-top: 25px;
+
+	transition: border 0.2s ease-out;
+
+	&::placeholder {
+		opacity: 0.5;
+	}
+
+	&:focus {
+		border-color: var.$light-gray;
+	}
+}
+
+.form-wrapper {
+	width: min(80%, 350px);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-inline: auto;
+
+	gap: 5px;
+
+	background-color: var.$light-dark;
+	border: solid 1px #92949711;
+	border-radius: 5px;
+	padding: 40px 20px;
+
+	.form-header {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		gap: 5px;
+
+		margin-bottom: 40px;
+	}
+
+	form {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		gap: 15px;
+
+		.input-wrapper {
+			width: 100%;
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+
+			label {
+				position: absolute;
+				left: 15px;
+				top: 8px;
+				font-size: 10px;
+			}
+		}
+
+		.submit-button {
+			@include btns.button-theme(var.$light-blue, transparent);
+			margin-block: 30px;
+		}
+	}
+}

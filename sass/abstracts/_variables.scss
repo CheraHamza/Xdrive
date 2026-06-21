@@ -1,0 +1,25 @@
+@font-face {
+	font-family: "Geist";
+	src: url("/fonts/Geist.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	src: url("/fonts/JetBrainsMono.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+$main-font: "Geist";
+$secondary-font: "JetBrains Mono";
+
+$white: #e2e2e5;
+$light-blue: #bec8d2;
+$light-gray: #929497;
+$dark-gray: #212426;
+$light-dark: #1a1c1e;
+$dark: #121416;
