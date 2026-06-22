@@ -143,3 +143,12 @@ export const postLogin = (req, res, next) => {
 		});
 	})(req, res, next);
 };
+
+export const postLogout = (req, res, next) => {
+	req.logout((err) => {
+		if (err) {
+			return next(err);
+		}
+		res.redirect("/");
+	});
+};
