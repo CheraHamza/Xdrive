@@ -1,0 +1,52 @@
+<header>
+  <div class="input-wrapper">
+    <span class="material-symbols-outlined search-icon big">search</span>
+    <input type="text" name="search" id="search" placeholder="Search in Xdrive">
+  </div>
+
+  <div class="btns-wrapper">
+    <button class="support-btn">
+      <span class="material-symbols-outlined">help</span>
+      <span class="medium">Support</span>
+    </button>
+
+    <div class="settings-wrapper">
+      <button class="settings-btn">
+        <span class="material-symbols-outlined">settings</span>
+      </button>
+
+      <div class="settings-dropdown">
+        <h1 class="normal medium">Settings</h1>
+        <div class="dropdown-btns">
+          <form action="/logout" method="post">
+            <button class="logout-btn text-label">Log out</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script defer>
+  const settingsWrapper = document.querySelector('.settings-wrapper');
+  const settingsBtn = document.querySelector('.settings-btn');
+  const settingsDropdown = document.querySelector('.settings-dropdown');
+
+  settingsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    settingsBtn.classList.toggle('active');
+
+    if (settingsBtn.classList.contains('active')) {
+      settingsDropdown.style.display = 'flex';
+    } else {
+      settingsDropdown.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!settingsWrapper.contains(e.target)) {
+      settingsBtn.classList.remove('active');
+      settingsDropdown.style.display = 'none';
+    }
+  });
+</script>
