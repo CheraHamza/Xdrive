@@ -1,19 +1,142 @@
-@mixin button-theme($bg-color, $text-color) {
-	width: 100%;
-	background-color: $bg-color;
-	padding-block: 10px;
+@use "../abstracts/variables" as var;
 
-    border: 1px solid $bg-color;
+@mixin button($text-color) {
+	width: 100%;
+
+	background-color: transparent;
+	color: $text-color;
+
+	border: none;
 	border-radius: 5px;
 	outline: none;
 
 	cursor: pointer;
 
 	transition: all 0.1s ease-in-out;
+}
+
+@mixin inverting-button($bg-color, $text-color) {
+	@include button($text-color);
+
+	background-color: $bg-color;
+	border: 2px solid $bg-color;
 
 	&:hover,
 	&:focus {
 		background-color: $text-color;
 		color: $bg-color;
 	}
+}
+
+@mixin select-button(
+	$bg-color,
+	$text-color,
+	$active-bg-color,
+	$active-text-color,
+	$highlight-color
+) {
+	@include button($text-color);
+
+	&.active {
+		background-color: $active-bg-color;
+		color: $active-text-color;
+	}
+
+	&:not(.active) {
+		&:hover,
+		&:focus {
+			color: $highlight-color;
+			border-color: $highlight-color;
+		}
+	}
+}
+
+.nav-btns > button {
+	@include select-button(
+		var.$light-dark,
+		var.$light-gray,
+		var.$dark-gray,
+		var.$white,
+		var.$white
+	);
+
+	&.active {
+		.material-symbols-outlined {
+			font-variation-settings: "FILL" 1;
+		}
+	}
+}
+
+.submit-button {
+	@include inverting-button(var.$light-blue, var.$light-dark);
+	margin-block: 30px;
+
+	padding: 10px;
+}
+
+.new-btn {
+	@include inverting-button(var.$light-blue, var.$light-dark);
+
+	border: 2px solid;
+	border-radius: 20px;
+
+	span.material-symbols-outlined {
+		font-size: 28px;
+		left: 20%;
+	}
+}
+
+.new-btn,
+.nav-btns > button {
+	padding-block: 18px;
+
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	.material-symbols-outlined {
+		position: absolute;
+		left: 15%;
+	}
+}
+
+.support-btn {
+	@include select-button(
+		var.$dark,
+		var.$light-gray,
+		var.$white,
+		var.$dark,
+		var.$white
+	);
+
+	width: 120px;
+	height: fit-content;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+
+	padding: 5px 30px;
+	border: 2px solid #92949738;
+	border-radius: 20px;
+}
+
+.settings-btn {
+	@include select-button(
+		var.$dark,
+		var.$light-gray,
+		var.$white,
+		var.$dark,
+		var.$white
+	);
+
+	display: flex;
+	padding: 5px;
+	border-radius: 30px;
+}
+
+.logout-btn {
+	@include inverting-button(var.$dark-red, var.$light-red);
+	padding: 10px 20px;
 }

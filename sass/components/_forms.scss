@@ -12,9 +12,7 @@ input {
 	border-radius: 5px;
 	outline: none;
 
-	padding-inline: 15px;
-	padding-block: 15px;
-	padding-top: 25px;
+	padding: 15px;
 
 	transition: border 0.2s ease-out;
 
@@ -66,17 +64,16 @@ input {
 			flex-direction: column;
 			align-items: center;
 
+			input {
+				padding-top: 25px;
+			}
+
 			label {
 				position: absolute;
 				left: 15px;
 				top: 8px;
 				font-size: 10px;
 			}
-		}
-
-		.submit-button {
-			@include btns.button-theme(var.$light-blue, transparent);
-			margin-block: 30px;
 		}
 	}
 }

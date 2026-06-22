@@ -1,0 +1,22 @@
+@use "../abstracts/variables" as var;
+@use "buttons" as btns;
+@use "elements" as elmnts;
+
+.navbar {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 30px;
+
+	padding: 50px 30px;
+
+	background-color: var.$light-dark;
+
+	.nav-btns {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+	}
+}

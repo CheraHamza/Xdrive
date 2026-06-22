@@ -2,6 +2,10 @@
 @use "abstracts/variables" as var;
 @use "components/forms";
 @use "components/elements" as elmnts;
+@use "components/nav";
+@use "components/header";
+
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,delete,group,help,home,search,settings,star&display=block");
 
 * {
 	box-sizing: border-box;
@@ -44,15 +48,15 @@ body {
 }
 
 .bold {
-	font-width: 800;
+	font-weight: 800;
 }
 
 .medium {
-	font-width: 400;
+	font-weight: 600;
 }
 
 .thin {
-	font-width: 200;
+	font-weight: 200;
 }
 
 .logo-composite {
@@ -112,5 +116,20 @@ body {
 				color: #a58e7f;
 			}
 		}
+	}
+}
+
+.home-page {
+	display: grid;
+	grid-template-columns: 250px 1fr;
+	grid-template-rows: 1fr;
+
+	.main-wrapper {
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+		padding: 20px 60px;
+
+		gap: 60px;
 	}
 }

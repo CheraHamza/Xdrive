@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,delete,group,help,home,search,settings,star&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -12,6 +13,162 @@
   font-style: normal;
   font-display: swap;
 }
+.nav-btns > button {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+.nav-btns > button.active {
+  background-color: #212426;
+  color: #e2e2e5;
+}
+.nav-btns > button:not(.active):hover, .nav-btns > button:not(.active):focus {
+  color: #e2e2e5;
+  border-color: #e2e2e5;
+}
+.nav-btns > button.active .material-symbols-outlined {
+  font-variation-settings: "FILL" 1;
+}
+
+.submit-button {
+  width: 100%;
+  background-color: transparent;
+  color: #1a1c1e;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  background-color: #bec8d2;
+  border: 2px solid #bec8d2;
+}
+.submit-button:hover, .submit-button:focus {
+  background-color: #1a1c1e;
+  color: #bec8d2;
+}
+.submit-button {
+  margin-block: 30px;
+  padding: 10px;
+}
+
+.new-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #1a1c1e;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  background-color: #bec8d2;
+  border: 2px solid #bec8d2;
+}
+.new-btn:hover, .new-btn:focus {
+  background-color: #1a1c1e;
+  color: #bec8d2;
+}
+.new-btn {
+  border: 2px solid;
+  border-radius: 20px;
+}
+.new-btn span.material-symbols-outlined {
+  font-size: 28px;
+  left: 20%;
+}
+
+.new-btn,
+.nav-btns > button {
+  padding-block: 18px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.new-btn .material-symbols-outlined,
+.nav-btns > button .material-symbols-outlined {
+  position: absolute;
+  left: 15%;
+}
+
+.support-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+.support-btn.active {
+  background-color: #e2e2e5;
+  color: #121416;
+}
+.support-btn:not(.active):hover, .support-btn:not(.active):focus {
+  color: #e2e2e5;
+  border-color: #e2e2e5;
+}
+.support-btn {
+  width: 120px;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 30px;
+  border: 2px solid rgba(146, 148, 151, 0.2196078431);
+  border-radius: 20px;
+}
+
+.settings-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+.settings-btn.active {
+  background-color: #e2e2e5;
+  color: #121416;
+}
+.settings-btn:not(.active):hover, .settings-btn:not(.active):focus {
+  color: #e2e2e5;
+  border-color: #e2e2e5;
+}
+.settings-btn {
+  display: flex;
+  padding: 5px;
+  border-radius: 30px;
+}
+
+.logout-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #ffb4ab;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  background-color: #690005;
+  border: 2px solid #690005;
+}
+.logout-btn:hover, .logout-btn:focus {
+  background-color: #ffb4ab;
+  color: #690005;
+}
+.logout-btn {
+  padding: 10px 20px;
+}
+
 input {
   width: 100%;
   color: #e2e2e5;
@@ -19,9 +176,7 @@ input {
   border: solid 1px rgba(146, 148, 151, 0.2196078431);
   border-radius: 5px;
   outline: none;
-  padding-inline: 15px;
-  padding-block: 15px;
-  padding-top: 25px;
+  padding: 15px;
   transition: border 0.2s ease-out;
 }
 input::placeholder {
@@ -64,28 +219,14 @@ input:focus {
   flex-direction: column;
   align-items: center;
 }
+.form-wrapper form .input-wrapper input {
+  padding-top: 25px;
+}
 .form-wrapper form .input-wrapper label {
   position: absolute;
   left: 15px;
   top: 8px;
   font-size: 10px;
-}
-.form-wrapper form .submit-button {
-  width: 100%;
-  background-color: #bec8d2;
-  padding-block: 10px;
-  border: 1px solid #bec8d2;
-  border-radius: 5px;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.1s ease-in-out;
-}
-.form-wrapper form .submit-button:hover, .form-wrapper form .submit-button:focus {
-  background-color: transparent;
-  color: #bec8d2;
-}
-.form-wrapper form .submit-button {
-  margin-block: 30px;
 }
 
 a {
@@ -95,6 +236,71 @@ a {
 }
 a:hover, a:focus {
   color: #e2e2e5;
+}
+
+.navbar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 50px 30px;
+  background-color: #1a1c1e;
+}
+.navbar .nav-btns {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header .input-wrapper {
+  width: min(80%, 600px);
+  position: relative;
+}
+header input {
+  padding: 10px;
+  padding-left: 40px;
+}
+header .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+}
+header .btns-wrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header .settings-wrapper {
+  position: relative;
+}
+header .settings-dropdown {
+  width: 200px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 15px);
+  z-index: 99;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  background-color: #1a1c1e;
+  padding: 20px 10px;
+  border: 1px solid rgba(146, 148, 151, 0.2392156863);
+  border-radius: 5px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+}
+header .dropdown-btns {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 * {
@@ -137,15 +343,15 @@ body {
 }
 
 .bold {
-  font-width: 800;
+  font-weight: 800;
 }
 
 .medium {
-  font-width: 400;
+  font-weight: 600;
 }
 
 .thin {
-  font-width: 200;
+  font-weight: 200;
 }
 
 .logo-composite {
@@ -198,6 +404,19 @@ body {
 }
 .signup-page .hero-section > p span {
   color: #a58e7f;
+}
+
+.home-page {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 1fr;
+}
+.home-page .main-wrapper {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 60px;
+  gap: 60px;
 }
 
 /*# sourceMappingURL=style.css.map */
