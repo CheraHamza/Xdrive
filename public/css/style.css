@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,delete,group,help,home,search,settings,star&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,delete,group,help,home,search,settings,star,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -169,6 +169,27 @@
   padding: 10px 20px;
 }
 
+.visibility-toggle {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+.visibility-toggle:hover, .visibility-toggle:focus {
+  background-color: rgba(146, 148, 151, 0.2196078431);
+}
+.visibility-toggle.visible {
+  color: #e2e2e5;
+}
+
 input {
   width: 100%;
   color: #e2e2e5;
@@ -212,12 +233,22 @@ input:focus {
   align-items: center;
   gap: 15px;
 }
+.form-wrapper form .input-err-wrapper {
+  width: 100%;
+}
+.form-wrapper form .input-err-wrapper .error-msg {
+  position: relative;
+  top: -3px;
+  font-family: "JetBrains Mono";
+  font-size: 11px;
+  font-weight: 100;
+  word-spacing: -2px;
+  color: #ffb4ab;
+  text-transform: uppercase;
+}
 .form-wrapper form .input-wrapper {
   width: 100%;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 .form-wrapper form .input-wrapper input {
   padding-top: 25px;
@@ -227,6 +258,12 @@ input:focus {
   left: 15px;
   top: 8px;
   font-size: 10px;
+}
+.form-wrapper form .input-wrapper .visibility-toggle {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 20px;
 }
 
 a {

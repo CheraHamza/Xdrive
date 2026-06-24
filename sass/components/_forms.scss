@@ -1,7 +1,6 @@
 @use "../abstracts/variables" as var;
 @use "../components/buttons" as btns;
 
-
 input {
 	width: 100%;
 
@@ -57,12 +56,27 @@ input {
 
 		gap: 15px;
 
+		.input-err-wrapper {
+			width: 100%;
+
+			.error-msg {
+				position: relative;
+				top: -3px;
+
+				font-family: var.$secondary-font;
+				font-size: 11px;
+				font-weight: 100;
+				word-spacing: -2px;
+
+				color: var.$light-red;
+
+				text-transform: uppercase;
+			}
+		}
+
 		.input-wrapper {
 			width: 100%;
 			position: relative;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
 
 			input {
 				padding-top: 25px;
@@ -73,6 +87,14 @@ input {
 				left: 15px;
 				top: 8px;
 				font-size: 10px;
+			}
+
+			.visibility-toggle {
+				position: absolute;
+				right: 15px;
+				top: 15px;
+
+				font-size: 20px;
 			}
 		}
 	}

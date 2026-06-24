@@ -140,3 +140,22 @@
 	@include inverting-button(var.$dark-red, var.$light-red);
 	padding: 10px 20px;
 }
+
+.visibility-toggle {
+	@include button(var.$light-gray);
+	width: fit-content;
+
+	padding: 5px;
+	border-radius: 50%;
+
+	opacity: 0.8;
+
+	&:hover,
+	&:focus {
+		background-color: #92949738;
+	}
+
+	&.visible {
+		color: var.$white;
+	}
+}

@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 
 const alphabeticError = "must only contain alphabetic characters";
 const nameLengthError = "must be between 3 and 20 characters.";
-const emailError = "must be a valid email format.";
+const emailError = "must be a valid format.";
 
 export const getSignup = async (req, res) => {
 	res.render("sign-up", { title: "Sign up" });
@@ -16,19 +16,19 @@ const validateSignup = [
 	body("name")
 		.trim()
 		.notEmpty()
-		.withMessage("cannot be empty.")
+		.withMessage("name is required.")
 		.matches(/^[A-Za-z ]+$/)
-		.withMessage(alphabeticError)
+		.withMessage("name " + alphabeticError)
 		.isLength({ min: 3, max: 20 })
-		.withMessage(nameLengthError),
+		.withMessage("name " + nameLengthError),
 
 	body("email")
 		.trim()
 		.toLowerCase()
 		.notEmpty()
-		.withMessage("cannot be empty.")
+		.withMessage("email is required.")
 		.isEmail()
-		.withMessage(emailError)
+		.withMessage("email " + emailError)
 		.custom(async (value) => {
 			const emailInUse = await prisma.user.findUnique({
 				where: { email: value },
@@ -45,7 +45,7 @@ const validateSignup = [
 	body("password")
 		.trim()
 		.notEmpty()
-		.withMessage("cannot be empty")
+		.withMessage("password is required.")
 		.isStrongPassword({
 			minLength: 8,
 			minLowercase: 1,
@@ -55,20 +55,20 @@ const validateSignup = [
 			returnScore: false,
 		})
 		.withMessage(
-			"must be at least 8 chars and include uppercase, lowercase, number, and symbol.",
+			"password must be at least 8 chars and include uppercase, lowercase, number, and symbol.",
 		),
 
 	body("confirm-password")
 		.trim()
 		.notEmpty()
-		.withMessage("cannot be empty.")
+		.withMessage("password is required.")
 		.custom((value, { req }) => {
 			if (value !== req.body.password) {
 				throw new Error("passwords do not match.");
 			}
 			return true;
 		})
-		.withMessage("passwords do not match"),
+		.withMessage("passwords do not match."),
 ];
 
 function groupValidationErrors(errors) {
@@ -133,7 +133,7 @@ export const postLogin = (req, res, next) => {
 			return res.status(401).render("login", {
 				title: "Log in",
 				authErrors,
-				previousValues: { email: req.body.email || "" },
+				previousValues: { email: req.body.email },
 			});
 		}
 

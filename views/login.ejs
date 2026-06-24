@@ -7,6 +7,7 @@
   <title>Xdrive - <%= title %></title>
   <link rel="icon" type="image/svg+xml" href="icons/light-logo.svg">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/forms.js" defer></script>
 
 </head>
 
@@ -24,14 +25,22 @@
 
 
       <form action="/login" method="post">
-        <div class="input-wrapper email">
-          <label class="text-label small gray" for="email">EMAIL</label>
-          <input id="email" name="email" type="email" placeholder="user@xdrive.com">
+        <div class="input-err-wrapper">
+          <span class="error-msg"><%= locals.authErrors?.email?.[0] ?? "" %></span>
+          <div class="input-wrapper email">
+            <label class="text-label small gray" for="email">EMAIL</label>
+            <input id="email" name="email" type="email" placeholder="user@xdrive.com" value="<%= locals.previousValues?.email %>">
+          </div>
         </div>
-        <div class="input-wrapper password">
-          <label class="text-label small gray" for="password">PASSWORD</label>
-          <input id="password" name="password" type="password" placeholder="Min. 8 characters">
+
+        <div class="input-err-wrapper">
+          <span class="error-msg"> <%= locals.authErrors?.password?.[0] ?? "" %></span>
+          <div class="input-wrapper password">
+            <label class="text-label small gray" for="password">PASSWORD</label>
+            <input id="password" name="password" type="password" placeholder="Min. 8 characters">
+          </div>
         </div>
+
         <button type="submit" class="submit-button text-label normal">Log in</button>
       </form>
 
