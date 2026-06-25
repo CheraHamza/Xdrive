@@ -12,7 +12,7 @@
 
 	cursor: pointer;
 
-	transition: all 0.1s ease-in-out;
+	transition: all 0.12s ease-in-out;
 }
 
 @mixin inverting-button($bg-color, $text-color) {
@@ -36,6 +36,7 @@
 	$highlight-color
 ) {
 	@include button($text-color);
+	background-color: $bg-color;
 
 	&.active {
 		background-color: $active-bg-color;
@@ -157,5 +158,46 @@
 
 	&.visible {
 		color: var.$white;
+	}
+}
+
+.new-folder-btn,
+.upload-file-btn {
+	@include inverting-button(var.$dark, var.$white);
+
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	gap: 5px;
+
+	border: none;
+
+	padding: 10px;
+
+	&:hover > .material-symbols-outlined,
+	&:focus > .material-symbols-outlined {
+		font-variation-settings: "FILL" 1;
+	}
+}
+
+.new-folder-btn {
+	border-radius: 5px 0 0 5px;
+}
+
+.upload-file-btn {
+	border-radius: 0 5px 5px 0;
+}
+
+.add-folder-form {
+	.btns-wrapper {
+		button {
+			@include inverting-button(var.$light-dark, var.$white);
+			width: fit-content;
+
+			padding: 10px;
+			border-radius: 20px;
+
+			
+		}
 	}
 }

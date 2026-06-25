@@ -28,7 +28,6 @@
 </header>
 
 <script defer>
-  const settingsWrapper = document.querySelector('.settings-wrapper');
   const settingsBtn = document.querySelector('.settings-btn');
   const settingsDropdown = document.querySelector('.settings-dropdown');
 
@@ -44,7 +43,7 @@
   });
 
   document.addEventListener('click', (e) => {
-    if (!settingsWrapper.contains(e.target)) {
+    if (!settingsDropdown.contains(e.target)) {
       settingsBtn.classList.remove('active');
       settingsDropdown.style.display = 'none';
     }

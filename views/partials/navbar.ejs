@@ -1,14 +1,34 @@
 <nav class="navbar">
   <%- include("logo-composite") %>
 
-  <button class="new-btn medium">
-    <span class="material-symbols-outlined add-icon">
-      add
-    </span>
-    <span class="normal thin">
-      New
-    </span>
-  </button>
+  <div class="new-btn-wrapper">
+    <button class="new-btn medium">
+      <span class="material-symbols-outlined add-icon">
+        add
+      </span>
+      <span class="normal thin">
+        New
+      </span>
+    </button>
+
+    <div class="new-dropdown">
+      <button class="new-folder-btn">
+        <span class="material-symbols-outlined">create_new_folder</span>
+        <span class="small text-label">New folder</span>
+      </button>
+      <hr>
+      <button class="upload-file-btn">
+        <span class="material-symbols-outlined">upload_file</span>
+        <span class="small text-label">File upload</span>
+      </button>
+      <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+        <input id="file" type="file" name="file">
+      </form>
+    </div>
+    <div class="">
+
+    </div>
+  </div>
 
   <div class="nav-btns">
     <button class="home-btn active">
@@ -35,3 +55,94 @@
     </button>
   </div>
 </nav>
+
+<div class="full-view-form">
+  <form class="add-folder-form" action="/addFolder">
+
+    <label for="folder-name" class="big text-label">New Folder</label>
+    <input class="normal" id="folder-name" type="text" name="folder-name" placeholder="New folder">
+
+    <div class="btns-wrapper">
+      <button type="button" class="cancel-btn medium text-label">Cancel</button>
+      <button type="submit" class="submit-btn medium text-label">Create</button>
+    </div>
+
+  </form>
+</div>
+
+<script defer>
+  const newBtn = document.querySelector(".new-btn")
+  const dropDown = document.querySelector(".new-dropdown");
+
+  newBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    newBtn.classList.toggle("active");
+
+    if (newBtn.classList.contains("active")) {
+      dropDown.style.display = "flex";
+
+    } else {
+      dropDown.style.display = "none";
+    }
+  })
+
+  document.addEventListener('click', (e) => {
+    newBtn.classList.remove('active');
+    dropDown.style.display = 'none';
+
+  });
+</script>
+
+
+<script defer>
+  const uploadBtn = document.querySelector(".upload-file-btn");
+  const uploadForm = document.querySelector(".upload-form");
+  const fileInputField = uploadForm.querySelector("input");
+
+  uploadBtn.addEventListener("click", () => {
+    fileInputField.click();
+  })
+
+  fileInputField.addEventListener("change", () => {
+    if (fileInputField.files.length > 0) {
+      uploadForm.submit();
+    }
+  })
+</script>
+
+<script defer>
+  const newFolderBtn = document.querySelector(".new-folder-btn");
+  const fullViewForm = document.querySelector(".full-view-form");
+  const newFolderForm = fullViewForm.querySelector("form");
+
+  const inputField = newFolderForm.querySelector("input");
+
+  newFolderBtn.addEventListener("click", () => {
+    fullViewForm.classList.toggle("active");
+
+    if (fullViewForm.classList.contains("active")) {
+      fullViewForm.style.display = "flex";
+      inputField.focus();
+    } else {
+      fullViewForm.style.display = "none";
+    }
+  })
+
+  fullViewForm.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    if (!newFolderForm.contains(e.target)) {
+      fullViewForm.classList.remove('active');
+      fullViewForm.style.display = 'none';
+    }
+
+  });
+
+  const cancelBtn = newFolderForm.querySelector(".cancel-btn");
+
+  cancelBtn.addEventListener("click", () => {
+    inputField.value = "New folder";
+    fullViewForm.classList.remove('active');
+    fullViewForm.style.display = 'none';
+  })
+</script>

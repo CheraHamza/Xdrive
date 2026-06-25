@@ -99,3 +99,41 @@ input {
 		}
 	}
 }
+
+.upload-form {
+	display: none;
+}
+
+.full-view-form {
+	height: 100dvh;
+	width: 100%;
+	position: absolute;
+	z-index: 100;
+
+	display: none;
+	align-items: center;
+	justify-content: center;
+
+	background-color: #ffffff1f;
+
+	form {
+		width: min(80%, 400px);
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+
+		padding: 30px;
+		background-color: var.$light-dark;
+		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.089);
+
+		border-radius: 5px;
+
+		.btns-wrapper {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+
+			justify-content: end;
+		}
+	}
+}
