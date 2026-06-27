@@ -25,21 +25,24 @@ model User {
 model File {
   id         Int      @id @default(autoincrement())
   name       String
-  type       Type     @default(File)
+  type       Type     @default(file)
   uploadedAt DateTime @default(now())
+  path       String   @unique
+  size       Int
   owner      User     @relation(fields: [ownerId], references: [id])
   ownerId    Int
 }
 
 enum Type {
-  Picture
-  Video
-  File
+  image
+  movie
+  zip
+  file
 }
 
 model Session {
-  id       String    @id
-  sid      String    @unique
-  data     String
+  id        String   @id
+  sid       String   @unique
+  data      String
   expiresAt DateTime
 }
