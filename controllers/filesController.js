@@ -90,6 +90,9 @@ export const postUpload = [
 export const getAllFiles = async (req, res, next) => {
 	const files = await prisma.file.findMany({
 		where: { ownerId: req.user.id },
+		orderBy: {
+			uploadedAt: "asc",
+		},
 	});
 
 	files.forEach((file) => {
