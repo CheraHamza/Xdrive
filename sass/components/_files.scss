@@ -1,0 +1,46 @@
+.files-container {
+	width: 100%;
+	height: 100%;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 30px;
+}
+
+.file-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	gap: 15px;
+
+	.preview-wrapper {
+		width: 100%;
+		max-width: 180px;
+		height: 140px;
+		overflow: hidden;
+		border-radius: 5px;
+		border: 1px solid #92949718;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		img,
+		video {
+			width: 100%;
+			height: 100%;
+
+			display: block;
+			pointer-events: none;
+			user-select: noen;
+
+			object-fit: contain;
+			object-position: center;
+		}
+
+		.file-name {
+			word-break: break-all;
+			hyphens: auto;
+			overflow-wrap: break-word;
+		}
+	}
+}

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,group,help,home,search,settings,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,draft,folder,folder_zip,group,help,home,image,movie,search,settings,star,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -257,6 +257,42 @@
   border-radius: 20px;
 }
 
+.file-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #e2e2e5;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  background-color: #1a1c1e;
+  padding: 15px;
+  border: 1px solid rgba(146, 148, 151, 0.062745098);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.048);
+  cursor: auto;
+}
+.file-btn .file-icon {
+  font-size: 100px;
+}
+.file-btn .file-icon.file {
+  color: #c4c59c;
+}
+.file-btn .file-icon.image {
+  color: rgb(161, 200, 245);
+}
+.file-btn .file-icon.movie {
+  color: #ffb4ab;
+}
+.file-btn .file-icon.zip {
+  color: rgb(160, 160, 160);
+}
+.file-btn:focus {
+  color: #bec8d2;
+  background-color: #212426;
+  border-color: rgba(146, 148, 151, 0.2117647059);
+}
+
 input {
   width: 100%;
   color: #e2e2e5;
@@ -456,6 +492,48 @@ header .dropdown-btns {
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.files-container {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 30px;
+}
+
+.file-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 15px;
+}
+.file-btn .preview-wrapper {
+  width: 100%;
+  max-width: 180px;
+  height: 140px;
+  overflow: hidden;
+  border-radius: 5px;
+  border: 1px solid rgba(146, 148, 151, 0.0941176471);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.file-btn .preview-wrapper img,
+.file-btn .preview-wrapper video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: noen;
+  object-fit: contain;
+  object-position: center;
+}
+.file-btn .preview-wrapper .file-name {
+  word-break: break-all;
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 * {

@@ -1,0 +1,64 @@
+<div class="files-container">
+  <% if (locals.files) { %>
+  <% files.forEach(file => { %>
+  <button class="file-btn" data-url="<%= file.path %>">
+    <div class="preview-wrapper">
+      <% if (file.type == "image") {%>
+      <img src="<%= file.path %>" class="<%= file.name.endsWith(".gif") ? 'gif-thumbnail' : '' %>" alt="Preview">
+      <% } else if (file.type == "movie") { %>
+      <video src="<%= file.path %>" alt="" preload="metadata" muted playsinline disablePictureInPicture></video>
+      <% } else { %>
+      <span class="material-symbols-outlined file-icon <%= file.type %>"><%= file.icon %></span>
+      <% } %>
+    </div>
+    <span class="thin small text-label file-name"><%= file.name %></span>
+  </button>
+  <% }); %>
+  <% } %>
+</div>
+
+<script defer>
+  const fileBtns = document.querySelectorAll(".file-btn");
+
+  fileBtns.forEach(btn => {
+    const fileURL = btn.getAttribute("data-url");
+    btn.addEventListener("dblclick", () => {
+      if (fileURL) {
+        window.open(fileURL, '_blank');
+      }
+    });
+  });
+</script>
+
+
+<!-- Freeze gifs -->
+
+<script defer>
+  document.addEventListener("DOMContentLoaded", () => {
+    const gifImages = document.querySelectorAll(".gif-thumbnail");
+
+    gifImages.forEach(img => {
+      if (img.complete) {
+        freezeGif(img);
+      } else {
+        img.addEventListener("load", () => freezeGif(img));
+      }
+    });
+
+    function freezeGif(img) {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const staticDataUrl = canvas.toDataURL("image/png");
+        img.src = staticDataUrl;
+      } catch (error) {
+        console.error("Failed to freeze GIF thumbnail:", error);
+      }
+    }
+  })
+</script>

@@ -196,8 +196,45 @@
 
 			padding: 10px;
 			border-radius: 20px;
-
-			
 		}
+	}
+}
+
+.file-btn {
+	@include button(var.$white);
+
+	background-color: var.$light-dark;
+
+	padding: 15px;
+
+	border: 1px solid #92949710;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.048);
+
+	cursor: auto;
+
+	.file-icon {
+		font-size: 100px;
+
+		&.file {
+			color: #c4c59c;
+		}
+
+		&.image {
+			color: rgb(161, 200, 245);
+		}
+
+		&.movie {
+			color: var.$light-red;
+		}
+
+		&.zip {
+			color: rgb(160, 160, 160);
+		}
+	}
+
+	&:focus {
+		color: var.$light-blue;
+		background-color: var.$dark-gray;
+		border-color: #92949736;
 	}
 }
