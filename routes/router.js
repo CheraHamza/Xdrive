@@ -8,7 +8,11 @@ import {
 	postSignup,
 	postLogout,
 } from "../controllers/authentication.js";
-import { getAllFiles, postUpload } from "../controllers/filesController.js";
+import {
+	getAllFiles,
+	postUpload,
+	starFile,
+} from "../controllers/filesController.js";
 
 export const router = Router();
 
@@ -23,3 +27,4 @@ router.post("/login", isAnonymous, postLogin);
 router.post("/logout", isAuth, postLogout);
 
 router.post("/upload", isAuth, postUpload);
+router.post("/star", isAuth, starFile);

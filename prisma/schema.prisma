@@ -29,6 +29,7 @@ model File {
   uploadedAt DateTime @default(now())
   path       String   @unique
   size       Int
+  starred    Boolean  @default(false)
   owner      User     @relation(fields: [ownerId], references: [id])
   ownerId    Int
 }

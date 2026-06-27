@@ -34,8 +34,7 @@ export const postUpload = [
 			res.status(400).redirect("/");
 		}
 
-		const { originalname, mimetype, size, path } =
-			req.file;
+		const { originalname, mimetype, size, path } = req.file;
 
 		const fileType = () => {
 			const mainType = mimetype.split("/")[0];
@@ -107,4 +106,20 @@ export const getAllFiles = async (req, res, next) => {
 	});
 
 	res.render("home", { title: "Home", files });
+};
+
+export const starFile = async (req, res, next) => {
+	const fileId = parseInt(req.body.fileId, 10);
+	const starred = req.body.starred === "true";
+
+	console.log(starred);
+
+	await prisma.file.update({
+		where: { id: fileId },
+		data: {
+			starred: !starred,
+		},
+	});
+
+	res.redirect(req.get("Referrer") || "/");
 };

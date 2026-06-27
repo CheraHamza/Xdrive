@@ -1,7 +1,7 @@
 <div class="files-container">
   <% if (locals.files) { %>
   <% files.forEach(file => { %>
-  <button class="file-btn" data-url="<%= file.path %>">
+  <div class="file" data-url="<%= file.path %>" tabindex="0">
     <div class="preview-wrapper">
       <% if (file.type == "image") {%>
       <img src="<%= file.path %>" class="<%= file.name.endsWith(".gif") ? 'gif-thumbnail' : '' %>" alt="Preview">
@@ -12,17 +12,23 @@
       <% } %>
     </div>
     <span class="thin small text-label file-name"><%= file.name %></span>
-  </button>
+    <form action="/star" method="post">
+      <input id="fileId" name="fileId" type="hidden" value="<%= file.id %>">
+      <input id="starred" name="starred" type="hidden" value="<%= file.starred %>">
+      <button type="submit" class="material-symbols-outlined star-btn <%= file.starred ? 'starred' : '' %>">star</button>
+    </form>
+
+  </div>
   <% }); %>
   <% } %>
 </div>
 
 <script defer>
-  const fileBtns = document.querySelectorAll(".file-btn");
+  const fileElements = document.querySelectorAll(".file");
 
-  fileBtns.forEach(btn => {
-    const fileURL = btn.getAttribute("data-url");
-    btn.addEventListener("dblclick", () => {
+  fileElements.forEach(file => {
+    const fileURL = file.getAttribute("data-url");
+    file.addEventListener("dblclick", () => {
       if (fileURL) {
         window.open(fileURL, '_blank');
       }
@@ -46,6 +52,9 @@
     });
 
     function freezeGif(img) {
+      if (img.src.startsWith("data:image")) {
+        return;
+      }
       try {
         const canvas = document.createElement("canvas");
         canvas.width = img.naturalWidth;
