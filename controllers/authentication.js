@@ -2,7 +2,6 @@ import { prisma } from "../lib/prisma.js";
 import { body, validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import passport from "passport";
-import dotenv from "dotenv";
 
 const alphabeticError = "must only contain alphabetic characters";
 const nameLengthError = "must be between 3 and 20 characters.";
