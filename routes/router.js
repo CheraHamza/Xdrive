@@ -8,13 +8,11 @@ import {
 	postSignup,
 	postLogout,
 } from "../controllers/authentication.js";
-import { postUpload } from "../controllers/filesController.js";
+import { getAllFiles, postUpload } from "../controllers/filesController.js";
 
 export const router = Router();
 
-router.get(["/", "/home"], isAuth, (req, res) =>
-	res.render("home", { title: "Home" }),
-);
+router.get(["/", "/home"], isAuth, getAllFiles);
 
 router.get("/signup", isAnonymous, getSignup);
 router.post("/signup", isAnonymous, postSignup);

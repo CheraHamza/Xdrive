@@ -1,5 +1,7 @@
 import express from "express";
+import { prisma } from "../lib/prisma.js";
 import multer from "multer";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -7,10 +9,19 @@ const __direname = path.dirname(fileURLToPath(import.meta.url));
 
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, path.join(__direname, "../uploads/"));
+		const userId = req.user.id;
+
+		const uploadPath = path.join(__direname, `../files/user_${userId}`);
+
+		if (!fs.existsSync(uploadPath)) {
+			fs.mkdirSync(uploadPath, { recursive: true });
+		}
+
+		cb(null, uploadPath);
 	},
 	filename: (req, file, cb) => {
-		cb(null, file.originalname);
+		const uniquePrefix = Date.now() + "-";
+		cb(null, uniquePrefix + file.originalname);
 	},
 });
 
@@ -18,11 +29,79 @@ const upload = multer({ storage: storage });
 
 export const postUpload = [
 	upload.single("file"),
-	(req, res, next) => {
+	async (req, res, next) => {
 		if (!req.file) {
 			res.status(400).redirect("/");
 		}
 
+		const { originalname, mimetype, size, path } =
+			req.file;
+
+		const fileType = () => {
+			const mainType = mimetype.split("/")[0];
+			const extension = originalname
+				.substring(originalname.lastIndexOf(".") + 1)
+				.toLowerCase();
+			const archiveExtensions = [
+				"zip",
+				"rar",
+				"7z",
+				"tar",
+				"gz",
+				"tgz",
+				"bz2",
+				"xz",
+			];
+
+			if (mainType === "image") {
+				return "image";
+			}
+
+			if (mainType === "video") {
+				return "movie";
+			}
+
+			if (archiveExtensions.includes(extension)) {
+				return "zip";
+			}
+
+			return "file";
+		};
+
+		const filePath = path.substring(path.indexOf("files"));
+
+		await prisma.file.create({
+			data: {
+				name: originalname,
+				type: fileType(),
+				uploadedAt: new Date(),
+				path: filePath,
+				size: size,
+				owner: {
+					connect: { id: req.user.id },
+				},
+			},
+		});
+
 		res.status(200).redirect("/");
 	},
 ];
+
+export const getAllFiles = async (req, res, next) => {
+	const files = await prisma.file.findMany({
+		where: { ownerId: req.user.id },
+	});
+
+	files.forEach((file) => {
+		const iconMap = {
+			image: "image",
+			movie: "movie",
+			file: "draft",
+			zip: "folder_zip",
+		};
+
+		file.icon = iconMap[file.type] || "draft";
+	});
+
+	res.render("home", { title: "Home", files });
+};
