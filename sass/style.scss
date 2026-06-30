@@ -5,8 +5,9 @@
 @use "components/nav";
 @use "components/header";
 @use "components/files";
+@use "components/dropdowns";
 
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,draft,folder,folder_zip,group,help,home,image,movie,search,settings,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,home,image,info,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 
 * {
 	box-sizing: border-box;
@@ -133,4 +134,8 @@ body {
 
 		gap: 60px;
 	}
+}
+
+.material-symbols-outlined {
+	user-select: none;
 }

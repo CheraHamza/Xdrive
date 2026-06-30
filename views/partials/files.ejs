@@ -11,7 +11,21 @@
       <span class="material-symbols-outlined file-icon <%= file.type %>"><%= file.icon %></span>
       <% } %>
     </div>
-    <span class="thin small text-label file-name"><%= file.name %></span>
+
+    <div class="file-name-wrapper">
+      <span class="material-symbols-outlined file-icon <%= file?.type %>">
+        <%= file?.icon %>
+      </span>
+      <span class="thin small text-label file-name"><%= file.name %></span>
+      <div class="file-menu-wrapper">
+        <button class="file-menu-btn">
+          <span class="material-symbols-outlined file-menu-icon">more_vert</span>
+        </button>
+        <%-include("drop-down", {file}) %>
+      </div>
+    </div>
+
+
     <form action="/star" method="post">
       <input id="fileId" name="fileId" type="hidden" value="<%= file.id %>">
       <input id="starred" name="starred" type="hidden" value="<%= file.starred %>">
@@ -28,13 +42,57 @@
 
   fileElements.forEach(file => {
     const fileURL = file.getAttribute("data-url");
-    file.addEventListener("dblclick", () => {
+    const fileMenuBtn = file.querySelector(".file-menu-btn");
+    const fileDropdown = file.querySelector(".file-dropdown")
+
+    file.addEventListener("dblclick", (e) => {
       if (fileURL) {
         window.open(fileURL, '_blank');
       }
     });
+
+    fileMenuBtn.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+    })
+
+
+    fileMenuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      fileElements.forEach(otherFile => {
+        if (otherFile !== file) {
+          const otherDropdown = otherFile.querySelector(".file-dropdown");
+          otherDropdown.classList.remove("active");
+        }
+      })
+
+      const isOpening = !fileDropdown.classList.contains("active");
+      fileDropdown.classList.toggle("active");
+
+      if (isOpening) {
+        fileDropdown.style.left = "";
+        fileDropdown.style.right = "";
+
+        const rect = fileDropdown.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+
+        if (rect.right > windowWidth) {
+          fileDropdown.style.right = "25px";
+        } else {
+          fileDropdown.style.left = "25px"
+        }
+      }
+    })
+  });
+
+  document.addEventListener('click', () => {
+    fileElements.forEach(file => {
+      const fileDropdown = file.querySelector(".file-dropdown");
+      fileDropdown.classList.remove('active');
+    })
   });
 </script>
+
 
 
 <!-- Freeze gifs -->

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,draft,folder,folder_zip,group,help,home,image,movie,search,settings,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,home,image,info,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -276,6 +276,54 @@
   color: #bec8d2;
 }
 
+button.file-dropdown-option {
+  width: 100%;
+  background-color: transparent;
+  color: rgba(146, 148, 151, 0.7882352941);
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 10px;
+  border-radius: 0;
+  border-block: 1px solid rgba(217, 218, 219, 0.0470588235);
+  padding-block: 10px;
+  padding-inline: 20px;
+}
+button.file-dropdown-option:hover, button.file-dropdown-option:focus {
+  color: #e2e2e5;
+  background-color: rgba(146, 148, 151, 0.0823529412);
+}
+button.file-dropdown-option .icon {
+  font-size: 20px;
+}
+
+.file-menu-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  padding: 5px;
+}
+.file-menu-btn:focus, .file-menu-btn:hover {
+  background-color: rgba(106, 107, 109, 0.2666666667);
+}
+.file-menu-btn .file-menu-icon {
+  font-size: 20px;
+}
+
 input {
   width: 100%;
   color: #e2e2e5;
@@ -502,6 +550,9 @@ header .dropdown-btns {
   cursor: auto;
   transition: all 0.12s ease-in-out;
 }
+.file:hover {
+  background-color: rgba(147, 148, 150, 0.1215686275);
+}
 .file:focus {
   color: #bec8d2;
   background-color: #212426;
@@ -531,21 +582,62 @@ header .dropdown-btns {
 .file .preview-wrapper .file-icon {
   font-size: 100px;
 }
-.file .preview-wrapper .file-icon.file {
-  color: #c4c59c;
+.file .file-name-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 10px;
 }
-.file .preview-wrapper .file-icon.zip {
-  color: rgb(160, 160, 160);
+.file .file-name-wrapper .file-name {
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
 }
-.file .preview-wrapper .file-name {
-  word-break: break-all;
-  hyphens: auto;
-  overflow-wrap: break-word;
+.file .file-name-wrapper .file-icon {
+  font-size: 18px;
+}
+.file .file-name-wrapper .file-menu-wrapper {
+  position: relative;
 }
 .file form {
   position: absolute;
   top: -13px;
   right: -12px;
+}
+.file .file-icon.file {
+  color: #c4c59c;
+}
+.file .file-icon.image {
+  color: rgb(143, 178, 224);
+}
+.file .file-icon.movie {
+  color: #ffb4ab;
+}
+.file .file-icon.zip {
+  color: rgb(160, 160, 160);
+}
+
+.file-dropdown {
+  position: absolute;
+  top: 25px;
+  z-index: 99;
+  width: 160px;
+  display: none;
+}
+.file-dropdown.active {
+  display: flex;
+}
+.file-dropdown {
+  flex-direction: column;
+  align-items: center;
+  background-color: #212426;
+  border: 1px solid rgba(217, 218, 219, 0.0823529412);
+  border-radius: 5px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.062);
 }
 
 * {
@@ -662,6 +754,10 @@ body {
   flex-direction: column;
   padding: 20px 60px;
   gap: 60px;
+}
+
+.material-symbols-outlined {
+  user-select: none;
 }
 
 /*# sourceMappingURL=style.css.map */

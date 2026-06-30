@@ -217,3 +217,49 @@
 		}
 	}
 }
+
+button.file-dropdown-option {
+	@include button(#929497c9);
+
+	display: flex;
+	align-items: center;
+	justify-content: start;
+	gap: 10px;
+
+	border-radius: 0;
+	border-block: 1px solid #d9dadb0c;
+
+	padding-block: 10px;
+	padding-inline: 20px;
+
+	&:hover,
+	&:focus {
+		color: var.$white;
+		background-color: #92949715;
+	}
+
+	.icon {
+		font-size: 20px;
+	}
+}
+
+.file-menu-btn {
+	@include button(var.$light-gray);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-radius: 20px;
+
+	padding: 5px;
+
+	&:focus,
+	&:hover {
+		background-color: #6a6b6d44;
+	}
+
+	.file-menu-icon {
+		font-size: 20px;
+	}
+}

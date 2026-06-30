@@ -1,0 +1,23 @@
+@use "../abstracts/variables" as var;
+
+.file-dropdown {
+	position: absolute;
+	top: 25px;
+	// left: 25px; handled dynamically in js
+	z-index: 99;
+
+	width: 160px;
+	display: none;
+	&.active {
+		display: flex;
+	}
+	flex-direction: column;
+	align-items: center;
+
+	background-color: var.$dark-gray;
+
+	border: 1px solid #d9dadb15;
+	border-radius: 5px;
+
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.062);
+}

@@ -30,6 +30,10 @@
 
 	transition: all 0.12s ease-in-out;
 
+	&:hover {
+		background-color: #9394961f;
+	}
+
 	&:focus {
 		color: var.$light-blue;
 		background-color: var.$dark-gray;
@@ -62,20 +66,32 @@
 
 		.file-icon {
 			font-size: 100px;
-
-			&.file {
-				color: #c4c59c;
-			}
-
-			&.zip {
-				color: rgb(160, 160, 160);
-			}
 		}
+	}
+
+	.file-name-wrapper {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: start;
+		gap: 10px;
 
 		.file-name {
-			word-break: break-all;
-			hyphens: auto;
-			overflow-wrap: break-word;
+			width: 100%;
+			text-align: left;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			user-select: none;
+		}
+
+		.file-icon {
+			font-size: 18px;
+		}
+
+		.file-menu-wrapper {
+			position: relative;
 		}
 	}
 
@@ -83,5 +99,23 @@
 		position: absolute;
 		top: -13px;
 		right: -12px;
+	}
+
+	.file-icon {
+		&.file {
+			color: #c4c59c;
+		}
+
+		&.image {
+			color: rgb(143, 178, 224);
+		}
+
+		&.movie {
+			color: var.$light-red;
+		}
+
+		&.zip {
+			color: rgb(160, 160, 160);
+		}
 	}
 }
