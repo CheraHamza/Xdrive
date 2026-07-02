@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		const userId = req.user.id;
 
-		const uploadPath = path.join(__direname, `../files/user_${userId}`);
+		const uploadPath = path.join(__direname, `../files/users/${userId}`);
 
 		if (!fs.existsSync(uploadPath)) {
 			fs.mkdirSync(uploadPath, { recursive: true });
@@ -76,7 +76,7 @@ export const postUpload = [
 				uploadedAt: new Date(),
 				path: filePath,
 				size: size,
-				owner: {
+				user: {
 					connect: { id: req.user.id },
 				},
 			},
@@ -88,7 +88,7 @@ export const postUpload = [
 
 export const getAllFiles = async (req, res, next) => {
 	const files = await prisma.file.findMany({
-		where: { ownerId: req.user.id },
+		where: { userId: req.user.id },
 		orderBy: {
 			uploadedAt: "asc",
 		},
@@ -109,10 +109,8 @@ export const getAllFiles = async (req, res, next) => {
 };
 
 export const starFile = async (req, res, next) => {
-	const fileId = parseInt(req.body.fileId, 10);
+	const fileId = req.body.fileId;
 	const starred = req.body.starred === "true";
-
-	console.log(starred);
 
 	await prisma.file.update({
 		where: { id: fileId },
@@ -138,7 +136,7 @@ export const downloadFile = async (req, res, next) => {
 };
 
 export const renameFile = async (req, res, next) => {
-	const fileID = parseInt(req.body.fileID, 10);
+	const fileID = req.body.fileID;
 	const newFileName = req.body.filename;
 
 	await prisma.file.update({

@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
+  id       String   @id @default(cuid())
   email    String   @unique
   name     String?
   password String
@@ -24,14 +24,14 @@ model User {
 }
 
 model Folder {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
 
-  owner   User @relation(fields: [ownerId], references: [id])
-  ownerId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  parentId Int?
+  parentId String?
   parent   Folder?  @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
   children Folder[] @relation("FolderToFolder")
 
@@ -39,7 +39,7 @@ model Folder {
 }
 
 model File {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(cuid())
   name       String
   type       Type     @default(file)
   uploadedAt DateTime @default(now())
@@ -47,10 +47,10 @@ model File {
   size       Int
   starred    Boolean  @default(false)
 
-  owner   User @relation(fields: [ownerId], references: [id])
-  ownerId Int
+  user   User @relation(fields: [userId], references: [id])
+  userId String
 
-  folderId Int?
+  folderId String?
   folder   Folder? @relation(fields: [folderId], references: [id])
 }
 
