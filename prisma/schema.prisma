@@ -15,11 +15,27 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
   name     String?
   password String
   files    File[]
+  folders  Folder[]
+}
+
+model Folder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+
+  owner   User @relation(fields: [ownerId], references: [id])
+  ownerId Int
+
+  parentId Int?
+  parent   Folder?  @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  children Folder[] @relation("FolderToFolder")
+
+  files File[]
 }
 
 model File {
@@ -30,8 +46,12 @@ model File {
   path       String   @unique
   size       Int
   starred    Boolean  @default(false)
-  owner      User     @relation(fields: [ownerId], references: [id])
-  ownerId    Int
+
+  owner   User @relation(fields: [ownerId], references: [id])
+  ownerId Int
+
+  folderId Int?
+  folder   Folder? @relation(fields: [folderId], references: [id])
 }
 
 enum Type {
