@@ -20,4 +20,10 @@
 	border-radius: 5px;
 
 	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.062);
+
+	user-select: none;
+
+	form {
+		width: 100%;
+	}
 }

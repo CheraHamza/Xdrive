@@ -56,20 +56,6 @@
   </div>
 </nav>
 
-<div class="full-view-form">
-  <form class="add-folder-form" action="/addFolder">
-
-    <label for="folder-name" class="big text-label">New Folder</label>
-    <input class="normal" id="folder-name" type="text" name="folder-name" placeholder="New folder">
-
-    <div class="btns-wrapper">
-      <button type="button" class="cancel-btn medium text-label">Cancel</button>
-      <button type="submit" class="submit-btn medium text-label">Create</button>
-    </div>
-
-  </form>
-</div>
-
 <script defer>
   const newBtn = document.querySelector(".new-btn")
   const dropDown = document.querySelector(".new-dropdown");
@@ -95,24 +81,8 @@
 
 
 <script defer>
-  const uploadBtn = document.querySelector(".upload-file-btn");
-  const uploadForm = document.querySelector(".upload-form");
-  const fileInputField = uploadForm.querySelector("input");
-
-  uploadBtn.addEventListener("click", () => {
-    fileInputField.click();
-  })
-
-  fileInputField.addEventListener("change", () => {
-    if (fileInputField.files.length > 0) {
-      uploadForm.submit();
-    }
-  })
-</script>
-
-<script defer>
   const newFolderBtn = document.querySelector(".new-folder-btn");
-  const fullViewForm = document.querySelector(".full-view-form");
+  const fullViewForm = document.querySelector(".full-view-form.add-folder");
   const newFolderForm = fullViewForm.querySelector("form");
 
   const inputField = newFolderForm.querySelector("input");
@@ -121,10 +91,7 @@
     fullViewForm.classList.toggle("active");
 
     if (fullViewForm.classList.contains("active")) {
-      fullViewForm.style.display = "flex";
       inputField.focus();
-    } else {
-      fullViewForm.style.display = "none";
     }
   })
 
@@ -133,7 +100,6 @@
 
     if (!newFolderForm.contains(e.target)) {
       fullViewForm.classList.remove('active');
-      fullViewForm.style.display = 'none';
     }
 
   });
@@ -143,6 +109,5 @@
   cancelBtn.addEventListener("click", () => {
     inputField.value = "New folder";
     fullViewForm.classList.remove('active');
-    fullViewForm.style.display = 'none';
   })
 </script>

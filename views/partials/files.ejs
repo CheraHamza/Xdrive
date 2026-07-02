@@ -1,14 +1,14 @@
 <div class="files-container">
   <% if (locals.files) { %>
   <% files.forEach(file => { %>
-  <div class="file" data-url="<%= file.path %>" tabindex="0">
+  <div class="file" id="<%= file?.id %>" data-url="<%= file?.path %>" data-name="<%= file?.name %>" tabindex="0">
     <div class="preview-wrapper">
-      <% if (file.type == "image") {%>
-      <img src="<%= file.path %>" class="<%= file.name.endsWith(".gif") ? 'gif-thumbnail' : '' %>" alt="Preview">
-      <% } else if (file.type == "movie") { %>
-      <video src="<%= file.path %>" alt="" preload="metadata" muted playsinline disablePictureInPicture></video>
+      <% if (file?.type == "image") {%>
+      <img src="<%= file?.path %>" class="<%= file?.name.endsWith(".gif") ? 'gif-thumbnail' : '' %>" alt="Preview">
+      <% } else if (file?.type == "movie") { %>
+      <video src="<%= file?.path %>" alt="" preload="metadata" muted playsinline disablePictureInPicture></video>
       <% } else { %>
-      <span class="material-symbols-outlined file-icon <%= file.type %>"><%= file.icon %></span>
+      <span class="material-symbols-outlined file-icon <%= file?.type %>"><%= file?.icon %></span>
       <% } %>
     </div>
 
@@ -16,7 +16,7 @@
       <span class="material-symbols-outlined file-icon <%= file?.type %>">
         <%= file?.icon %>
       </span>
-      <span class="thin small text-label file-name"><%= file.name %></span>
+      <span class="thin small text-label file-name"><%= file?.name %></span>
       <div class="file-menu-wrapper">
         <button class="file-menu-btn">
           <span class="material-symbols-outlined file-menu-icon">more_vert</span>
@@ -26,9 +26,9 @@
     </div>
 
 
-    <form action="/star" method="post">
-      <input id="fileId" name="fileId" type="hidden" value="<%= file.id %>">
-      <input id="starred" name="starred" type="hidden" value="<%= file.starred %>">
+    <form class="star-form" action="/star" method="post">
+      <input id="fileId" name="fileId" type="hidden" value="<%= file?.id %>">
+      <input id="starred" name="starred" type="hidden" value="<%= file?.starred %>">
       <button type="submit" class="material-symbols-outlined star-btn <%= file.starred ? 'starred' : '' %>">star</button>
     </form>
 
@@ -37,95 +37,4 @@
   <% } %>
 </div>
 
-<script defer>
-  const fileElements = document.querySelectorAll(".file");
-
-  fileElements.forEach(file => {
-    const fileURL = file.getAttribute("data-url");
-    const fileMenuBtn = file.querySelector(".file-menu-btn");
-    const fileDropdown = file.querySelector(".file-dropdown")
-
-    file.addEventListener("dblclick", (e) => {
-      if (fileURL) {
-        window.open(fileURL, '_blank');
-      }
-    });
-
-    fileMenuBtn.addEventListener("dblclick", (e) => {
-      e.stopPropagation();
-    })
-
-
-    fileMenuBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-
-      fileElements.forEach(otherFile => {
-        if (otherFile !== file) {
-          const otherDropdown = otherFile.querySelector(".file-dropdown");
-          otherDropdown.classList.remove("active");
-        }
-      })
-
-      const isOpening = !fileDropdown.classList.contains("active");
-      fileDropdown.classList.toggle("active");
-
-      if (isOpening) {
-        fileDropdown.style.left = "";
-        fileDropdown.style.right = "";
-
-        const rect = fileDropdown.getBoundingClientRect();
-        const windowWidth = window.innerWidth;
-
-        if (rect.right > windowWidth) {
-          fileDropdown.style.right = "25px";
-        } else {
-          fileDropdown.style.left = "25px"
-        }
-      }
-    })
-  });
-
-  document.addEventListener('click', () => {
-    fileElements.forEach(file => {
-      const fileDropdown = file.querySelector(".file-dropdown");
-      fileDropdown.classList.remove('active');
-    })
-  });
-</script>
-
-
-
-<!-- Freeze gifs -->
-
-<script defer>
-  document.addEventListener("DOMContentLoaded", () => {
-    const gifImages = document.querySelectorAll(".gif-thumbnail");
-
-    gifImages.forEach(img => {
-      if (img.complete) {
-        freezeGif(img);
-      } else {
-        img.addEventListener("load", () => freezeGif(img));
-      }
-    });
-
-    function freezeGif(img) {
-      if (img.src.startsWith("data:image")) {
-        return;
-      }
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        const staticDataUrl = canvas.toDataURL("image/png");
-        img.src = staticDataUrl;
-      } catch (error) {
-        console.error("Failed to freeze GIF thumbnail:", error);
-      }
-    }
-  })
-</script>
+<script src="js/files.js" defer> </script>

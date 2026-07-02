@@ -235,7 +235,7 @@
   border-radius: 0 5px 5px 0;
 }
 
-.add-folder-form .btns-wrapper button {
+.full-view-form .btns-wrapper button {
   width: 100%;
   background-color: transparent;
   color: #e2e2e5;
@@ -247,11 +247,11 @@
   background-color: #1a1c1e;
   border: 2px solid #1a1c1e;
 }
-.add-folder-form .btns-wrapper button:hover, .add-folder-form .btns-wrapper button:focus {
+.full-view-form .btns-wrapper button:hover, .full-view-form .btns-wrapper button:focus {
   background-color: #e2e2e5;
   color: #1a1c1e;
 }
-.add-folder-form .btns-wrapper button {
+.full-view-form .btns-wrapper button {
   width: fit-content;
   padding: 10px;
   border-radius: 20px;
@@ -410,6 +410,11 @@ input:focus {
   position: absolute;
   z-index: 100;
   display: none;
+}
+.full-view-form.active {
+  display: flex;
+}
+.full-view-form {
   align-items: center;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.1215686275);
@@ -603,7 +608,7 @@ header .dropdown-btns {
 .file .file-name-wrapper .file-menu-wrapper {
   position: relative;
 }
-.file form {
+.file .star-form {
   position: absolute;
   top: -13px;
   right: -12px;
@@ -638,6 +643,10 @@ header .dropdown-btns {
   border: 1px solid rgba(217, 218, 219, 0.0823529412);
   border-radius: 5px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.062);
+  user-select: none;
+}
+.file-dropdown form {
+  width: 100%;
 }
 
 * {
