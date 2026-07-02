@@ -9,8 +9,10 @@ import {
 	postLogout,
 } from "../controllers/authentication.js";
 import {
+	downloadFile,
 	getAllFiles,
 	postUpload,
+	renameFile,
 	starFile,
 } from "../controllers/filesController.js";
 
@@ -28,3 +30,5 @@ router.post("/logout", isAuth, postLogout);
 
 router.post("/upload", isAuth, postUpload);
 router.post("/star", isAuth, starFile);
+router.post("/download", isAuth, downloadFile);
+router.post("/rename", isAuth, renameFile);

@@ -123,3 +123,30 @@ export const starFile = async (req, res, next) => {
 
 	res.redirect(req.get("Referrer") || "/");
 };
+
+export const downloadFile = async (req, res, next) => {
+	const filePath = req.body.filePath;
+	const fileName = req.body.fileName;
+
+	res.download(filePath, fileName, (err) => {
+		if (err) {
+			if (!res.headersSent) {
+				return res.status(404).send({ message: "File not found." });
+			}
+		}
+	});
+};
+
+export const renameFile = async (req, res, next) => {
+	const fileID = parseInt(req.body.fileID, 10);
+	const newFileName = req.body.filename;
+
+	await prisma.file.update({
+		where: { id: fileID },
+		data: {
+			name: newFileName,
+		},
+	});
+
+	res.redirect(req.get("Referrer") || "/");
+};
