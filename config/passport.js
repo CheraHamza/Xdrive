@@ -33,7 +33,7 @@ passport.use(
 				if (!user) {
 					return done(null, false, {
 						field: "email",
-						message: "Email does not exist.",
+						message: "Email does not exist, you can sign up instead.",
 					});
 				}
 

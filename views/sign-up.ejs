@@ -31,28 +31,28 @@
 
       <form action="/signup" method="post">
         <div class="input-err-wrapper">
-          <span class="error-msg"></span>
+          <span class="error-msg"><%= locals.errors?.name?.[0] %></span>
           <div class="input-wrapper name">
             <label class="text-label small gray" for="name">Name</label>
             <input id="name" name="name" type="text" placeholder="Full Name" value="<%= locals.previousValues?.name %>">
           </div>
         </div>
         <div class="input-err-wrapper">
-          <span class="error-msg"></span>
+          <span class="error-msg"><%= locals.errors?.email?.[0] %></span>
           <div class="input-wrapper email">
             <label class="text-label small gray" for="email">EMAIL</label>
             <input id="email" name="email" type="email" placeholder="user@xdrive.com" value="<%= locals.previousValues?.email %>">
           </div>
         </div>
         <div class="input-err-wrapper">
-          <span class="error-msg"></span>
+          <span class="error-msg"><%= locals.errors?.password?.[0] %></span>
           <div class="input-wrapper password">
             <label class="text-label small gray" for="password">PASSWORD</label>
             <input id="password" name="password" type="password" placeholder="Min. 8 characters">
           </div>
         </div>
         <div class="input-err-wrapper">
-          <span class="error-msg"></span>
+          <span class="error-msg"><%= locals.errors?.["confirm-password"]?.[0] %></span>
           <div class="input-wrapper password">
             <label class="text-label small gray" for="confirm-password">CONFIRM PASSWORD</label>
             <input id="confirm-password" name="confirm-password" type="password" placeholder="Min. 8 characters">
