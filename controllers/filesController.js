@@ -34,6 +34,9 @@ export const postUpload = [
 			res.status(400).redirect("/");
 		}
 
+		const rootFolderId = "root_" + req.user.id;
+		const currentFolderId = req.params.folderId || rootFolderId;
+
 		const { originalname, mimetype, size, path } = req.file;
 
 		const fileType = () => {
@@ -64,7 +67,7 @@ export const postUpload = [
 				return "zip";
 			}
 
-			return "file";
+			return "other";
 		};
 
 		const filePath = path.substring(path.indexOf("files"));
@@ -79,6 +82,9 @@ export const postUpload = [
 				user: {
 					connect: { id: req.user.id },
 				},
+				folder: {
+					connect: { id: currentFolderId },
+				},
 			},
 		});
 
@@ -86,26 +92,43 @@ export const postUpload = [
 	},
 ];
 
-export const getAllFiles = async (req, res, next) => {
-	const files = await prisma.file.findMany({
-		where: { userId: req.user.id },
-		orderBy: {
-			uploadedAt: "asc",
+export const getRoot = async (req, res, next) => {
+	const rootId = "root_" + req.user.id;
+	const rootFolder = await prisma.folder.upsert({
+		where: {
+			id: rootId,
+		},
+		update: {},
+		create: {
+			id: rootId,
+			name: "root",
+			createdAt: new Date(),
+			user: { connect: { id: req.user.id } },
+		},
+		include: {
+			files: true,
+			children: true,
 		},
 	});
 
-	files.forEach((file) => {
+	rootFolder.files.forEach((file) => {
 		const iconMap = {
 			image: "image",
 			movie: "movie",
-			file: "draft",
+			other: "draft",
 			zip: "folder_zip",
 		};
 
 		file.icon = iconMap[file.type] || "draft";
 	});
 
-	res.render("home", { title: "Home", files });
+	console.log(rootFolder);
+
+	res.render("home", {
+		title: "Home",
+		files: rootFolder.files,
+		folders: rootFolder.children,
+	});
 };
 
 export const starFile = async (req, res, next) => {
@@ -143,6 +166,24 @@ export const renameFile = async (req, res, next) => {
 		where: { id: fileID },
 		data: {
 			name: newFileName,
+		},
+	});
+
+	res.redirect(req.get("Referrer") || "/");
+};
+
+export const createFolder = async (req, res, next) => {
+	const rootFolderId = "root_" + req.user.id;
+	const currentFolderId = req.params.folderId || rootFolderId;
+
+	const newFolderName = req.body.foldername;
+
+	await prisma.folder.create({
+		data: {
+			name: newFolderName,
+			createdAt: new Date(),
+			user: { connect: { id: req.user.id } },
+			parent: { connect: { id: currentFolderId } },
 		},
 	});
 

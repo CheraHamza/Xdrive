@@ -70,7 +70,13 @@ input {
 
 				color: var.$light-red;
 
-				text-transform: uppercase;
+				&.active {
+					display: inline-block;
+				}
+
+				&::first-letter {
+					text-transform: capitalize;
+				}
 			}
 		}
 
@@ -104,10 +110,10 @@ input {
 	display: none;
 }
 
-.full-view-form {
-	height: 100dvh;
+.form-modal {
+	height: 100%;
 	width: 100%;
-	position: absolute;
+	position: fixed;
 	z-index: 100;
 
 	display: none;

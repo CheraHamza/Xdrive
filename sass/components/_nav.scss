@@ -1,6 +1,5 @@
 @use "../abstracts/variables" as var;
 @use "buttons" as btns;
-@use "elements" as elmnts;
 
 .navbar {
 	height: 100%;
@@ -34,6 +33,9 @@
 			background-color: var.$light-dark;
 
 			display: none;
+			&.active {
+				display: flex;
+			}
 			gap: 0px;
 
 			border: 1px solid #92949786;

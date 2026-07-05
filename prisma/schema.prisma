@@ -41,7 +41,7 @@ model Folder {
 model File {
   id         String   @id @default(cuid())
   name       String
-  type       Type     @default(file)
+  type       Type     @default(other)
   uploadedAt DateTime @default(now())
   path       String   @unique
   size       Int
@@ -58,7 +58,7 @@ enum Type {
   image
   movie
   zip
-  file
+  other
 }
 
 model Session {

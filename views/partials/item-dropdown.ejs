@@ -1,0 +1,52 @@
+<% const isFolder = locals.isFolder || false; %>
+<% const item = locals.item; %>
+
+<div class="item-dropdown" data-id="<%= item?.id %>">
+
+  <button class="open-item">
+    <span class="material-symbols-outlined icon">open_in_new</span>
+    <span>Open</span>
+  </button>
+
+  <form class="download-form" action="<%= isFolder ? '/download-folder' : 'download-file' %>" method="post">
+    <% if (isFolder) { %>
+
+    <input id="folderId" name="folderId" type="hidden" value="<%= item?.id %>">
+    <% } else { %>
+    <input id="fileName" name="fileName" type="hidden" value="<%= item?.name %>">
+    <input id="filePath" name="filePath" type="hidden" value="<%= item?.path %>">
+    <% } %>
+
+    <button class="download-item" type="submit">
+      <span class="material-symbols-outlined icon">download</span>
+      <span>Download</span>
+    </button>
+  </form>
+
+
+
+  <button class="rename-item">
+    <span class="material-symbols-outlined icon">edit_square</span>
+    <span>Rename</span>
+  </button>
+
+  <button class="move-item">
+    <span class="material-symbols-outlined icon">drive_file_move</span>
+    <span>Move</span>
+  </button>
+
+  <button class="item-details">
+    <span class="material-symbols-outlined icon">info</span>
+    <span>Details</span>
+  </button>
+
+  <button class="share-item">
+    <span class="material-symbols-outlined icon">share</span>
+    <span>Share</span>
+  </button>
+
+  <button class="delete-item">
+    <span class="material-symbols-outlined icon">delete</span>
+    <span>Move to trash</span>
+  </button>
+</div>

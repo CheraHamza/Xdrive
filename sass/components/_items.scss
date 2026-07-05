@@ -1,14 +1,14 @@
 @use "../abstracts/variables" as var;
 
-.files-container {
-	width: 100%;
-	height: 100%;
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+.files-container,
+.folders-container {
+	display: flex;
+	flex-wrap: wrap;
 	gap: 30px;
 }
 
-.file {
+.item {
+	width: min(80%, 200px);
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -64,19 +64,19 @@
 			object-position: center;
 		}
 
-		.file-icon {
+		.item-icon {
 			font-size: 100px;
 		}
 	}
 
-	.file-name-wrapper {
+	.item-name-wrapper {
 		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: start;
 		gap: 10px;
 
-		.file-name {
+		.item-name {
 			width: 100%;
 			text-align: left;
 			white-space: nowrap;
@@ -86,11 +86,11 @@
 			user-select: none;
 		}
 
-		.file-icon {
+		.item-icon {
 			font-size: 18px;
 		}
 
-		.file-menu-wrapper {
+		.item-menu-wrapper {
 			position: relative;
 		}
 	}
@@ -101,8 +101,8 @@
 		right: -12px;
 	}
 
-	.file-icon {
-		&.file {
+	.item-icon {
+		&.other {
 			color: #c4c59c;
 		}
 
@@ -116,6 +116,37 @@
 
 		&.zip {
 			color: rgb(160, 160, 160);
+		}
+
+		&.folder {
+			color: #a58e7f;
+			font-variation-settings: "FILL" 1;
+		}
+	}
+
+	.item-dropdown {
+		position: absolute;
+		z-index: 99;
+
+		width: 160px;
+		display: none;
+		&.active {
+			display: flex;
+		}
+		flex-direction: column;
+		align-items: center;
+
+		background-color: var.$dark-gray;
+
+		border: 1px solid #d9dadb15;
+		border-radius: 5px;
+
+		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.062);
+
+		user-select: none;
+
+		form {
+			width: 100%;
 		}
 	}
 }

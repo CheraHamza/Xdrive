@@ -36,6 +36,51 @@ inputWrappers.forEach((wrapper) => {
 	if (errorMsg.textContent != "") {
 		inputField.addEventListener("input", () => {
 			errorMsg.textContent = "";
+			errorMsg.classList.remove("active");
 		});
+
+		errorMsg.classList.add("active");
 	}
+});
+
+function setupModal(backdropSelector) {
+	const backdrop = document.querySelector(backdropSelector);
+	if (!backdrop) return null;
+
+	const form = backdrop.querySelector("form");
+	const cancelBtn = backdrop.querySelector(".cancel-btn");
+	const primaryInput = backdrop.querySelector("input[type='text']");
+
+	backdrop.addEventListener("click", (e) => {
+		e.stopPropagation();
+		if (form && !form.contains(e.target)) {
+			close();
+		}
+	});
+
+	cancelBtn?.addEventListener("click", () => {
+		close();
+	});
+
+	function open() {
+		backdrop.classList.add("active");
+		if (primaryInput) {
+			primaryInput.focus();
+		}
+	}
+
+	function close() {
+		backdrop.classList.remove("active");
+		if (form) form.reset();
+	}
+
+	return { open, close, backdrop, form };
+}
+
+export const renameModal = setupModal(".form-modal.rename-item");
+
+const createFolderModal = setupModal(".form-modal.add-folder");
+
+document.querySelector(".new-folder-btn")?.addEventListener("click", () => {
+	createFolderModal?.open();
 });

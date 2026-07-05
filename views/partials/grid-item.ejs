@@ -1,0 +1,28 @@
+<% const isFolder = locals.isFolder || false; %>
+<% const item = locals.item; %>
+<div class="item" id="<%= item?.id %>" data-type="<%= isFolder ? 'folder' : 'file' %>" data-name="<%= item?.name %>" tabindex="0" title="<%= item?.name %>" <% if (!isFolder) {%> data-url="<%=item?.path%>" <% } %>>
+  <div class="preview-wrapper">
+    <% if (isFolder) { %>
+    <span class="material-symbols-outlined item-icon folder">folder</span>
+    <% } else if (item?.type == "image") { %>
+    <img src="<%= item?.path %>" class="<%= item?.name.endsWith('.gif') ? 'gif-thumbnail' : '' %>" alt="Preview">
+    <% } else if (item?.type == "movie") { %>
+    <video src="<%= item?.path %>" preload="metadata" muted playsinline disablePictureInPicture></video>
+    <% } else { %><span class="material-symbols-outlined item-icon <%= item?.type %>">
+      <%= item?.icon %>
+    </span>
+    <% } %>
+  </div>
+  <div class="item-name-wrapper"> <span class="material-symbols-outlined item-icon <%= !isFolder ? item?.type : 'folder' %>">
+      <%= isFolder ? 'folder' : item?.icon %>
+    </span> <span class="thin small text-label item-name">
+      <%= item?.name %>
+    </span>
+    <div class="item-menu-wrapper"> <button class="item-menu-btn"> <span class="material-symbols-outlined item-menu-icon">more_vert</span>
+      </button>
+      <%- include("item-dropdown", {item: item,isFolder: isFolder}) %>
+    </div>
+  </div>
+  <form class="star-form" action="<%= isFolder ? '/star-folder' : '/star-file' %>" method="post"> <input id="<%= isFolder ? 'folderId' : 'fileId' %>" name="<%= isFolder ? 'folderId' : 'fileId' %>" type="hidden" value="<%= item?.id %>"> <input id="starred" name="starred" type="hidden" value="<%= item?.starred %>"> <button type="submit" class="material-symbols-outlined star-btn<%= item?.starred ? 'starred' : '' %>">star</button>
+  </form>
+</div>

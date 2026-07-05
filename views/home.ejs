@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xdrive - <%= title %></title>
+  <title>Xdrive -
+    <%= title %>
+  </title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/svg+xml" href="icons/light-logo.svg">
 </head>
@@ -15,10 +17,30 @@
     <%- include("partials/navbar") %>
     <section class="main-wrapper">
       <%- include("partials/header") %>
-      <h1 class="normal thin">My Files</h1>
-      <%- include("partials/files", {files}) %>
+      <div class="items-container">
+        <h1 class="normal text-label thin">My Files</h1>
+        <p class="text-label thin gray">Folders</p>
+        <div class="folders-container">
+          <% if (locals.folders) { %>
+          <% folders.forEach(folder => { %>
+          <%- include("partials/grid-item", {item: folder, isFolder: true}) %>
+          <% }) %>
+          <% } %>
+        </div>
+        <p class="text-label thin gray">Files</p>
+        <div class="files-container">
+          <% if (locals.files) { %>
+          <% files.forEach(file => { %>
+          <%- include("partials/grid-item", {item: file, isFolder: false}) %>
+          <% }); %>
+          <% } %>
+        </div>
+      </div>
+
     </section>
   </div>
 </body>
 
 </html>
+
+<script src="js/items.js" type="module"></script>

@@ -188,7 +188,7 @@
 	border-radius: 0 5px 5px 0;
 }
 
-.full-view-form {
+.form-modal {
 	.btns-wrapper {
 		button {
 			@include inverting-button(var.$light-dark, var.$white);
@@ -218,7 +218,7 @@
 	}
 }
 
-button.file-dropdown-option {
+.item-dropdown button {
 	@include button(#929497c9);
 
 	display: flex;
@@ -243,7 +243,7 @@ button.file-dropdown-option {
 	}
 }
 
-.file-menu-btn {
+.item-menu-btn {
 	@include button(var.$light-gray);
 
 	display: flex;
@@ -259,7 +259,7 @@ button.file-dropdown-option {
 		background-color: #6a6b6d44;
 	}
 
-	.file-menu-icon {
+	.item-menu-icon {
 		font-size: 20px;
 	}
 }

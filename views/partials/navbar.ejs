@@ -25,9 +25,6 @@
         <input id="file" type="file" name="file">
       </form>
     </div>
-    <div class="">
-
-    </div>
   </div>
 
   <div class="nav-btns">
@@ -62,52 +59,27 @@
 
   newBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    newBtn.classList.toggle("active");
+    dropDown.classList.toggle("active");
 
-    if (newBtn.classList.contains("active")) {
-      dropDown.style.display = "flex";
-
-    } else {
-      dropDown.style.display = "none";
-    }
   })
 
   document.addEventListener('click', (e) => {
-    newBtn.classList.remove('active');
-    dropDown.style.display = 'none';
-
+    dropDown.classList.remove('active');
   });
 </script>
 
-
 <script defer>
-  const newFolderBtn = document.querySelector(".new-folder-btn");
-  const fullViewForm = document.querySelector(".full-view-form.add-folder");
-  const newFolderForm = fullViewForm.querySelector("form");
+  const uploadBtn = document.querySelector(".upload-file-btn");
+  const fileForm = document.querySelector(".upload-form")
+  const fileField = fileForm.querySelector("input[type='file']")
 
-  const inputField = newFolderForm.querySelector("input");
-
-  newFolderBtn.addEventListener("click", () => {
-    fullViewForm.classList.toggle("active");
-
-    if (fullViewForm.classList.contains("active")) {
-      inputField.focus();
-    }
+  uploadBtn.addEventListener("click", () => {
+    fileField.click()
   })
 
-  fullViewForm.addEventListener('click', (e) => {
-    e.stopPropagation();
-
-    if (!newFolderForm.contains(e.target)) {
-      fullViewForm.classList.remove('active');
+  fileField.addEventListener("change", () => {
+    if (fileField.files.length > 0) {
+      fileForm.submit();
     }
-
-  });
-
-  const cancelBtn = newFolderForm.querySelector(".cancel-btn");
-
-  cancelBtn.addEventListener("click", () => {
-    inputField.value = "New folder";
-    fullViewForm.classList.remove('active');
   })
 </script>

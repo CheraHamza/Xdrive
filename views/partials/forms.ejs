@@ -1,8 +1,8 @@
-<div class="full-view-form add-folder">
-  <form class="add-folder-form" action="/addFolder" method="post">
+<div class="form-modal add-folder">
+  <form class="add-folder-form" action="/createFolder" method="post">
 
-    <label for="folder-name" class="big text-label">New Folder</label>
-    <input class="normal" id="folder-name" type="text" name="folder-name" placeholder="New folder">
+    <label for="foldername" class="big text-label">New Folder</label>
+    <input class="normal" id="foldername" type="text" name="foldername" placeholder="New folder">
 
     <div class="btns-wrapper">
       <button type="button" class="cancel-btn medium text-label">Cancel</button>
@@ -12,12 +12,12 @@
   </form>
 </div>
 
-<div class="full-view-form rename-file">
-  <form class="rename-file-form" action="/rename" method="post">
+<div class="form-modal rename-item">
+  <form class="rename-item-form" method="post">
 
-    <input type="hidden" name="fileID" id="fileID">
-    <label for="filename" class="big text-label">Rename</label>
-    <input class="normal" id="filename" type="text" name="filename" placeholder="New name">
+    <input type="hidden" name="itemId" id="itemId">
+    <label for="name" class="big text-label">Rename</label>
+    <input class="normal" id="name" type="text" name="name" placeholder="New name">
 
     <div class="btns-wrapper">
       <button type="button" class="cancel-btn medium text-label">Cancel</button>

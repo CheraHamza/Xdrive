@@ -9,8 +9,9 @@ import {
 	postLogout,
 } from "../controllers/authentication.js";
 import {
+	createFolder,
 	downloadFile,
-	getAllFiles,
+	getRoot,
 	postUpload,
 	renameFile,
 	starFile,
@@ -18,7 +19,7 @@ import {
 
 export const router = Router();
 
-router.get(["/", "/home"], isAuth, getAllFiles);
+router.get(["/", "/home"], isAuth, getRoot);
 
 router.get("/signup", isAnonymous, getSignup);
 router.post("/signup", isAnonymous, postSignup);
@@ -32,3 +33,5 @@ router.post("/upload", isAuth, postUpload);
 router.post("/star", isAuth, starFile);
 router.post("/download", isAuth, downloadFile);
 router.post("/rename", isAuth, renameFile);
+
+router.post("/createFolder", isAuth, createFolder);
