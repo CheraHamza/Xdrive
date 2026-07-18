@@ -97,10 +97,16 @@ itemElements.forEach((item) => {
 
 	// Move
 	const moveBtn = dropdown.querySelector("button.move-item");
-	moveBtn.addEventListener("click", (e) => {
+	moveBtn.addEventListener("click", () => {
 		moveItemModal.form.action = `/move-${itemType}`;
 		moveItemModal?.open(itemId);
 	});
+
+	// Details 
+	const detailsBtn = dropdown.querySelector("button.item-details");
+	detailsBtn.addEventListener("click", () => {
+		
+	})
 });
 
 // Freeze Gifs

@@ -188,7 +188,7 @@
 	border-radius: 0 5px 5px 0;
 }
 
-.form-modal {
+.modal {
 	.btns-wrapper {
 		button {
 			@include inverting-button(var.$light-dark, var.$white);

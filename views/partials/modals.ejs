@@ -1,4 +1,4 @@
-<div class="form-modal add-folder">
+<div class="modal add-folder">
   <form class="add-folder-form" action="/createFolder" method="post">
 
     <label for="foldername" class="big text-label">New Folder</label>
@@ -12,7 +12,7 @@
   </form>
 </div>
 
-<div class="form-modal rename-item">
+<div class="modal rename-item">
   <form class="rename-item-form" method="post">
 
     <input type="hidden" name="itemId" id="itemId">
@@ -28,7 +28,7 @@
 </div>
 
 
-<div class="form-modal move-item">
+<div class="modal move-item">
   <form class="move-item-form" method="post">
     <input type="hidden" name="itemId" id="itemIdToMove">
     <input type="hidden" name="destinationFolderId" id="destinationFolderId">
@@ -41,4 +41,14 @@
       <button type="button" class="cancel-btn medium text-label">Cancel</button>
     </div>
   </form>
+</div>
+
+<div class="modal item-details active">
+  <div>
+
+
+    <div class="btns-wrapper">
+      <button type="button" class="cancel-btn medium text-label">Close</button>
+    </div>
+  </div>
 </div>

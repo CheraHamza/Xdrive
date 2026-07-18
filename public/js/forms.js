@@ -77,9 +77,9 @@ function setupModal(backdropSelector) {
 	return { open, close, backdrop, form };
 }
 
-export const renameModal = setupModal(".form-modal.rename-item");
+export const renameModal = setupModal(".modal.rename-item");
 
-const createFolderModal = setupModal(".form-modal.add-folder");
+const createFolderModal = setupModal(".modal.add-folder");
 
 document.querySelector(".new-folder-btn")?.addEventListener("click", () => {
 	createFolderModal?.open();
@@ -238,6 +238,6 @@ function setupMoveItemModal(modalInstance) {
 	return { open, close, backdrop, form };
 }
 
-const baseMoveModal = setupModal(".form-modal.move-item");
+const baseMoveModal = setupModal(".modal.move-item");
 
 export const moveItemModal = setupMoveItemModal(baseMoveModal);
