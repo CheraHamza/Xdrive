@@ -1,4 +1,4 @@
-import { renameModal } from "./forms.js";
+import { moveItemModal, renameModal } from "./forms.js";
 
 const itemElements = document.querySelectorAll(".item");
 
@@ -93,6 +93,13 @@ itemElements.forEach((item) => {
 		renameModal.form.querySelector("#name").value = itemName;
 
 		renameModal.open();
+	});
+
+	// Move
+	const moveBtn = dropdown.querySelector("button.move-item");
+	moveBtn.addEventListener("click", (e) => {
+		moveItemModal.form.action = `/move-${itemType}`;
+		moveItemModal?.open(itemId);
 	});
 });
 

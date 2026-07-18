@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,home,image,info,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,home,image,info,keyboard_arrow_down,keyboard_arrow_right,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -441,6 +441,91 @@ input:focus {
   justify-content: end;
 }
 
+.folder-tree-container {
+  max-height: 350px;
+  overflow-y: auto;
+  border: 1px solid rgba(146, 148, 151, 0.0666666667);
+  border-radius: 6px;
+  padding: 10px;
+  background-color: #212426;
+}
+.folder-tree-container .tree-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.folder-tree-container .children-container {
+  padding-left: 20px;
+}
+.folder-tree-container .children-container.collapsed {
+  display: none;
+}
+.folder-tree-container .folder-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 5px;
+  transition: background-color 0.15s ease;
+}
+.folder-tree-container .folder-row:hover {
+  background-color: rgba(146, 148, 151, 0.1450980392);
+}
+.folder-tree-container .folder-row:hover .inline-move-btn {
+  opacity: 1;
+}
+.folder-tree-container .folder-row:hover .inline-move-btn.disabled {
+  opacity: 0.6;
+}
+.folder-tree-container .folder-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.folder-tree-container .folder-left .caret {
+  cursor: pointer;
+  user-select: none;
+  color: #929497;
+}
+.folder-tree-container .folder-left .caret.has-children:hover {
+  color: #e2e2e5;
+}
+.folder-tree-container .folder-left .empty-placeholder {
+  visibility: hidden;
+  width: 15px;
+}
+.folder-tree-container .folder-left .folder-icon {
+  font-variation-settings: "FILL" 1;
+  color: #929497;
+}
+.folder-tree-container .inline-move-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #bec8d2;
+  border: none;
+  color: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.1s;
+}
+.folder-tree-container .inline-move-btn:hover {
+  background-color: #e2e2e5;
+}
+.folder-tree-container .inline-move-btn.disabled {
+  color: #444;
+  background-color: #888;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.folder-tree-container .inline-move-btn.disabled:hover {
+  background-color: #888;
+  opacity: 0.6;
+}
+
 .navbar {
   height: 100%;
   display: flex;
@@ -772,13 +857,13 @@ a:hover, a:focus {
 }
 .home-page .main-wrapper {
   height: 100%;
-  max-height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: 40px;
   padding: 20px 60px;
 }
 .home-page .main-wrapper .items-container {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;
