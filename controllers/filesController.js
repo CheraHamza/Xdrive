@@ -37,7 +37,7 @@ export const postUpload = [
 		const rootFolderId = "root_" + req.user.id;
 		const currentFolderId = req.params.folderId || rootFolderId;
 
-		const { originalname, mimetype, size, path } = req.file;
+		const { originalname, filename, mimetype, size, path } = req.file;
 
 		const fileType = () => {
 			const mainType = mimetype.split("/")[0];
@@ -75,6 +75,7 @@ export const postUpload = [
 		await prisma.file.create({
 			data: {
 				name: originalname,
+				filename: filename,
 				type: fileType(),
 				uploadedAt: new Date(),
 				path: filePath,
@@ -92,47 +93,8 @@ export const postUpload = [
 	},
 ];
 
-export const getRoot = async (req, res, next) => {
-	const rootId = "root_" + req.user.id;
-	const rootFolder = await prisma.folder.upsert({
-		where: {
-			id: rootId,
-		},
-		update: {},
-		create: {
-			id: rootId,
-			name: "root",
-			createdAt: new Date(),
-			user: { connect: { id: req.user.id } },
-		},
-		include: {
-			files: true,
-			children: true,
-		},
-	});
-
-	rootFolder.files.forEach((file) => {
-		const iconMap = {
-			image: "image",
-			movie: "movie",
-			other: "draft",
-			zip: "folder_zip",
-		};
-
-		file.icon = iconMap[file.type] || "draft";
-	});
-
-	console.log(rootFolder);
-
-	res.render("home", {
-		title: "Home",
-		files: rootFolder.files,
-		folders: rootFolder.children,
-	});
-};
-
 export const starFile = async (req, res, next) => {
-	const fileId = req.body.fileId;
+	const fileId = req.body.itemId;
 	const starred = req.body.starred === "true";
 
 	await prisma.file.update({
@@ -159,11 +121,11 @@ export const downloadFile = async (req, res, next) => {
 };
 
 export const renameFile = async (req, res, next) => {
-	const fileID = req.body.fileID;
-	const newFileName = req.body.filename;
+	const fileId = req.body.itemId;
+	const newFileName = req.body.name;
 
 	await prisma.file.update({
-		where: { id: fileID },
+		where: { id: fileId },
 		data: {
 			name: newFileName,
 		},
@@ -172,19 +134,13 @@ export const renameFile = async (req, res, next) => {
 	res.redirect(req.get("Referrer") || "/");
 };
 
-export const createFolder = async (req, res, next) => {
-	const rootFolderId = "root_" + req.user.id;
-	const currentFolderId = req.params.folderId || rootFolderId;
+export const moveFile = async (req, res, next) => {
+	const fileId = req.body.itemId;
+	const destinationFolderId = req.body.destinationFolderId;
 
-	const newFolderName = req.body.foldername;
-
-	await prisma.folder.create({
-		data: {
-			name: newFolderName,
-			createdAt: new Date(),
-			user: { connect: { id: req.user.id } },
-			parent: { connect: { id: currentFolderId } },
-		},
+	await prisma.file.update({
+		where: { id: fileId },
+		data: { folderId: destinationFolderId },
 	});
 
 	res.redirect(req.get("Referrer") || "/");

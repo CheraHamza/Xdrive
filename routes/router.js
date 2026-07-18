@@ -9,13 +9,22 @@ import {
 	postLogout,
 } from "../controllers/authentication.js";
 import {
-	createFolder,
 	downloadFile,
-	getRoot,
 	postUpload,
 	renameFile,
 	starFile,
+	moveFile,
 } from "../controllers/filesController.js";
+import {
+	createFolder,
+	downloadFolder,
+	getRoot,
+	getFolder,
+	getFolderTree,
+	moveFolder,
+	renameFolder,
+	starFolder,
+} from "../controllers/foldersController.js";
 
 export const router = Router();
 
@@ -30,8 +39,16 @@ router.post("/login", isAnonymous, postLogin);
 router.post("/logout", isAuth, postLogout);
 
 router.post("/upload", isAuth, postUpload);
-router.post("/star", isAuth, starFile);
-router.post("/download", isAuth, downloadFile);
-router.post("/rename", isAuth, renameFile);
+router.post("/star-file", isAuth, starFile);
+router.post("/download-file", isAuth, downloadFile);
+router.post("/rename-file", isAuth, renameFile);
+router.post("/move-file", isAuth, moveFile);
 
 router.post("/createFolder", isAuth, createFolder);
+router.get("/folder/:folderId", isAuth, getFolder);
+router.post("/star-folder", isAuth, starFolder);
+router.post("/download-folder", isAuth, downloadFolder);
+router.post("/rename-folder", isAuth, renameFolder);
+router.post("/move-folder", isAuth, moveFolder);
+
+router.get("/folder-tree", isAuth, getFolderTree);
