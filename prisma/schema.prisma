@@ -27,6 +27,8 @@ model Folder {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
+  starred   Boolean  @default(false)
+  size      Int      @default(0)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -36,22 +38,29 @@ model Folder {
   children Folder[] @relation("FolderToFolder")
 
   files File[]
+
+  @@index([parentId])
+  @@index([userId])
 }
 
 model File {
   id         String   @id @default(cuid())
   name       String
+  filename   String   @unique
   type       Type     @default(other)
   uploadedAt DateTime @default(now())
   path       String   @unique
   size       Int
   starred    Boolean  @default(false)
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
   userId String
 
   folderId String?
   folder   Folder? @relation(fields: [folderId], references: [id])
+
+  @@index([folderId])
+  @@index([userId])
 }
 
 enum Type {
