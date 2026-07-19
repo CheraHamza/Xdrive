@@ -4,6 +4,7 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { format } from "date-fns";
 
 const __direname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -144,4 +145,24 @@ export const moveFile = async (req, res, next) => {
 	});
 
 	res.redirect(req.get("Referrer") || "/");
+};
+
+export const getFileDetailsById = async (req, res, next) => {
+	const itemId = req.params.id;
+
+	const details = {};
+
+	const file = await prisma.file.findUnique({
+		where: { id: itemId },
+		include: { folder: true, user: true },
+	});
+
+	details.name = file.name;
+	details.type = file.type;
+	details.time = format(new Date(file.uploadedAt), "dd MMM yyyy HH:mm:ss");
+	details.size = (file.size / (1024 * 1024)).toFixed(2);
+	details.location = file.folder.name;
+	details.owner = file.user.id === req.user.id ? "Me" : folder.user.name;
+
+	res.json({ success: true, details });
 };

@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { ZipArchive } from "archiver";
+import { format } from "date-fns";
 
 const __direname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -215,4 +216,30 @@ export const moveFolder = async (req, res, next) => {
 	});
 
 	res.redirect(req.get("Referrer") || "/");
+};
+
+export const getFolderDetailsById = async (req, res, next) => {
+	const itemId = req.params.id;
+
+	const details = {};
+
+	const folder = await prisma.folder.findUnique({
+		where: { id: itemId },
+		include: { files: true, parent: true, user: true },
+	});
+
+	details.name = folder.name;
+	details.type = "Folder";
+	details.time = format(new Date(folder.createdAt), "dd MMM yyyy HH:mm:ss");
+	details.size = (
+		folder.files.reduce((acc, file) => {
+			return acc + file.size;
+		}, 0) /
+		(1024 * 1024)
+	).toFixed(2);
+	details.location =
+		folder.parent.name === "root" ? "Home" : folder.parent.name;
+	details.owner = folder.user.id === req.user.id ? "Me" : folder.user.name;
+
+	res.json({ success: true, details });
 };

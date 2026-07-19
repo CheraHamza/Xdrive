@@ -47,13 +47,14 @@ function setupModal(backdropSelector) {
 	const backdrop = document.querySelector(backdropSelector);
 	if (!backdrop) return null;
 
+	const firstChild = backdrop.querySelector("& > *");
 	const form = backdrop.querySelector("form");
 	const cancelBtn = backdrop.querySelector(".cancel-btn");
 	const primaryInput = backdrop.querySelector("input[type='text']");
 
 	backdrop.addEventListener("click", (e) => {
 		e.stopPropagation();
-		if (form && !form.contains(e.target)) {
+		if (firstChild && !firstChild.contains(e.target)) {
 			close();
 		}
 	});
@@ -74,16 +75,8 @@ function setupModal(backdropSelector) {
 		if (form) form.reset();
 	}
 
-	return { open, close, backdrop, form };
+	return { open, close, backdrop, form, firstChild };
 }
-
-export const renameModal = setupModal(".modal.rename-item");
-
-const createFolderModal = setupModal(".modal.add-folder");
-
-document.querySelector(".new-folder-btn")?.addEventListener("click", () => {
-	createFolderModal?.open();
-});
 
 function setupMoveItemModal(modalInstance) {
 	if (!modalInstance) return null;
@@ -238,6 +231,16 @@ function setupMoveItemModal(modalInstance) {
 	return { open, close, backdrop, form };
 }
 
+export const renameModal = setupModal(".modal.rename-item");
+
+const createFolderModal = setupModal(".modal.add-folder");
+
+document.querySelector(".new-folder-btn")?.addEventListener("click", () => {
+	createFolderModal?.open();
+});
+
 const baseMoveModal = setupModal(".modal.move-item");
 
 export const moveItemModal = setupMoveItemModal(baseMoveModal);
+
+export const detailsModal = setupModal(".modal.item-details");

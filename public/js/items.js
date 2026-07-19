@@ -1,4 +1,4 @@
-import { moveItemModal, renameModal } from "./forms.js";
+import { moveItemModal, renameModal, detailsModal } from "./forms.js";
 
 const itemElements = document.querySelectorAll(".item");
 
@@ -102,11 +102,37 @@ itemElements.forEach((item) => {
 		moveItemModal?.open(itemId);
 	});
 
-	// Details 
+	// Details
 	const detailsBtn = dropdown.querySelector("button.item-details");
-	detailsBtn.addEventListener("click", () => {
-		
-	})
+	detailsBtn.addEventListener("click", async () => {
+		const isFolder = itemType === "folder";
+
+		let dataPoint = `/${isFolder ? "folder" : "file"}-details/${itemId}`;
+
+		const response = await fetch(dataPoint);
+		const data = await response.json();
+		const details = data.details;
+
+		const modalTitle = detailsModal.firstChild.querySelector(".title");
+		modalTitle.textContent = isFolder ? "Folder Details" : "File Details";
+		const nameField = detailsModal.firstChild.querySelector(".name-value");
+		nameField.textContent = details.name;
+		const typeField = detailsModal.firstChild.querySelector(".type-value");
+		typeField.textContent = details.type;
+		const sizeField = detailsModal.firstChild.querySelector(".size-value");
+		sizeField.textContent = details.size + " MB";
+		const locationField =
+			detailsModal.firstChild.querySelector(".location-value");
+		locationField.textContent = details.location;
+		const ownerField = detailsModal.firstChild.querySelector(".owner-value");
+		ownerField.textContent = details.owner;
+		const timeLabel = detailsModal.firstChild.querySelector(".time-lable");
+		timeLabel.textContent = isFolder ? "Created" : "Uploaded";
+		const timeField = detailsModal.firstChild.querySelector(".time-value");
+		timeField.textContent = details.time;
+
+		detailsModal.open();
+	});
 });
 
 // Freeze Gifs
