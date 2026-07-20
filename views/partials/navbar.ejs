@@ -28,28 +28,42 @@
   </div>
 
   <div class="nav-btns">
-    <button class="home-btn active">
-      <span class="material-symbols-outlined home-icon">home</span>
-      <span class="medium">Home</span>
-    </button>
-    <button class="starred-btn">
-      <span class="material-symbols-outlined starred-btn">
-        star
-      </span>
-      <span class="medium">Starred</span>
-    </button>
-    <button class="shared-btn">
-      <span class="material-symbols-outlined shared-btn">
-        group
-      </span>
-      <span class="medium">Shared</span>
-    </button>
-    <button class="trash-btn">
-      <span class="material-symbols-outlined trash-btn">
-        delete
-      </span>
-      <span class="medium">Trash</span>
-    </button>
+    <a href="/home">
+      <button class="home-btn <%= locals.location?.[0]?.name === "Home"? "active" : "" %>">
+        <span class="material-symbols-outlined home-icon">home</span>
+        <span class="medium">Home</span>
+      </button>
+    </a>
+
+    <a href="/starred">
+      <button class="starred-btn <%= locals.location?.[0]?.name === "Starred"? "active" : "" %>">
+        <span class="material-symbols-outlined starred-btn">
+          star
+        </span>
+        <span class="medium">Starred</span>
+      </button>
+    </a>
+
+    <a href="shared">
+      <button class="shared-btn <%= locals.location?.[0]?.name === "Shared"? "active" : "" %>">
+        <span class="material-symbols-outlined shared-btn">
+          group
+        </span>
+        <span class="medium">Shared</span>
+      </button>
+    </a>
+
+    <a href="/trash">
+      <button class="trash-btn <%= locals.location?.[0]?.name === "Trash"? "active" : "" %>">
+        <span class="material-symbols-outlined trash-btn">
+          delete
+        </span>
+        <span class="medium">Trash</span>
+      </button>
+    </a>
+
+
+
   </div>
 </nav>
 

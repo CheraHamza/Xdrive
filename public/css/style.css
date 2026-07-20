@@ -13,7 +13,7 @@
   font-style: normal;
   font-display: swap;
 }
-.nav-btns > button {
+.nav-btns button {
   width: 100%;
   background-color: transparent;
   color: #929497;
@@ -24,15 +24,15 @@
   transition: all 0.12s ease-in-out;
   background-color: #1a1c1e;
 }
-.nav-btns > button.active {
+.nav-btns button.active {
   background-color: #212426;
   color: #e2e2e5;
 }
-.nav-btns > button:not(.active):hover, .nav-btns > button:not(.active):focus {
+.nav-btns button:not(.active):hover, .nav-btns button:not(.active):focus {
   color: #e2e2e5;
   border-color: #e2e2e5;
 }
-.nav-btns > button.active .material-symbols-outlined {
+.nav-btns button.active .material-symbols-outlined {
   font-variation-settings: "FILL" 1;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .new-btn,
-.nav-btns > button {
+.nav-btns button {
   padding-block: 18px;
   position: relative;
   display: flex;
@@ -91,7 +91,7 @@
   align-items: center;
 }
 .new-btn .material-symbols-outlined,
-.nav-btns > button .material-symbols-outlined {
+.nav-btns button .material-symbols-outlined {
   position: absolute;
   left: 15%;
 }
@@ -765,6 +765,10 @@ a:hover, a:focus {
   color: #e2e2e5;
 }
 
+.material-symbols-outlined {
+  user-select: none;
+}
+
 .logo-composite {
   display: flex;
   align-items: center;
@@ -843,10 +847,6 @@ a:hover, a:focus {
   font-size: 14px;
 }
 
-.material-symbols-outlined {
-  user-select: none;
-}
-
 .modal {
   height: 100%;
   width: 100%;
@@ -883,6 +883,15 @@ a:hover, a:focus {
   flex-direction: column;
   gap: 10px;
   font-size: 15px;
+}
+
+.location-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.location-bar h1 {
+  font-size: 25px;
 }
 
 /*# sourceMappingURL=style.css.map */

@@ -28,11 +28,15 @@ import {
 	starFolder,
 	getFolderDetailsById,
 	trashFolder,
+	getStarred,
+	getTrash,
 } from "../controllers/foldersController.js";
 
 export const router = Router();
 
 router.get(["/", "/home"], isAuth, getRoot);
+router.get("/starred", isAuth, getStarred);
+router.get("/trash", isAuth, getTrash);
 
 router.get("/signup", isAnonymous, getSignup);
 router.post("/signup", isAnonymous, postSignup);

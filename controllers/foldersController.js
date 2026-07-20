@@ -60,11 +60,19 @@ export const getRoot = async (req, res, next) => {
 
 	mapFileIcons(rootFolder.files);
 
+	const location = [
+		{
+			name: "Home",
+			url: "/",
+		},
+	];
+
 	res.render("index", {
 		title: "Home",
 		files: rootFolder.files,
 		folders: rootFolder.children,
 		currentFolderId: rootId,
+		location,
 	});
 };
 
@@ -81,11 +89,83 @@ export const getFolder = async (req, res, next) => {
 
 	mapFileIcons(folder.files);
 
+	const allFolders = await prisma.folder.findMany({
+		where: { userId: req.user.id },
+	});
+
+	const folderMap = new Map(allFolders.map((f) => [f.id, f]));
+
+	const location = [];
+
+	let currentId = folderId;
+
+	while (currentId) {
+		const currentFolder = folderMap.get(currentId);
+		if (!currentFolder) break;
+
+		location.unshift({
+			name: currentFolder.name,
+			url:
+				currentFolder.id === `root_${req.user.id}`
+					? "/"
+					: `/folder/${currentFolder.id}`,
+		});
+		currentId = currentFolder.parentId;
+	}
+
 	res.render("index", {
 		title: folder.name,
 		files: folder.files,
 		folders: folder.children,
 		currentFolderId: folder.id,
+		location,
+	});
+};
+
+export const getStarred = async (req, res, next) => {
+	const starredFolders = await prisma.folder.findMany({
+		where: { starred: true },
+	});
+
+	const starredFiles = await prisma.file.findMany({
+		where: { starred: true },
+	});
+
+	const location = [
+		{
+			name: "Starred",
+			url: "/starred",
+		},
+	];
+	res.render("index", {
+		title: "Starred",
+		files: starredFiles,
+		folders: starredFolders,
+		location,
+	});
+};
+
+export const getTrash = async (req, res, next) => {
+	const trashedFolders = await prisma.folder.findMany({
+		where: { trashed: true },
+	});
+
+	const trashedFiles = await prisma.file.findMany({
+		where: { trashed: true },
+	});
+
+	const location = [
+		{
+			name: "Trash",
+			url: "/trash",
+		},
+	];
+
+	res.render("index", {
+		title: "Trash",
+		files: trashedFiles,
+		folders: trashedFolders,
+		location,
 	});
 };
 

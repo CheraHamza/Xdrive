@@ -70,6 +70,10 @@ a {
 	}
 }
 
+.material-symbols-outlined {
+	user-select: none;
+}
+
 .logo-composite {
 	display: flex;
 	align-items: center;
@@ -161,10 +165,6 @@ a {
 	}
 }
 
-.material-symbols-outlined {
-	user-select: none;
-}
-
 .modal {
 	height: 100%;
 	width: 100%;
@@ -207,5 +207,15 @@ a {
 		gap: 10px;
 
 		font-size: 15px;
+	}
+}
+
+.location-bar {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+
+	h1 {
+		font-size: 25px;
 	}
 }

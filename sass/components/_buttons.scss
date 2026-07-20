@@ -52,7 +52,7 @@
 	}
 }
 
-.nav-btns > button {
+.nav-btns  button {
 	@include select-button(
 		var.$light-dark,
 		var.$light-gray,
@@ -88,7 +88,7 @@
 }
 
 .new-btn,
-.nav-btns > button {
+.nav-btns  button {
 	padding-block: 18px;
 
 	position: relative;
