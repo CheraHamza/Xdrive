@@ -1,4 +1,9 @@
-import { moveItemModal, renameModal, detailsModal } from "./modals.js";
+import {
+	moveItemModal,
+	renameModal,
+	detailsModal,
+	trashModal,
+} from "./modals.js";
 
 const itemElements = document.querySelectorAll(".item");
 
@@ -131,10 +136,18 @@ itemElements.forEach((item) => {
 		const timeField = detailsModal.firstChild.querySelector(".time-value");
 		timeField.textContent = details.time;
 
-		detailsModal.open();
+		detailsModal?.open();
 	});
 
-	//
+	// Trash
+
+	const trashBtn = dropdown.querySelector("button.trash-item");
+	trashBtn.addEventListener("click", async () => {
+		trashModal.form.action = `/trash-${itemType}`;
+		trashModal.form.querySelector("#itemId").value = itemId;
+
+		trashModal?.open();
+	});
 });
 
 // Freeze Gifs

@@ -15,6 +15,7 @@ import {
 	starFile,
 	moveFile,
 	getFileDetailsById,
+	trashFile,
 } from "../controllers/filesController.js";
 import {
 	createFolder,
@@ -26,6 +27,7 @@ import {
 	renameFolder,
 	starFolder,
 	getFolderDetailsById,
+	trashFolder,
 } from "../controllers/foldersController.js";
 
 export const router = Router();
@@ -46,6 +48,7 @@ router.post("/download-file", isAuth, downloadFile);
 router.post("/rename-file", isAuth, renameFile);
 router.post("/move-file", isAuth, moveFile);
 router.get("/file-details/:id", isAuth, getFileDetailsById);
+router.post("/trash-file", isAuth, trashFile);
 
 router.post("/createFolder", isAuth, createFolder);
 router.get("/folder/:folderId", isAuth, getFolder);
@@ -54,5 +57,6 @@ router.post("/download-folder", isAuth, downloadFolder);
 router.post("/rename-folder", isAuth, renameFolder);
 router.post("/move-folder", isAuth, moveFolder);
 router.get("/folder-details/:id", isAuth, getFolderDetailsById);
+router.post("/trash-folder", isAuth, trashFolder);
 
 router.get("/folder-tree", isAuth, getFolderTree);

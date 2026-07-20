@@ -242,3 +242,14 @@ export const getFolderDetailsById = async (req, res, next) => {
 
 	res.json({ success: true, details });
 };
+
+export const trashFolder = async (req, res, next) => {
+	const folderId = req.body.itemId;
+
+	await prisma.folder.update({
+		where: { id: folderId },
+		data: { trashed: true },
+	});
+
+	res.redirect(req.get("Referrer") || "/");
+};

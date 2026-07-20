@@ -199,3 +199,5 @@ const baseMoveModal = setupModal(".modal.move-item");
 export const moveItemModal = setupMoveItemModal(baseMoveModal);
 
 export const detailsModal = setupModal(".modal.item-details");
+
+export const trashModal = setupModal(".modal.trash-item");

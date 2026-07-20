@@ -166,3 +166,11 @@ export const getFileDetailsById = async (req, res, next) => {
 
 	res.json({ success: true, details });
 };
+
+export const trashFile = async (req, res, next) => {
+	const fileId = req.body.itemId;
+
+	await prisma.file.update({ where: { id: fileId }, data: { trashed: true } });
+
+	res.redirect(req.get("Referrer") || "/");
+};
