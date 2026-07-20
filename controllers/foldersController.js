@@ -48,7 +48,7 @@ export const getRoot = async (req, res, next) => {
 		update: {},
 		create: {
 			id: rootId,
-			name: "root",
+			name: "Home",
 			createdAt: new Date(),
 			user: { connect: { id: req.user.id } },
 		},
@@ -237,8 +237,7 @@ export const getFolderDetailsById = async (req, res, next) => {
 		}, 0) /
 		(1024 * 1024)
 	).toFixed(2);
-	details.location =
-		folder.parent.name === "root" ? "Home" : folder.parent.name;
+	details.location = folder.parent.name;
 	details.owner = folder.user.id === req.user.id ? "Me" : folder.user.name;
 
 	res.json({ success: true, details });

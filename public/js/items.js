@@ -1,4 +1,4 @@
-import { moveItemModal, renameModal, detailsModal } from "./forms.js";
+import { moveItemModal, renameModal, detailsModal } from "./modals.js";
 
 const itemElements = document.querySelectorAll(".item");
 
@@ -133,6 +133,8 @@ itemElements.forEach((item) => {
 
 		detailsModal.open();
 	});
+
+	//
 });
 
 // Freeze Gifs
