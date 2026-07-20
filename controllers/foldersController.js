@@ -53,14 +53,14 @@ export const getRoot = async (req, res, next) => {
 			user: { connect: { id: req.user.id } },
 		},
 		include: {
-			files: true,
-			children: true,
+			files: { where: { trashed: false } },
+			children: { where: { trashed: false } },
 		},
 	});
 
 	mapFileIcons(rootFolder.files);
 
-	res.render("home", {
+	res.render("index", {
 		title: "Home",
 		files: rootFolder.files,
 		folders: rootFolder.children,
@@ -74,15 +74,15 @@ export const getFolder = async (req, res, next) => {
 	const folder = await prisma.folder.findUnique({
 		where: { id: folderId },
 		include: {
-			files: true,
-			children: true,
+			files: { where: { trashed: false } },
+			children: { where: { trashed: false } },
 		},
 	});
 
 	mapFileIcons(folder.files);
 
-	res.render("home", {
-		title: "home",
+	res.render("index", {
+		title: folder.name,
 		files: folder.files,
 		folders: folder.children,
 		currentFolderId: folder.id,
