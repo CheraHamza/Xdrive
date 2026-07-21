@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { ZipArchive } from "archiver";
 import { format } from "date-fns";
+import { permanentlyDeleteFile } from "./filesController.js";
 
 const __direname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -124,11 +125,11 @@ export const getFolder = async (req, res, next) => {
 
 export const getStarred = async (req, res, next) => {
 	const starredFolders = await prisma.folder.findMany({
-		where: { starred: true },
+		where: { starred: true, trashed: false },
 	});
 
 	const starredFiles = await prisma.file.findMany({
-		where: { starred: true },
+		where: { starred: true, trashed: false },
 	});
 
 	const location = [
@@ -330,6 +331,88 @@ export const trashFolder = async (req, res, next) => {
 		where: { id: folderId },
 		data: { trashed: true },
 	});
+
+	res.redirect(req.get("Referrer") || "/");
+};
+
+export const restoreFolder = async (req, res, next) => {
+	const folderId = req.body.itemId;
+
+	await prisma.folder.update({
+		where: { id: folderId },
+		data: { trashed: false },
+	});
+
+	res.redirect(req.get("Referrer") || "/");
+};
+
+async function getAllNestedFilePaths(folderId) {
+	const folderData = await prisma.folder.findUnique({
+		where: { id: folderId },
+		select: {
+			files: { select: { path: true } },
+			children: { select: { id: true } },
+		},
+	});
+
+	if (!folderData) return [];
+
+	let filePaths = folderData.files.map((file) => file.path);
+
+	for (const childFolder of folderData.children) {
+		const childPaths = await getAllNestedFilePaths(childFolder.id);
+		filePaths = filePaths.concat(childPaths);
+	}
+
+	return filePaths;
+}
+
+async function permanentlyDeleteFolder(folderId) {
+	const filePathsToDelete = await getAllNestedFilePaths(folderId);
+
+	await Promise.all(
+		filePathsToDelete.map(async (filePath) => {
+			try {
+				await fs.promises.unlink(filePath);
+			} catch (err) {
+				if (err.code !== "ENOENT") {
+					console.error(`Failed to delete file on disk at ${filePath}`, err);
+				}
+			}
+		}),
+	);
+
+	await prisma.folder.delete({
+		where: { id: folderId },
+	});
+}
+
+export const deleteFolder = async (req, res, next) => {
+	const folderId = req.body.itemId;
+
+	await permanentlyDeleteFolder(folderId);
+
+	res.redirect(req.get("Referrer") || "/");
+};
+
+export const emptyTrash = async (req, res, next) => {
+	const userId = req.user.id;
+
+	const trashedFolders = await prisma.folder.findMany({
+		where: { userId, trashed: true },
+		select: { id: true },
+	});
+
+	await Promise.all(
+		trashedFolders.map((folder) => permanentlyDeleteFolder(folder.id)),
+	);
+
+	const trashedFiles = await prisma.file.findMany({
+		where: { userId, trashed: true },
+		select: { id: true },
+	});
+
+	await Promise.all(trashedFiles.map((file) => permanentlyDeleteFile(file.id)));
 
 	res.redirect(req.get("Referrer") || "/");
 };

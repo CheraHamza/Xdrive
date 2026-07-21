@@ -3,6 +3,7 @@
 
 <div class="item-dropdown" data-id="<%= item?.id %>">
 
+  <% if (!item.trashed) { %>
   <button class="open-item">
     <span class="material-symbols-outlined icon">open_in_new</span>
     <span>Open</span>
@@ -22,8 +23,6 @@
       <span>Download</span>
     </button>
   </form>
-
-
 
   <button class="rename-item">
     <span class="material-symbols-outlined icon">edit_square</span>
@@ -49,4 +48,22 @@
     <span class="material-symbols-outlined icon">delete</span>
     <span>Move to trash</span>
   </button>
+
+  <% } else { %>
+
+  <form method="post" action="<%= isFolder ? '/restore-folder' : '/restore-file' %>">
+    <input name="itemId" type="hidden" value="<%= item.id %>">
+    <button type="submit" class="restore-item">
+      <span class="material-symbols-outlined icon">history</span>
+      <span>Restore</span>
+    </button>
+  </form>
+
+
+  <button class="delete-item">
+    <span class="material-symbols-outlined icon">delete_forever</span>
+    <span>Delete forever</span>
+  </button>
+
+  <% } %>
 </div>

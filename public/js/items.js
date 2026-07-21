@@ -3,6 +3,7 @@ import {
 	renameModal,
 	detailsModal,
 	trashModal,
+	deleteModal,
 } from "./modals.js";
 
 const itemElements = document.querySelectorAll(".item");
@@ -86,12 +87,12 @@ itemElements.forEach((item) => {
 	item.addEventListener("dblclick", handleOpen);
 
 	const openBtn = dropdown.querySelector("button.open-item");
-	openBtn.addEventListener("click", handleOpen);
+	openBtn?.addEventListener("click", handleOpen);
 
 	// Rename
 	const renameBtn = dropdown.querySelector("button.rename-item");
 
-	renameBtn.addEventListener("click", () => {
+	renameBtn?.addEventListener("click", () => {
 		renameModal.form.action = `/rename-${itemType}`;
 
 		renameModal.form.querySelector("#itemId").value = itemId;
@@ -102,14 +103,14 @@ itemElements.forEach((item) => {
 
 	// Move
 	const moveBtn = dropdown.querySelector("button.move-item");
-	moveBtn.addEventListener("click", () => {
+	moveBtn?.addEventListener("click", () => {
 		moveItemModal.form.action = `/move-${itemType}`;
 		moveItemModal?.open(itemId);
 	});
 
 	// Details
 	const detailsBtn = dropdown.querySelector("button.item-details");
-	detailsBtn.addEventListener("click", async () => {
+	detailsBtn?.addEventListener("click", async () => {
 		const isFolder = itemType === "folder";
 
 		let dataPoint = `/${isFolder ? "folder" : "file"}-details/${itemId}`;
@@ -142,11 +143,22 @@ itemElements.forEach((item) => {
 	// Trash
 
 	const trashBtn = dropdown.querySelector("button.trash-item");
-	trashBtn.addEventListener("click", async () => {
+	trashBtn?.addEventListener("click", async () => {
 		trashModal.form.action = `/trash-${itemType}`;
 		trashModal.form.querySelector("#itemId").value = itemId;
 
 		trashModal?.open();
+	});
+
+	// Delete
+
+	const deleteBtn = dropdown.querySelector("button.delete-item");
+	deleteBtn?.addEventListener("click", async () => {
+		deleteModal.form.action = `/delete-${itemType}`;
+		deleteModal.form.querySelector("#itemId").value = itemId;
+		deleteModal.form.querySelector(".item-name").textContent = `'${itemName}'`;
+
+		deleteModal?.open();
 	});
 });
 

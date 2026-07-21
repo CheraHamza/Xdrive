@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,home,image,info,keyboard_arrow_down,keyboard_arrow_right,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -322,6 +322,29 @@
 }
 .item-menu-btn .item-menu-icon {
   font-size: 20px;
+}
+
+.empty-trash-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #1a1c1e;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  background-color: #bec8d2;
+  border: 2px solid #bec8d2;
+}
+.empty-trash-btn:hover, .empty-trash-btn:focus {
+  background-color: #1a1c1e;
+  color: #bec8d2;
+}
+.empty-trash-btn {
+  width: fit-content;
+  align-self: end;
+  padding: 10px;
+  border-radius: 20px;
 }
 
 input {
@@ -831,7 +854,7 @@ a:hover, a:focus {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 10px;
   padding: 20px 60px;
 }
 .home-page .main-wrapper .items-container {
@@ -889,6 +912,7 @@ a:hover, a:focus {
   display: flex;
   align-items: center;
   gap: 5px;
+  margin-block: 40px 20px;
 }
 .location-bar h1 {
   font-size: 25px;

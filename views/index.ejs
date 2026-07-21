@@ -19,6 +19,12 @@
     <section class="main-wrapper">
       <%- include("partials/header") %>
       <%- include("partials/location-bar") %>
+      <% if (locals.location[0].name === "Trash") { %>
+      <button class="empty-trash-btn">
+        <span class="material-symbols-outlined"></span>
+        <span>Empty trash</span>
+      </button>
+      <% } %>
       <div class="items-container">
 
         <p class="text-label thin gray">Folders</p>

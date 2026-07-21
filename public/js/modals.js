@@ -201,3 +201,11 @@ export const moveItemModal = setupMoveItemModal(baseMoveModal);
 export const detailsModal = setupModal(".modal.item-details");
 
 export const trashModal = setupModal(".modal.trash-item");
+
+export const deleteModal = setupModal(".modal.delete-item");
+
+const emptyTrashModal = setupModal(".modal.empty-trash");
+
+document.querySelector(".empty-trash-btn")?.addEventListener("click", () => {
+	emptyTrashModal?.open();
+});

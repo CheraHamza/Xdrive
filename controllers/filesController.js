@@ -6,13 +6,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { format } from "date-fns";
 
-const __direname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		const userId = req.user.id;
 
-		const uploadPath = path.join(__direname, `../files/users/${userId}`);
+		const uploadPath = path.resolve(__dirname, "../files/users", userId);
 
 		if (!fs.existsSync(uploadPath)) {
 			fs.mkdirSync(uploadPath, { recursive: true });
@@ -171,6 +171,40 @@ export const trashFile = async (req, res, next) => {
 	const fileId = req.body.itemId;
 
 	await prisma.file.update({ where: { id: fileId }, data: { trashed: true } });
+
+	res.redirect(req.get("Referrer") || "/");
+};
+
+export const restoreFile = async (req, res, next) => {
+	const fileId = req.body.itemId;
+
+	await prisma.file.update({ where: { id: fileId }, data: { trashed: false } });
+
+	res.redirect(req.get("Referrer") || "/");
+};
+
+export async function permanentlyDeleteFile(fileId) {
+	const file = await prisma.file.findUnique({
+		where: { id: fileId },
+	});
+
+	try {
+		await fs.promises.unlink(file.path);
+	} catch (err) {
+		if (err.code !== "ENOENT") {
+			console.error(`Failed to delete file on disk at ${file.path}:`, err);
+		}
+	}
+
+	await prisma.file.delete({
+		where: { id: fileId },
+	});
+}
+
+export const deleteFile = async (req, res, next) => {
+	const fileId = req.body.itemId;
+
+	await permanentlyDeleteFile(fileId);
 
 	res.redirect(req.get("Referrer") || "/");
 };

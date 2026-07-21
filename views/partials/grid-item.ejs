@@ -23,6 +23,8 @@
       <%- include("item-dropdown", {item: item,isFolder: isFolder}) %>
     </div>
   </div>
+  <% if (!item.trashed) { %>
   <form class="star-form" action="<%= isFolder ? '/star-folder' : '/star-file' %>" method="post"> <input name="itemId" type="hidden" value="<%= item?.id %>"> <input id="starred" name="starred" type="hidden" value="<%= item?.starred %>"> <button type="submit" class="material-symbols-outlined star-btn <%= item?.starred ? 'starred' : '' %>">star</button>
   </form>
+  <% } %>
 </div>
