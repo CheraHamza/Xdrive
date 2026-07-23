@@ -36,7 +36,7 @@ export const postUpload = [
 		}
 
 		const rootFolderId = "root_" + req.user.id;
-		const currentFolderId = req.params.folderId || rootFolderId;
+		const currentFolderId = req.body.currentFolderId || rootFolderId;
 
 		const { originalname, filename, mimetype, size, path } = req.file;
 
@@ -90,7 +90,7 @@ export const postUpload = [
 			},
 		});
 
-		res.status(200).redirect("/");
+		res.status(200).redirect(req.get("Referrer") || "/");
 	},
 ];
 

@@ -22,6 +22,7 @@
         <span class="small text-label">File upload</span>
       </button>
       <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+        <input type="hidden" id="currentFolderId" name="currentFolderId" value="<%= locals.currentFolderId?? '' %>">
         <input id="file" type="file" name="file">
       </form>
     </div>

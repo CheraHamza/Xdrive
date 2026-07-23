@@ -11,7 +11,7 @@ const __direname = path.dirname(fileURLToPath(import.meta.url));
 
 export const createFolder = async (req, res, next) => {
 	const rootFolderId = "root_" + req.user.id;
-	const currentFolderId = req.params.folderId || rootFolderId;
+	const currentFolderId = req.body.currentFolderId || rootFolderId;
 
 	const newFolderName = req.body.foldername;
 

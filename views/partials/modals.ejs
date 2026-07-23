@@ -1,6 +1,8 @@
 <div class="modal add-folder">
   <form class="add-folder-form" action="/createFolder" method="post">
 
+    <input type="hidden" id="currentFolderId" name="currentFolderId" value="<%= locals.currentFolderId?? '' %>">
+
     <label for="foldername" class="big text-label">New Folder</label>
     <input class="normal" id="foldername" type="text" name="foldername" placeholder="New folder">
 
