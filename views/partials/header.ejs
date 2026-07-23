@@ -1,7 +1,9 @@
 <header>
   <div class="input-wrapper">
-    <span class="material-symbols-outlined search-icon big">search</span>
-    <input type="text" name="search" id="search" placeholder="Search in Xdrive">
+    <form action="/search" method="get">
+      <span class="material-symbols-outlined search-icon big">search</span>
+      <input type="search" name="search" id="search" placeholder="Search in Xdrive" value="<%= locals.searchQuery ? locals.searchQuery : "" %>">
+    </form>
   </div>
 
   <div class="btns-wrapper">

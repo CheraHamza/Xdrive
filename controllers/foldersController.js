@@ -416,3 +416,50 @@ export const emptyTrash = async (req, res, next) => {
 
 	res.redirect(req.get("Referrer") || "/");
 };
+
+export const getSearch = async (req, res, next) => {
+	let searchQuery = req.query.search;
+
+	if (Array.isArray(searchQuery)) {
+		searchQuery = searchQuery[0];
+	}
+
+	searchQuery = typeof searchQuery === "string" ? searchQuery.trim() : "";
+
+	const location = [
+		{
+			name: "Search results",
+			url: "",
+		},
+		{
+			name: `'${searchQuery}'`,
+			url: "",
+		},
+	];
+
+	if (!searchQuery) {
+		return res.render("index", {
+			title: "Search",
+			folders: [],
+			files: [],
+			location,
+			searchQuery,
+		});
+	}
+
+	const matchingFolders = await prisma.folder.findMany({
+		where: { name: { startsWith: searchQuery, mode: "insensitive" } },
+	});
+
+	const matchingFiles = await prisma.file.findMany({
+		where: { name: { startsWith: searchQuery, mode: "insensitive" } },
+	});
+
+	res.render("index", {
+		title: "Search",
+		folders: matchingFolders,
+		files: matchingFiles,
+		location,
+		searchQuery,
+	});
+};

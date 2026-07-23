@@ -35,6 +35,7 @@ import {
 	restoreFolder,
 	deleteFolder,
 	emptyTrash,
+	getSearch,
 } from "../controllers/foldersController.js";
 
 export const router = Router();
@@ -71,6 +72,8 @@ router.get("/folder-details/:id", isAuth, getFolderDetailsById);
 router.post("/trash-folder", isAuth, trashFolder);
 router.post("/restore-folder", isAuth, restoreFolder);
 router.post("/delete-folder", isAuth, deleteFolder);
+
+router.get("/search", isAuth, getSearch);
 
 router.get("/folder-tree", isAuth, getFolderTree);
 
