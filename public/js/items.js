@@ -140,16 +140,6 @@ itemElements.forEach((item) => {
 		detailsModal?.open();
 	});
 
-	// Trash
-
-	const trashBtn = dropdown.querySelector("button.trash-item");
-	trashBtn?.addEventListener("click", async () => {
-		trashModal.form.action = `/trash-${itemType}`;
-		trashModal.form.querySelector("#itemId").value = itemId;
-
-		trashModal?.open();
-	});
-
 	// Delete
 
 	const deleteBtn = dropdown.querySelector("button.delete-item");

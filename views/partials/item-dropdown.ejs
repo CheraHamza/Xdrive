@@ -44,10 +44,14 @@
     <span>Share</span>
   </button>
 
-  <button class="trash-item">
-    <span class="material-symbols-outlined icon">delete</span>
-    <span>Move to trash</span>
-  </button>
+  <form method="post" action="<%= isFolder ? '/trash-folder' : '/trash-file' %>">
+    <input type="hidden" name="itemId" value="<%= item.id %>">
+    <button type="submit" class="trash-item">
+      <span class="material-symbols-outlined icon">delete</span>
+      <span>Move to trash</span>
+    </button>
+  </form>
+
 
   <% } else { %>
 
