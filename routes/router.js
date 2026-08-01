@@ -18,6 +18,8 @@ import {
 	trashFile,
 	restoreFile,
 	deleteFile,
+	getFileSharingDetails,
+	shareFile,
 } from "../controllers/filesController.js";
 import {
 	createFolder,
@@ -36,6 +38,8 @@ import {
 	deleteFolder,
 	emptyTrash,
 	getSearch,
+	getFolderSharingDetails,
+	shareFolder,
 } from "../controllers/foldersController.js";
 
 export const router = Router();
@@ -61,6 +65,8 @@ router.get("/file-details/:id", isAuth, getFileDetailsById);
 router.post("/trash-file", isAuth, trashFile);
 router.post("/restore-file", isAuth, restoreFile);
 router.post("/delete-file", isAuth, deleteFile);
+router.get("/file-sharing-details/:id", isAuth, getFileSharingDetails);
+router.post("/share-file", isAuth, shareFile);
 
 router.post("/createFolder", isAuth, createFolder);
 router.get("/folder/:folderId", isAuth, getFolder);
@@ -72,6 +78,8 @@ router.get("/folder-details/:id", isAuth, getFolderDetailsById);
 router.post("/trash-folder", isAuth, trashFolder);
 router.post("/restore-folder", isAuth, restoreFolder);
 router.post("/delete-folder", isAuth, deleteFolder);
+router.get("/folder-sharing-details/:id", isAuth, getFolderSharingDetails);
+router.post("/share-folder", isAuth, shareFolder);
 
 router.get("/search", isAuth, getSearch);
 

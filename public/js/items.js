@@ -4,6 +4,7 @@ import {
 	detailsModal,
 	trashModal,
 	deleteModal,
+	shareModal,
 } from "./modals.js";
 
 const itemElements = document.querySelectorAll(".item");
@@ -113,7 +114,7 @@ itemElements.forEach((item) => {
 	detailsBtn?.addEventListener("click", async () => {
 		const isFolder = itemType === "folder";
 
-		let dataPoint = `/${isFolder ? "folder" : "file"}-details/${itemId}`;
+		let dataPoint = `/${itemType}-details/${itemId}`;
 
 		const response = await fetch(dataPoint);
 		const data = await response.json();
@@ -149,6 +150,119 @@ itemElements.forEach((item) => {
 		deleteModal.form.querySelector(".item-name").textContent = `'${itemName}'`;
 
 		deleteModal?.open();
+	});
+
+	async function openShareModal(itemId, itemType) {
+		shareModal.form.action = `/share-${itemType}`;
+		shareModal.form.querySelector("#itemId").value = itemId;
+		shareModal.form.querySelector(".title").textContent = `Share ${itemType}`;
+
+		const response = await fetch(`/${itemType}-sharing-details/${itemId}`);
+		const data = await response.json();
+		const sharingDetails = data.sharingDetails;
+
+		if (sharingDetails) {
+			const accessTypeSelect = shareModal.form.querySelector("select#access");
+			accessTypeSelect.value = sharingDetails.access;
+			accessTypeSelect.dispatchEvent(new Event("change"));
+
+			if (!sharingDetails.isExpired && sharingDetails.access === "PUBLIC") {
+				const timerWrapper = shareModal.form.querySelector(".timer-wrapper");
+
+				const timerHeader = shareModal.form.querySelector(
+					".timer-header-wrapper .header",
+				);
+
+				const timerEditBtn = shareModal.form.querySelector(".edit-timer-btn");
+
+				const timerInputs = shareModal.form.querySelectorAll(".timer input");
+
+				const enableTimer = () => {
+					timerWrapper.classList.remove("disabled");
+
+					timerHeader.textContent = "Edit timer";
+
+					timerEditBtn.classList.remove("active");
+
+					timerInputs.forEach((input) => {
+						input.disabled = false;
+					});
+				};
+
+				const disableTimer = () => {
+					timerWrapper.classList.add("disabled");
+
+					timerHeader.textContent = "Remaining time";
+
+					timerEditBtn.classList.add("active");
+
+					timerInputs.forEach((input) => {
+						input.disabled = true;
+					});
+				};
+
+				const durationTypeSelect =
+					shareModal.form.querySelector("select#duration");
+
+				durationTypeSelect.value = sharingDetails.expiresAt
+					? "timed"
+					: "forever";
+				durationTypeSelect.dispatchEvent(new Event("change"));
+
+				if (sharingDetails.expiresAt) {
+					shareModal.form.querySelector("input#days").value =
+						sharingDetails.remainingTime.days;
+					shareModal.form.querySelector("input#hours").value =
+						sharingDetails.remainingTime.hours;
+					shareModal.form.querySelector("input#minutes").value =
+						sharingDetails.remainingTime.minutes;
+
+					disableTimer();
+
+					timerEditBtn.onclick = enableTimer;
+				}
+
+				shareModal.form.querySelector(".link-wrapper").classList.add("active");
+
+				shareModal.form.querySelector("input#link").value = sharingDetails.link;
+
+				shareModal.form.querySelector("button.submit-btn").textContent =
+					"Update";
+			}
+		}
+
+		shareModal?.open();
+
+		shareModal?.form.querySelector("input#link").blur();
+	}
+
+	const shareBtn = dropdown.querySelector("button.share-item");
+	shareBtn?.addEventListener("click", () => {
+		openShareModal(itemId, itemType);
+	});
+
+	shareModal?.form.addEventListener("submit", async (e) => {
+		e.preventDefault();
+
+		const form = e.target;
+		const payload = {
+			itemId: itemId,
+			access: form.access.value,
+			duration: form.duration.value,
+			days: form.days.value,
+			hours: form.hours.value,
+			minutes: form.minutes.value,
+		};
+
+		const response = await fetch(`share-${itemType}`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+
+		if (response.ok) {
+			await openShareModal(itemId, itemType);
+		}
 	});
 });
 

@@ -5,7 +5,7 @@
 @use "components/header";
 @use "components/items";
 
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,arrow_drop_down,arrow_drop_up,check_box,cloud,content_copy,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,more_vert,movie,open_in_new,public,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 
 * {
 	box-sizing: border-box;
@@ -32,7 +32,7 @@ body {
 }
 
 .small {
-	font-size: 12px;
+	font-size: 13px;
 }
 
 .normal {

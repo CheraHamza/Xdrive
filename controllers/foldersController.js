@@ -4,7 +4,15 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { ZipArchive } from "archiver";
-import { format } from "date-fns";
+import {
+	addDays,
+	addHours,
+	addMinutes,
+	format,
+	formatDuration,
+	intervalToDuration,
+	isBefore,
+} from "date-fns";
 import { permanentlyDeleteFile } from "./filesController.js";
 
 const __direname = path.dirname(fileURLToPath(import.meta.url));
@@ -462,4 +470,88 @@ export const getSearch = async (req, res, next) => {
 		location,
 		searchQuery,
 	});
+};
+
+export const getFolderSharingDetails = async (req, res, next) => {
+	const folderId = req.params.id;
+
+	const sharingDetails = await prisma.share.findUnique({
+		where: {
+			folderId: folderId,
+		},
+		include: {
+			folder: true,
+		},
+	});
+
+	if (sharingDetails) {
+		const expiresAt = sharingDetails.expiresAt;
+
+		sharingDetails.isExpired = expiresAt
+			? isBefore(new Date(expiresAt), new Date())
+			: false;
+
+		if (expiresAt && sharingDetails.isExpired) {
+			await prisma.share.update({
+				where: { folderId: sharingDetails.folderId },
+				data: { access: "RESTRICTED" },
+			});
+		}
+
+		if (!sharingDetails.isExpired) {
+			if (expiresAt) {
+				const {
+					days = 0,
+					hours = 0,
+					minutes = 0,
+				} = intervalToDuration({
+					start: new Date(),
+					end: new Date(expiresAt),
+				});
+
+				sharingDetails.remainingTime = { days, hours, minutes };
+			}
+
+			const baseUrl = `${req.protocol}://${req.get("host")}`;
+			const path = `/share/${sharingDetails.shareToken}`;
+			sharingDetails.link = new URL(path, baseUrl);
+		}
+
+		res.json({ success: true, sharingDetails });
+	} else {
+		res.json({ success: true, sharingDetails: null });
+	}
+};
+
+export const shareFolder = async (req, res, next) => {
+	const folderId = req.body.itemId;
+
+	const { access, duration, days = 0, hours = 0, minutes = 0 } = req.body;
+
+	let expiresAt = null;
+
+	if (duration === "timed") {
+		let now = new Date();
+
+		if (days > 0) now = addDays(now, Number(days));
+		if (hours > 0) now = addHours(now, Number(hours));
+		if (minutes > 0) now = addMinutes(now, Number(minutes));
+
+		expiresAt = now;
+	}
+
+	const shareRecord = await prisma.share.upsert({
+		where: { folderId: folderId },
+		update: {
+			access,
+			expiresAt,
+		},
+		create: {
+			folderId,
+			access,
+			expiresAt,
+		},
+	});
+
+	res.json({ success: true });
 };

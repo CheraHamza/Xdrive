@@ -30,6 +30,7 @@ model Folder {
   starred   Boolean  @default(false)
   size      Int      @default(0)
   trashed   Boolean  @default(false)
+  share     Share?
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -54,6 +55,7 @@ model File {
   size       Int
   starred    Boolean  @default(false)
   trashed    Boolean  @default(false)
+  share      Share?
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -65,11 +67,31 @@ model File {
   @@index([userId])
 }
 
+model Share {
+  id         String     @id @default(cuid())
+  shareToken String     @unique @default(cuid())
+  access     AccessType @default(RESTRICTED)
+  expiresAt  DateTime?
+
+  createdAt DateTime @default(now())
+
+  folderId String? @unique
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  fileId String? @unique
+  file   File?   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+}
+
 enum Type {
   image
   movie
   zip
   other
+}
+
+enum AccessType {
+  RESTRICTED
+  PUBLIC
 }
 
 model Session {

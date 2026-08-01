@@ -209,3 +209,5 @@ const emptyTrashModal = setupModal(".modal.empty-trash");
 document.querySelector(".empty-trash-btn")?.addEventListener("click", () => {
 	emptyTrashModal?.open();
 });
+
+export const shareModal = setupModal(".modal.share-item");

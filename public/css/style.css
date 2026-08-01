@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,cloud,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,more_vert,movie,open_in_new,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,arrow_drop_down,arrow_drop_up,check_box,cloud,content_copy,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,more_vert,movie,open_in_new,public,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -347,6 +347,77 @@
   border-radius: 20px;
 }
 
+.incBtn {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.incBtn margin span.material-symbols-outlined {
+  font-size: 30px;
+}
+.incBtn:hover {
+  color: #e2e2e5;
+}
+
+.copyBtn {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #212426;
+  padding: 10px;
+  border: rgba(146, 148, 151, 0.0823529412) solid 1px;
+  border-radius: 50px;
+}
+.copyBtn:hover {
+  color: #e2e2e5;
+}
+.copyBtn span {
+  font-size: 20px;
+}
+
+.edit-timer-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #929497;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  width: fit-content;
+  display: none;
+}
+.edit-timer-btn.active {
+  display: flex;
+}
+.edit-timer-btn {
+  align-items: center;
+  justify-content: center;
+}
+.edit-timer-btn:hover {
+  color: #e2e2e5;
+}
+.edit-timer-btn span {
+  font-size: 20px;
+}
+
 input {
   width: 100%;
   color: #e2e2e5;
@@ -515,6 +586,98 @@ input:focus {
 .folder-tree-container .inline-move-btn.disabled:hover {
   background-color: #888;
   opacity: 0.6;
+}
+
+.share-item-form select {
+  width: fit-content;
+  padding: 5px;
+  background-color: #212426;
+  color: #e2e2e5;
+  border: rgba(146, 148, 151, 0.0666666667) 1px solid;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.share-item-form .access-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.share-item-form .access-wrapper .access-icon {
+  margin-left: 5px;
+}
+.share-item-form .duration-wrapper {
+  display: none;
+}
+.share-item-form .duration-wrapper.active {
+  display: block;
+}
+.share-item-form .timer-wrapper {
+  display: none;
+}
+.share-item-form .timer-wrapper.active {
+  display: flex;
+}
+.share-item-form .timer-wrapper {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.share-item-form .timer-wrapper .timer-header-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.share-item-form .timer-wrapper .incrementer-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.share-item-form .timer-wrapper .incrementer-wrapper .incrementer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.share-item-form .timer-wrapper .incrementer-wrapper .incrementer input[type=number] {
+  width: 60px;
+  text-align: center;
+  padding: 10px;
+  -moz-appearance: textfield;
+}
+.share-item-form .timer-wrapper .incrementer-wrapper .incrementer input[type=number]::-webkit-outer-spin-button,
+.share-item-form .timer-wrapper .incrementer-wrapper .incrementer input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.share-item-form .timer-wrapper.disabled .incBtn {
+  display: none;
+}
+.share-item-form .timer-wrapper.disabled input {
+  user-select: none;
+  color: #888;
+}
+.share-item-form .link-wrapper {
+  display: none;
+}
+.share-item-form .link-wrapper.active {
+  display: flex;
+}
+.share-item-form .link-wrapper {
+  flex-direction: column;
+  gap: 5px;
+}
+.share-item-form .link-wrapper .link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.share-item-form .link-wrapper .link-row input {
+  padding: 10px;
+  color: #969696;
+}
+.share-item-form hr {
+  border-color: rgba(136, 136, 136, 0.5254901961);
+  margin-bottom: 20px;
 }
 
 .navbar {
@@ -752,7 +915,7 @@ body {
 }
 
 .small {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .normal {

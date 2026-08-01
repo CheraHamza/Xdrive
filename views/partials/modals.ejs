@@ -107,3 +107,97 @@
     </div>
   </form>
 </div>
+
+<div class="modal share-item ">
+  <form class="share-item-form" method="post">
+    <div class="title big text-label"></div>
+
+    <input type="hidden" id="itemId" name="itemId">
+
+    <div class="access-wrapper">
+      <label for="access" class="gray text-label small">General access:</label>
+      <select name="access" id="access" class="text-label">
+        <option value="RESTRICTED">Restricted</option>
+        <option value="PUBLIC">Public</option>
+      </select>
+      <span class="material-symbols-outlined access-icon gray">lock</span>
+    </div>
+
+    <div class="duration-wrapper">
+      <label for="duration" class="gray text-label small">Duration:</label>
+      <select class="text-label" name="duration" id="duration">
+        <option class="text-label" value="forever">Forever</option>
+        <option class="text-label" value="timed">Timed</option>
+      </select>
+    </div>
+
+
+
+    <div class="timer-wrapper">
+      <div class="timer-header-wrapper">
+        <div class="text-label gray small header">Set timer</div>
+        <button class="edit-timer-btn" type="button">
+          <span class="material-symbols-outlined" title="Edit timer">edit_square</span>
+        </button>
+      </div>
+
+
+      <div class="incrementer-wrapper">
+        <div class="incrementer">
+          <button type="button" class="incBtn days-up">
+            <span class="material-symbols-outlined">arrow_drop_up</span>
+          </button>
+          <input type="number" id="days" name="days" min="0" placeholder="0" value="1">
+          <button type="button" class="incBtn days-down">
+            <span class="material-symbols-outlined">arrow_drop_down</span>
+          </button>
+        </div>
+
+        <label for="days" class="gray text-label small">Days</label>
+
+        <div class="incrementer">
+          <button type="button" class="incBtn hours-up">
+            <span class="material-symbols-outlined">arrow_drop_up</span>
+          </button>
+          <input type="number" id="hours" name="hours" max="24" min="0" placeholder="0" value="0">
+          <button type="button" class="incBtn hours-down">
+            <span class="material-symbols-outlined">arrow_drop_down</span>
+          </button>
+        </div>
+
+        <label for="hours" class="gray text-label small">Hours</label>
+
+        <div class="incrementer">
+          <button type="button" class="incBtn minutes-up">
+            <span class="material-symbols-outlined">arrow_drop_up</span>
+          </button>
+          <input type="number" id="minutes" name="minutes" max="60" min="0" placeholder="0" value="0">
+          <button type="button" class="incBtn minutes-down">
+            <span class="material-symbols-outlined">arrow_drop_down</span>
+          </button>
+        </div>
+
+        <label for="minutes" class="gray text-label small">Minutes</label>
+      </div>
+    </div>
+
+
+
+    <div class="link-wrapper">
+      <hr>
+      <label for="link" class="text-label gray small">Link:</label>
+      <div class="link-row">
+        <input readonly id="link" name="link" type="text" value="">
+        <button type="button" class="copyBtn">
+          <span class="material-symbols-outlined">content_copy</span>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="btns-wrapper">
+      <button type="button" class="cancel-btn medium text-label">Close</button>
+      <button type="submit" class="submit-btn medium text-label">Share</button>
+    </div>
+  </form>
+</div>

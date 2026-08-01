@@ -272,3 +272,60 @@
 	padding: 10px;
 	border-radius: 20px;
 }
+
+.incBtn {
+	@include button(var.$light-gray);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	margin span.material-symbols-outlined {
+		font-size: 30px;
+	}
+
+	&:hover {
+		color: var.$white;
+	}
+}
+
+.copyBtn {
+	@include button(var.$light-gray);
+
+	width: fit-content;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	background: var.$dark-gray;
+	padding: 10px;
+	border: #92949715 solid 1px;
+	border-radius: 50px;
+
+	&:hover {
+		color: var.$white;
+	}
+
+	span {
+		font-size: 20px;
+	}
+}
+
+.edit-timer-btn {
+	@include button(var.$light-gray);
+	width: fit-content;
+	display: none;
+	&.active {
+		display: flex;
+	}
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		color: var.$white;
+	}
+
+	span {
+		font-size: 20px;
+	}
+}

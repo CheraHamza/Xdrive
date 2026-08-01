@@ -45,6 +45,7 @@ app.use(passport.session());
 
 app.use("/files", express.static(path.join(__dirname, "files")));
 
+app.use(express.json());
 app.use("/", router);
 
 app.listen(3000, (error) => {
