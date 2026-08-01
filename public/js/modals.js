@@ -7,11 +7,22 @@ function setupModal(backdropSelector) {
 	const cancelBtn = backdrop.querySelector(".cancel-btn");
 	const primaryInput = backdrop.querySelector("input[type='text']");
 
-	backdrop.addEventListener("click", (e) => {
+	let mouseDownTarget = null;
+
+	backdrop.addEventListener("mousedown", (e) => {
+		mouseDownTarget = e.target;
+	});
+
+	backdrop.addEventListener("mouseup", (e) => {
 		e.stopPropagation();
-		if (firstChild && !firstChild.contains(e.target)) {
+		const startedOutside = firstChild && !firstChild.contains(mouseDownTarget);
+		const endedOutside = firstChild && !firstChild.contains(e.target);
+
+		if (startedOutside && endedOutside) {
 			close();
 		}
+		
+		mouseDownTarget = null;
 	});
 
 	cancelBtn?.addEventListener("click", () => {
