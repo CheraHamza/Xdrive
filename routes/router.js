@@ -24,38 +24,44 @@ import {
 import {
 	createFolder,
 	downloadFolder,
-	getRoot,
 	getFolder,
-	getFolderTree,
 	moveFolder,
 	renameFolder,
 	starFolder,
 	getFolderDetailsById,
 	trashFolder,
-	getStarred,
-	getTrash,
 	restoreFolder,
 	deleteFolder,
-	emptyTrash,
-	getSearch,
 	getFolderSharingDetails,
 	shareFolder,
 } from "../controllers/foldersController.js";
+import {
+	emptyTrash,
+	getFolderTree,
+	getRoot,
+	getSearch,
+	getStarred,
+	getTrash,
+} from "../controllers/commonController.js";
 
 export const router = Router();
 
+// common
 router.get(["/", "/home"], isAuth, getRoot);
 router.get("/starred", isAuth, getStarred);
 router.get("/trash", isAuth, getTrash);
+router.get("/search", isAuth, getSearch);
+router.get("/folder-tree", isAuth, getFolderTree);
+router.post("/empty-trash", isAuth, emptyTrash);
 
+// authentication
 router.get("/signup", isAnonymous, getSignup);
 router.post("/signup", isAnonymous, postSignup);
-
 router.get("/login", isAnonymous, getLogin);
 router.post("/login", isAnonymous, postLogin);
-
 router.post("/logout", isAuth, postLogout);
 
+// files
 router.post("/upload", isAuth, postUpload);
 router.post("/star-file", isAuth, starFile);
 router.post("/download-file", isAuth, downloadFile);
@@ -68,6 +74,7 @@ router.post("/delete-file", isAuth, deleteFile);
 router.get("/file-sharing-details/:id", isAuth, getFileSharingDetails);
 router.post("/share-file", isAuth, shareFile);
 
+// folders
 router.post("/createFolder", isAuth, createFolder);
 router.get("/folder/:folderId", isAuth, getFolder);
 router.post("/star-folder", isAuth, starFolder);
@@ -80,9 +87,3 @@ router.post("/restore-folder", isAuth, restoreFolder);
 router.post("/delete-folder", isAuth, deleteFolder);
 router.get("/folder-sharing-details/:id", isAuth, getFolderSharingDetails);
 router.post("/share-folder", isAuth, shareFolder);
-
-router.get("/search", isAuth, getSearch);
-
-router.get("/folder-tree", isAuth, getFolderTree);
-
-router.post("/empty-trash", isAuth, emptyTrash);
