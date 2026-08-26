@@ -27,8 +27,6 @@
 		"pg": "^8.22.0"
 	},
 	"devDependencies": {
-		"connect-livereload": "^0.6.1",
-		"livereload": "^0.10.3",
 		"prisma": "^6.19.3",
 		"sass": "^1.101.0"
 	}
