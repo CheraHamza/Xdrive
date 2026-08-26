@@ -43,37 +43,35 @@ inputWrappers.forEach((wrapper) => {
 	}
 });
 
+const shareModalEl = document.querySelector(".modal.share-item");
 const shareForm = document.querySelector(".share-item-form");
 
 const accessTypeSelect = shareForm?.querySelector("select#access");
-
 const accessIcon = shareForm?.querySelector(".access-icon");
-
 const durationWrapper = shareForm?.querySelector(".duration-wrapper");
-
 const durationSelect = shareForm?.querySelector("select#duration");
-
 const timerWrapper = shareForm?.querySelector(".timer-wrapper");
-
-const linkWrapper = shareForm?.querySelector(".link-wrapper");
-
-const linkField = shareForm?.querySelector("input#link");
-
-const copyLinkBtn = shareForm?.querySelector("button.copyBtn");
+const copyLinkBtn = shareModalEl?.querySelector("#copyLinkBtn");
+const shareLinkInput = shareModalEl?.querySelector("#shareLinkInput");
+const shareSubmitBtn = shareForm?.querySelector(".submit-btn");
 
 accessTypeSelect?.addEventListener("change", (e) => {
 	let accessType = e.target.value;
 
 	if (accessType === "RESTRICTED") {
-		accessIcon.textContent = "lock";
+		if (accessIcon) accessIcon.textContent = "lock";
+		durationWrapper?.classList.remove("active");
 
-		durationWrapper.classList.remove("active");
-		durationSelect.value = "forever";
-		durationSelect.dispatchEvent(new Event("change"));
-		linkWrapper.classList.remove("active");
+		if (durationSelect) {
+			durationSelect.value = "forever";
+			durationSelect.dispatchEvent(new Event("change"));
+		}
+
+		if (shareSubmitBtn) shareSubmitBtn.textContent = "Save Settings";
 	} else {
-		accessIcon.textContent = "public";
-		durationWrapper.classList.add("active");
+		if (accessIcon) accessIcon.textContent = "public";
+		durationWrapper?.classList.add("active");
+		if (shareSubmitBtn) shareSubmitBtn.textContent = "Generate Link";
 	}
 });
 
@@ -87,8 +85,18 @@ durationSelect?.addEventListener("change", (e) => {
 	}
 });
 
-copyLinkBtn?.addEventListener("click", async () => {
-	await navigator.clipboard.writeText(linkField?.value);
+copyLinkBtn?.addEventListener("click", async (e) => {
+	if (!shareLinkInput || !shareLinkInput.value) return;
+
+	await navigator.clipboard.writeText(shareLinkInput.value);
+
+	const icon = copyLinkBtn.querySelector(".material-symbols-outlined");
+	if (icon) {
+		icon.textContent = "check";
+		setTimeout(() => {
+			icon.textContent = "content_copy";
+		}, 2000);
+	}
 });
 
 const daysField = shareForm?.querySelector("input#days");

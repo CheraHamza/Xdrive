@@ -19,15 +19,21 @@
     <%- include("partials/navbar") %>
     <section class="main-wrapper">
       <%- include("partials/header") %>
+      <% if (locals.location) {%>
       <%- include("partials/location-bar") %>
-      <% if (locals.location[0].name === "Trash") { %>
+      <% if (locals.location?.[0].name === "Trash") { %>
       <button class="empty-trash-btn">
         <span class="material-symbols-outlined"></span>
         <span>Empty trash</span>
       </button>
       <% } %>
-      <div class="items-container">
+      <% if (locals.location?.[0].name === "Shared with you") {%>
+      <%- include("partials/item-card") %>
+      <% } %>
+      <% } %>
 
+      <div class="items-container">
+        <% if (locals.folders && locals.folders.length > 0) {%>
         <p class="text-label thin gray">Folders</p>
         <div class="folders-container">
           <% if (locals.folders) { %>
@@ -36,6 +42,8 @@
           <% }) %>
           <% } %>
         </div>
+        <% } %>
+        <% if (locals.files && locals.files.length > 0) {%>
         <p class="text-label thin gray">Files</p>
         <div class="files-container">
           <% if (locals.files) { %>
@@ -44,6 +52,7 @@
           <% }); %>
           <% } %>
         </div>
+        <% } %>
       </div>
 
     </section>

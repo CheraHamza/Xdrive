@@ -40,6 +40,8 @@ import {
 	getFolderTree,
 	getRoot,
 	getSearch,
+	getShare,
+	getShared,
 	getStarred,
 	getTrash,
 } from "../controllers/commonController.js";
@@ -51,6 +53,8 @@ router.get(["/", "/home"], isAuth, getRoot);
 router.get("/starred", isAuth, getStarred);
 router.get("/trash", isAuth, getTrash);
 router.get("/search", isAuth, getSearch);
+router.get("/share/:id", getShare);
+router.get("/shared", isAuth, getShared);
 router.get("/folder-tree", isAuth, getFolderTree);
 router.post("/empty-trash", isAuth, emptyTrash);
 

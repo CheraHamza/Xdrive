@@ -9,7 +9,7 @@
     <span>Open</span>
   </button>
 
-  <form class="download-form" action="<%= isFolder ? '/download-folder' : 'download-file' %>" method="post">
+  <form class="download-form" action="<%= isFolder ? '/download-folder' : '/download-file' %>" method="post">
     <% if (isFolder) { %>
 
     <input id="folderId" name="folderId" type="hidden" value="<%= item?.id %>">

@@ -2,12 +2,13 @@ function setupModal(backdropSelector) {
 	const backdrop = document.querySelector(backdropSelector);
 	if (!backdrop) return null;
 
-	const firstChild = backdrop.querySelector("& > *");
+	const immediateChildren = [...backdrop.children];
 	const form = backdrop.querySelector("form");
 	const cancelBtn = backdrop.querySelector(".cancel-btn");
 	const primaryInput = backdrop.querySelector("input[type='text']");
 
 	let mouseDownTarget = null;
+	let onCloseCallback = null;
 
 	backdrop.addEventListener("mousedown", (e) => {
 		mouseDownTarget = e.target;
@@ -15,13 +16,17 @@ function setupModal(backdropSelector) {
 
 	backdrop.addEventListener("mouseup", (e) => {
 		e.stopPropagation();
-		const startedOutside = firstChild && !firstChild.contains(mouseDownTarget);
-		const endedOutside = firstChild && !firstChild.contains(e.target);
+		const startedOutside = !immediateChildren.some((child) =>
+			child.contains(mouseDownTarget),
+		);
+		const endedOutside = !immediateChildren.some((child) =>
+			child.contains(e.target),
+		);
 
 		if (startedOutside && endedOutside) {
 			close();
 		}
-		
+
 		mouseDownTarget = null;
 	});
 
@@ -39,9 +44,17 @@ function setupModal(backdropSelector) {
 	function close() {
 		backdrop.classList.remove("active");
 		if (form) form.reset();
+
+		if (typeof onCloseCallback == "function") {
+			onCloseCallback();
+		}
 	}
 
-	return { open, close, backdrop, form, firstChild };
+	function onClose(callback) {
+		onCloseCallback = callback;
+	}
+
+	return { open, close, onClose, backdrop, form, immediateChildren };
 }
 
 function setupMoveItemModal(modalInstance) {
@@ -197,6 +210,20 @@ function setupMoveItemModal(modalInstance) {
 	return { open, close, backdrop, form };
 }
 
+export function setShareModalView(view) {
+	const shareModalEl = document.querySelector(".modal.share-item");
+	const configView = shareModalEl?.querySelector(".share-config-view");
+	const linkView = shareModalEl?.querySelector(".share-link-view");
+
+	if (view === "link") {
+		configView?.classList.add("hidden");
+		linkView?.classList.remove("hidden");
+	} else {
+		configView?.classList.remove("hidden");
+		linkView?.classList.add("hidden");
+	}
+}
+
 export const renameModal = setupModal(".modal.rename-item");
 
 const createFolderModal = setupModal(".modal.add-folder");
@@ -210,8 +237,6 @@ const baseMoveModal = setupModal(".modal.move-item");
 export const moveItemModal = setupMoveItemModal(baseMoveModal);
 
 export const detailsModal = setupModal(".modal.item-details");
-
-export const trashModal = setupModal(".modal.trash-item");
 
 export const deleteModal = setupModal(".modal.delete-item");
 

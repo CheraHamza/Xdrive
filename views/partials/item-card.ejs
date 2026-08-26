@@ -1,0 +1,81 @@
+<% const isFolder = locals.itemType === 'folder' || false; %>
+<% const item = locals.item %>
+
+<div class="item-card" data-type="<%= locals.itemType %>" data-id="<%= item.id %>" data-url="/<%= item.path %>">
+  <div class="item-container">
+    <div class="icon-wrapper">
+      <div class="thumbnail-wrapper">
+        <% if (isFolder) { %>
+        <span class="material-symbols-outlined item-icon folder">folder</span>
+        <% } else if (item?.type == "image") { %>
+        <img src="/<%= item?.path %>" class="<%= item?.name.endsWith('.gif') ? 'gif-thumbnail' : '' %>" alt="Preview">
+        <% } else if (item?.type == "movie") { %>
+        <video src="/<%= item?.path %>" preload="metadata" muted playsinline disablePictureInPicture></video>
+        <% } else { %><span class="material-symbols-outlined item-icon <%= item?.type %>">
+          <%= item?.icon %>
+        </span>
+        <% } %>
+      </div>
+      <div class="item-name"><%= item?.name %></div>
+    </div>
+    <div class="action-btns-wrapper" >
+      <button class="open-item" onclick="handleOpen()">
+        <span class="material-symbols-outlined icon">open_in_new</span>
+        <span>Open</span>
+      </button>
+
+      <form class="download-form" action="<%= isFolder ? '/download-folder' : '/download-file' %>" method="post">
+        <% if (isFolder) { %>
+        <input id="folderId" name="folderId" type="hidden" value="<%= item?.id %>">
+        <% } else { %>
+        <input id="fileName" name="fileName" type="hidden" value="<%= item?.name %>">
+        <input id="filePath" name="filePath" type="hidden" value="<%= item?.path %>">
+        <% } %>
+
+        <button class="download-item" type="submit">
+          <span class="material-symbols-outlined icon">download</span>
+          <span>Download</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="gray text-label">Details</div>
+  <div class="rows-container">
+    <div class="row">
+      <div class=" thin gray text-label">Type</div>
+      <div class="type-value"><%= item.details.type %></div>
+    </div>
+    <div class="row">
+      <div class="size-label thin gray text-label">Size</div>
+      <div class="size-value"><%= item.details.size %> MB</div>
+    </div>
+    <% if (isFolder) {%>
+    <div class="row">
+      <div class="content-label thin gray text-label">Contains</div>
+      <div class="content-value"><%=`${item.details.Nfiles} files, ${item.details.Nfolders} folders`%></div>
+    </div>
+    <% }%>
+    <div class="row">
+      <div class="owner-label thin gray text-label">Owner</div>
+      <div class="owner-value"><%= item.details.owner %></div>
+    </div>
+  </div>
+
+
+  <script defer>
+    const itemCard = document.querySelector(".item-card");
+    const isFolder = itemCard.getAttribute("data-type") === 'folder' || false;
+    const itemId = itemCard.getAttribute("data-id");
+
+    const handleOpen = () => {
+      if (isFolder) {
+        window.location.href = `/folder/${itemId}`;
+      } else {
+        const fileURL = itemCard.getAttribute("data-url");
+        if (fileURL) window.open(fileURL, "_blank");
+      }
+    };
+  </script>

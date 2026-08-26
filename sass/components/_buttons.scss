@@ -188,16 +188,12 @@
 	border-radius: 0 5px 5px 0;
 }
 
-.modal {
-	.btns-wrapper {
-		button {
-			@include inverting-button(var.$light-dark, var.$white);
-			width: fit-content;
+.modal .btns-wrapper button {
+	@include inverting-button(var.$light-dark, var.$white);
+	width: fit-content;
 
-			padding: 10px;
-			border-radius: 20px;
-		}
-	}
+	padding: 10px;
+	border-radius: 20px;
 }
 
 .star-btn {
@@ -326,6 +322,27 @@
 	}
 
 	span {
+		font-size: 20px;
+	}
+}
+
+.action-btns-wrapper button {
+	@include button(var.$light-gray);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+
+	padding: 10px 20px;
+
+	border: 1px solid #6a6b6d44;
+	border-radius: 20px;
+
+	&:hover {
+		background-color: white;
+		color: var.$dark;
+	}
+
+	span.icon {
 		font-size: 20px;
 	}
 }

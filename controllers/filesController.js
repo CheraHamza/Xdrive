@@ -1,4 +1,3 @@
-import express from "express";
 import { prisma } from "../lib/prisma.js";
 import multer from "multer";
 import fs from "fs";
@@ -9,10 +8,8 @@ import {
 	addHours,
 	addMinutes,
 	format,
-	formatDuration,
-	intervalToDuration,
-	isBefore,
 } from "date-fns";
+import { formatSharingDetails } from "./commonController.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -170,7 +167,7 @@ export const getFileDetailsById = async (req, res, next) => {
 	details.time = format(new Date(file.uploadedAt), "dd MMM yyyy HH:mm:ss");
 	details.size = (file.size / (1024 * 1024)).toFixed(2);
 	details.location = file.folder.name;
-	details.owner = file.user.id === req.user.id ? "Me" : folder.user.name;
+	details.owner = file.user.id === req.user.id ? "Me" : file.user.name;
 
 	res.json({ success: true, details });
 };
@@ -218,84 +215,48 @@ export const deleteFile = async (req, res, next) => {
 };
 
 export const getFileSharingDetails = async (req, res, next) => {
-	const fileId = req.params.id;
+	try {
+		const fileId = req.params.id;
 
-	const sharingDetails = await prisma.share.findUnique({
-		where: {
-			fileId: fileId,
-		},
-		include: {
-			file: true,
-		},
-	});
+		const rawShare = await prisma.share.findUnique({
+			where: { fileId: fileId },
+		});
 
-	if (sharingDetails) {
-		const expiresAt = sharingDetails.expiresAt;
-
-		sharingDetails.isExpired = expiresAt
-			? isBefore(new Date(expiresAt), new Date())
-			: false;
-
-		if (expiresAt && sharingDetails.isExpired) {
-			await prisma.share.update({
-				where: { fileId: sharingDetails.fileId },
-				data: { access: "RESTRICTED" },
-			});
-		}
-
-		if (!sharingDetails.isExpired) {
-			if (expiresAt) {
-				const {
-					days = 0,
-					hours = 0,
-					minutes = 0,
-				} = intervalToDuration({
-					start: new Date(),
-					end: new Date(expiresAt),
-				});
-
-				sharingDetails.remainingTime = { days, hours, minutes };
-			}
-
-			const baseUrl = `${req.protocol}://${req.get("host")}`;
-			const path = `/share/${sharingDetails.shareToken}`;
-			sharingDetails.link = new URL(path, baseUrl);
-		}
+		const sharingDetails = await formatSharingDetails(rawShare, req);
 
 		res.json({ success: true, sharingDetails });
-	} else {
-		res.json({ success: true, sharingDetails: null });
+	} catch (error) {
+		next(error);
 	}
 };
 
 export const shareFile = async (req, res, next) => {
 	const fileId = req.body.itemId;
-
 	const { access, duration, days = 0, hours = 0, minutes = 0 } = req.body;
 
 	let expiresAt = null;
 
-	if (duration === "timed") {
+	if (access === "PUBLIC" && duration === "timed") {
 		let now = new Date();
 
-		if (days > 0) now = addDays(now, Number(days));
-		if (hours > 0) now = addHours(now, Number(hours));
-		if (minutes > 0) now = addMinutes(now, Number(minutes));
+		const numDays = Number(days) || 0;
+		const numHours = Number(hours) || 0;
+		const numMinutes = Number(minutes) || 0;
 
-		expiresAt = now;
+		if (numDays > 0) now = addDays(now, numDays);
+		if (numHours > 0) now = addHours(now, numHours);
+		if (numMinutes > 0) now = addMinutes(now, numMinutes);
+
+		// Only assign if at least one unit of duration was provided
+		if (numDays > 0 || numHours > 0 || numMinutes > 0) {
+			expiresAt = now;
+		}
 	}
 
-	const shareRecord = await prisma.share.upsert({
+	await prisma.share.upsert({
 		where: { fileId: fileId },
-		update: {
-			access,
-			expiresAt,
-		},
-		create: {
-			fileId: fileId,
-			access,
-			expiresAt,
-		},
+		update: { access, expiresAt },
+		create: { fileId: fileId, access, expiresAt },
 	});
 
 	res.json({ success: true });
