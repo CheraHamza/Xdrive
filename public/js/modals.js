@@ -226,10 +226,33 @@ export function setShareModalView(view) {
 
 export const renameModal = setupModal(".modal.rename-item");
 
+const newItemModal = setupModal(".modal.new-item");
 const createFolderModal = setupModal(".modal.add-folder");
+const uploadForm = document.querySelector(".upload-form");
+const uploadField = uploadForm?.querySelector("input[type='file']");
 
-document.querySelector(".new-folder-btn")?.addEventListener("click", () => {
-	createFolderModal?.open();
+document.querySelector(".new-btn")?.addEventListener("click", () => {
+	newItemModal?.open();
+});
+
+document
+	.querySelector(".modal.new-item .new-folder-btn")
+	?.addEventListener("click", () => {
+		newItemModal?.close();
+		createFolderModal?.open();
+	});
+
+document
+	.querySelector(".modal.new-item .upload-file-btn")
+	?.addEventListener("click", () => {
+		newItemModal?.close();
+		uploadField?.click();
+	});
+
+uploadField?.addEventListener("change", () => {
+	if (uploadField.files.length > 0 && uploadForm) {
+		uploadForm.submit();
+	}
 });
 
 const baseMoveModal = setupModal(".modal.move-item");

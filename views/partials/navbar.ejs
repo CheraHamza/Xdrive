@@ -2,7 +2,7 @@
   <%- include("logo-composite") %>
 
   <div class="new-btn-wrapper">
-    <button class="new-btn medium">
+    <button type="button" class="new-btn medium">
       <span class="material-symbols-outlined add-icon">
         add
       </span>
@@ -11,21 +11,10 @@
       </span>
     </button>
 
-    <div class="new-dropdown">
-      <button class="new-folder-btn">
-        <span class="material-symbols-outlined">create_new_folder</span>
-        <span class="small text-label">New folder</span>
-      </button>
-      <hr>
-      <button class="upload-file-btn">
-        <span class="material-symbols-outlined">upload_file</span>
-        <span class="small text-label">File upload</span>
-      </button>
-      <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
-        <input type="hidden" id="currentFolderId" name="currentFolderId" value="<%= locals.currentFolderId?? '' %>">
-        <input id="file" type="file" name="file">
-      </form>
-    </div>
+    <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+      <input type="hidden" id="currentFolderId" name="currentFolderId" value="<%= locals.currentFolderId?? '' %>">
+      <input id="file" type="file" name="file">
+    </form>
   </div>
 
   <div class="nav-btns">
@@ -67,34 +56,3 @@
 
   </div>
 </nav>
-
-<script defer>
-  const newBtn = document.querySelector(".new-btn")
-  const dropDown = document.querySelector(".new-dropdown");
-
-  newBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    dropDown.classList.toggle("active");
-
-  })
-
-  document.addEventListener('click', (e) => {
-    dropDown.classList.remove('active');
-  });
-</script>
-
-<script defer>
-  const uploadBtn = document.querySelector(".upload-file-btn");
-  const fileForm = document.querySelector(".upload-form")
-  const fileField = fileForm.querySelector("input[type='file']")
-
-  uploadBtn.addEventListener("click", () => {
-    fileField.click()
-  })
-
-  fileField.addEventListener("change", () => {
-    if (fileField.files.length > 0) {
-      fileForm.submit();
-    }
-  })
-</script>
