@@ -442,6 +442,28 @@
   font-size: 20px;
 }
 
+.auth-btns button {
+  width: 100%;
+  background-color: transparent;
+  color: #1a1c1e;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  background-color: #e2e2e5;
+  border: 2px solid #e2e2e5;
+}
+.auth-btns button:hover, .auth-btns button:focus {
+  background-color: #1a1c1e;
+  color: #e2e2e5;
+}
+.auth-btns button {
+  width: fit-content;
+  padding: 10px 25px;
+  border-radius: 20px;
+}
+
 input {
   width: 100%;
   color: #e2e2e5;
@@ -713,6 +735,7 @@ input:focus {
 .navbar .new-btn-wrapper {
   width: 100%;
   position: relative;
+  margin-top: 30px;
 }
 .navbar .new-btn-wrapper .new-dropdown {
   width: 150%;
@@ -754,13 +777,8 @@ header .search-icon {
   left: 10px;
   top: 8px;
 }
-header .btns-wrapper {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
 header .settings-wrapper {
+  margin-left: auto;
   position: relative;
 }
 header .settings-dropdown {
@@ -783,6 +801,12 @@ header .dropdown-btns {
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+header .auth-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
 }
 
 .files-container,
@@ -1047,7 +1071,6 @@ a:hover, a:focus {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 30px;
 }
 .logo-composite h1 {
   color: #bec8d2;
@@ -1098,14 +1121,17 @@ a:hover, a:focus {
 .home-page {
   min-height: 100%;
   display: grid;
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: 1fr;
   grid-template-rows: 1fr;
+}
+.home-page.has-navbar {
+  grid-template-columns: 250px 1fr;
 }
 .home-page .main-wrapper {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 20px 60px;
+  padding: 30px;
 }
 .home-page .main-wrapper .items-container {
   height: 100%;

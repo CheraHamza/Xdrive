@@ -14,20 +14,22 @@
 </head>
 
 <body>
-  <div class="page-container home-page">
+  <div class="page-container home-page <%= locals.isAuthenticated ? "has-navbar" : "" %>">
     <%- include("partials/modals") %>
+    <% if (locals.isAuthenticated) { %>
     <%- include("partials/navbar") %>
+    <% } %>
     <section class="main-wrapper">
       <%- include("partials/header") %>
       <% if (locals.location) {%>
       <%- include("partials/location-bar") %>
-      <% if (locals.location?.[0].name === "Trash") { %>
+      <% if (locals.title === "Trash") { %>
       <button class="empty-trash-btn">
         <span class="material-symbols-outlined"></span>
         <span>Empty trash</span>
       </button>
       <% } %>
-      <% if (locals.location?.[0].name === "Shared with you") {%>
+      <% if (locals.title === "Share") {%>
       <%- include("partials/item-card") %>
       <% } %>
       <% } %>

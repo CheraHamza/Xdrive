@@ -1,4 +1,5 @@
 <header>
+  <% if (locals.isAuthenticated) { %>
   <div class="input-wrapper">
     <form action="/search" method="get">
       <span class="material-symbols-outlined search-icon big">search</span>
@@ -6,34 +7,43 @@
     </form>
   </div>
 
-  <div class="btns-wrapper">
 
-    <div class="settings-wrapper">
-      <button class="settings-btn">
-        <span class="material-symbols-outlined">settings</span>
-      </button>
+  <div class="settings-wrapper">
+    <button class="settings-btn">
+      <span class="material-symbols-outlined">settings</span>
+    </button>
 
-      <div class="settings-dropdown">
-        <h1 class="normal medium">Settings</h1>
-        <div class="dropdown-btns">
-          <form action="/logout" method="post">
-            <button class="">
-              <span class="material-symbols-outlined">help</span>
-              <span class="medium">Support</span>
-            </button>
-            <button class="logout-btn text-label">Log out</button>
-          </form>
-        </div>
+    <div class="settings-dropdown">
+      <h1 class="normal medium">Settings</h1>
+      <div class="dropdown-btns">
+        <form action="/logout" method="post">
+          <button class="">
+            <span class="material-symbols-outlined">help</span>
+            <span class="medium">Support</span>
+          </button>
+          <button class="logout-btn text-label">Log out</button>
+        </form>
       </div>
     </div>
   </div>
+
+  <% } else { %>
+  <%- include("logo-composite") %>
+  <div class="auth-btns">
+    <a href="/login">
+      <button class="login-btn medium">Log in</button>
+    </a>
+    <a href="/signup">
+      <button class="signup-btn medium">Sign up</button>
+    </a>
+    <% } %>
 </header>
 
 <script defer>
   const settingsBtn = document.querySelector('.settings-btn');
   const settingsDropdown = document.querySelector('.settings-dropdown');
 
-  settingsBtn.addEventListener('click', (e) => {
+  settingsBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     settingsBtn.classList.toggle('active');
 
@@ -45,8 +55,8 @@
   });
 
   document.addEventListener('click', (e) => {
-    if (!settingsDropdown.contains(e.target)) {
-      settingsBtn.classList.remove('active');
+    if (!settingsDropdown?.contains(e.target)) {
+      settingsBtn?.classList.remove('active');
       settingsDropdown.style.display = 'none';
     }
   });

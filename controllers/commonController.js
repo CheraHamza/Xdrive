@@ -337,7 +337,11 @@ export const getShare = async (req, res, next) => {
 
 		const location = [
 			{
-				name: "Shared with you",
+				name: currentUserId === item.user.id ? "Shared" : "Shared with you",
+				url: currentUserId === item.user.id ? "/shared" : req.path,
+			},
+			{
+				name: item.name,
 				url: req.path,
 			},
 		];

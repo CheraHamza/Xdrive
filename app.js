@@ -23,6 +23,12 @@ app.use(sessionMiddleware());
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req, res, next) => {
+	res.locals.currentUser = req.user || null;
+	res.locals.isAuthenticated = req.isAuthenticated();
+	next();
+});
+
 app.use("/files", express.static(path.join(__dirname, "files")));
 
 app.use(express.json());
