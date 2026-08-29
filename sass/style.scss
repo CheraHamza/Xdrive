@@ -5,8 +5,9 @@
 @use "components/header";
 @use "components/items";
 @use "components/itemCard";
+@use "components/modal";
 
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,arrow_drop_down,arrow_drop_up,check,check_box,cloud,content_copy,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,more_vert,movie,open_in_new,public,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,arrow_drop_down,arrow_drop_up,check,check_box,cloud,content_copy,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,mail,more_vert,movie,open_in_new,public,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 
 * {
 	box-sizing: border-box;
@@ -164,51 +165,6 @@ a {
 				font-size: 14px;
 			}
 		}
-	}
-}
-
-.modal {
-	height: 100%;
-	width: 100%;
-	position: fixed;
-	z-index: 100;
-
-	display: none;
-	&.active {
-		display: flex;
-	}
-	align-items: center;
-	justify-content: center;
-
-	background-color: #ffffff1f;
-
-	& > * {
-		width: min(80%, 400px);
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
-
-		padding: 30px;
-		background-color: var.$light-dark;
-		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.089);
-
-		border-radius: 5px;
-
-		.btns-wrapper {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-
-			justify-content: end;
-		}
-	}
-
-	&.item-details .rows-container {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-
-		font-size: 15px;
 	}
 }
 

@@ -247,3 +247,9 @@ document.querySelector(".empty-trash-btn")?.addEventListener("click", () => {
 });
 
 export const shareModal = setupModal(".modal.share-item");
+
+export const supportModal = setupModal(".modal.support-info");
+
+document.querySelector(".support-btn")?.addEventListener("click", () => {
+	supportModal?.open();
+});

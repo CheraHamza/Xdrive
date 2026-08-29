@@ -103,24 +103,18 @@
 }
 
 .support-btn {
-	@include select-button(
-		var.$dark,
-		var.$light-gray,
-		var.$white,
-		var.$dark,
-		var.$white
-	);
+	@include inverting-button(var.$light-blue, var.$dark-gray);
 
-	width: 120px;
-	height: fit-content;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	gap: 5px;
 
-	padding: 5px 30px;
-	border: 2px solid #92949738;
-	border-radius: 20px;
+	padding: 10px 30px;
+
+	span.icon {
+		font-size: 20px;
+	}
 }
 
 .settings-btn {

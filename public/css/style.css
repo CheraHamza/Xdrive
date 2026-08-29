@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,arrow_drop_down,arrow_drop_up,check,check_box,cloud,content_copy,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,more_vert,movie,open_in_new,public,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,arrow_drop_down,arrow_drop_up,check,check_box,cloud,content_copy,create_new_folder,delete,delete_forever,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,mail,more_vert,movie,open_in_new,public,search,settings,share,star,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -99,32 +99,28 @@
 .support-btn {
   width: 100%;
   background-color: transparent;
-  color: #929497;
+  color: #212426;
   border: none;
   border-radius: 5px;
   outline: none;
   cursor: pointer;
   transition: all 0.12s ease-in-out;
-  background-color: #121416;
+  background-color: #bec8d2;
+  border: 2px solid #bec8d2;
 }
-.support-btn.active {
-  background-color: #e2e2e5;
-  color: #121416;
-}
-.support-btn:not(.active):hover, .support-btn:not(.active):focus {
-  color: #e2e2e5;
-  border-color: #e2e2e5;
+.support-btn:hover, .support-btn:focus {
+  background-color: #212426;
+  color: #bec8d2;
 }
 .support-btn {
-  width: 120px;
-  height: fit-content;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 5px;
-  padding: 5px 30px;
-  border: 2px solid rgba(146, 148, 151, 0.2196078431);
-  border-radius: 20px;
+  padding: 10px 30px;
+}
+.support-btn span.icon {
+  font-size: 20px;
 }
 
 .settings-btn {
@@ -801,6 +797,12 @@ header .dropdown-btns {
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+header .dropdown-btns > * {
+  width: 100%;
+  flex: 1;
 }
 header .auth-btns {
   display: flex;
@@ -1003,6 +1005,50 @@ header .auth-btns {
   padding-block: 10px;
 }
 
+.modal {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 100;
+  display: none;
+}
+.modal.active {
+  display: flex;
+}
+.modal {
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1215686275);
+}
+.modal > * {
+  width: min(80%, 400px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 30px;
+  background-color: #1a1c1e;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.089);
+  border-radius: 5px;
+}
+.modal > * .btns-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: end;
+}
+.modal.item-details .rows-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 15px;
+}
+.modal.support-info a {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -1144,44 +1190,6 @@ a:hover, a:focus {
 }
 .home-page .main-wrapper .items-container p {
   font-size: 14px;
-}
-
-.modal {
-  height: 100%;
-  width: 100%;
-  position: fixed;
-  z-index: 100;
-  display: none;
-}
-.modal.active {
-  display: flex;
-}
-.modal {
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.1215686275);
-}
-.modal > * {
-  width: min(80%, 400px);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 30px;
-  background-color: #1a1c1e;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.089);
-  border-radius: 5px;
-}
-.modal > * .btns-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: end;
-}
-.modal.item-details .rows-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 15px;
 }
 
 .location-bar {

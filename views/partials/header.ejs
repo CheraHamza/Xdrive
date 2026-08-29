@@ -16,11 +16,11 @@
     <div class="settings-dropdown">
       <h1 class="normal medium">Settings</h1>
       <div class="dropdown-btns">
+        <button class="support-btn text-label">
+          <span class="material-symbols-outlined icon">help</span>
+          <span class="">Support</span>
+        </button>
         <form action="/logout" method="post">
-          <button class="">
-            <span class="material-symbols-outlined">help</span>
-            <span class="medium">Support</span>
-          </button>
           <button class="logout-btn text-label">Log out</button>
         </form>
       </div>
@@ -43,6 +43,13 @@
   const settingsBtn = document.querySelector('.settings-btn');
   const settingsDropdown = document.querySelector('.settings-dropdown');
 
+  const closeSettingsMenu = () => {
+    settingsBtn?.classList.remove('active');
+    if (settingsDropdown) {
+      settingsDropdown.style.display = 'none';
+    }
+  };
+
   settingsBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     settingsBtn.classList.toggle('active');
@@ -50,14 +57,19 @@
     if (settingsBtn.classList.contains('active')) {
       settingsDropdown.style.display = 'flex';
     } else {
-      settingsDropdown.style.display = 'none';
+      closeSettingsMenu();
+    }
+  });
+
+  settingsDropdown?.addEventListener('click', (e) => {
+    if (e.target.closest('button')) {
+      closeSettingsMenu();
     }
   });
 
   document.addEventListener('click', (e) => {
     if (!settingsDropdown?.contains(e.target)) {
-      settingsBtn?.classList.remove('active');
-      settingsDropdown.style.display = 'none';
+      closeSettingsMenu();
     }
   });
 </script>

@@ -15,14 +15,15 @@
 
 <body>
   <div class="page-container home-page <%= locals.isAuthenticated ? "has-navbar" : "" %>">
-    <%- include("partials/modals") %>
     <% if (locals.isAuthenticated) { %>
+    <%- include("partials/modals") %>
     <%- include("partials/navbar") %>
     <% } %>
     <section class="main-wrapper">
       <%- include("partials/header") %>
       <% if (locals.location) {%>
       <%- include("partials/location-bar") %>
+      <% } %>
       <% if (locals.title === "Trash") { %>
       <button class="empty-trash-btn">
         <span class="material-symbols-outlined"></span>
@@ -32,27 +33,22 @@
       <% if (locals.title === "Share") {%>
       <%- include("partials/item-card") %>
       <% } %>
-      <% } %>
 
       <div class="items-container">
         <% if (locals.folders && locals.folders.length > 0) {%>
         <p class="text-label thin gray">Folders</p>
         <div class="folders-container">
-          <% if (locals.folders) { %>
           <% folders.forEach(folder => { %>
           <%- include("partials/grid-item", {item: folder, isFolder: true}) %>
           <% }) %>
-          <% } %>
         </div>
         <% } %>
         <% if (locals.files && locals.files.length > 0) {%>
         <p class="text-label thin gray">Files</p>
         <div class="files-container">
-          <% if (locals.files) { %>
           <% files.forEach(file => { %>
           <%- include("partials/grid-item", {item: file, isFolder: false}) %>
           <% }); %>
-          <% } %>
         </div>
         <% } %>
       </div>
