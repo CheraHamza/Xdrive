@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma.js";
 import { intervalToDuration, isBefore } from "date-fns";
 import { permanentlyDeleteFile } from "./filesController.js";
+import { permanentlyDeleteFolder } from "./foldersController.js";
 
 export function mapFileIcons(files) {
 	const iconMap = {
@@ -20,6 +21,16 @@ export function mapFileIcons(files) {
 	files.forEach((file) => {
 		file.icon = iconMap[file.type] || "draft";
 	});
+}
+
+export function redirectWithToast(req, res, message, type = "success") {
+	const target = req.get("Referrer") || "/";
+	const separator = target.includes("?") ? "&" : "?";
+	const safeMessage = encodeURIComponent(message);
+
+	return res.redirect(
+		`${target}${separator}toast=${safeMessage}&toastType=${type}`,
+	);
 }
 
 export const getRoot = async (req, res, next) => {
@@ -129,7 +140,7 @@ export const emptyTrash = async (req, res, next) => {
 
 	await Promise.all(trashedFiles.map((file) => permanentlyDeleteFile(file.id)));
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "Trash emptied", "success");
 };
 
 export const getFolderTree = async (req, res, next) => {

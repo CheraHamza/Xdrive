@@ -14,6 +14,8 @@
 </head>
 
 <body>
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
   <div class="page-container home-page <%= locals.isAuthenticated ? "has-navbar" : "" %>">
     <% if (locals.isAuthenticated) { %>
     <%- include("partials/modals") %>

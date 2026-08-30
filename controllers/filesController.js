@@ -9,7 +9,7 @@ import {
 	addMinutes,
 	format,
 } from "date-fns";
-import { formatSharingDetails } from "./commonController.js";
+import { formatSharingDetails, redirectWithToast } from "./commonController.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -159,7 +159,7 @@ export const postUpload = [
 			},
 		});
 
-		res.status(200).redirect(req.get("Referrer") || "/");
+		return redirectWithToast(req, res, "File uploaded", "success");
 	},
 ];
 
@@ -167,14 +167,16 @@ export const starFile = async (req, res, next) => {
 	const fileId = req.body.itemId;
 	const starred = req.body.starred === "true";
 
+	const nextStarred = !starred;
+
 	await prisma.file.update({
 		where: { id: fileId },
 		data: {
-			starred: !starred,
+			starred: nextStarred,
 		},
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, nextStarred ? "File starred" : "File unstarred", "success");
 };
 
 export const downloadFile = async (req, res, next) => {
@@ -201,7 +203,7 @@ export const renameFile = async (req, res, next) => {
 		},
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "File renamed", "success");
 };
 
 export const moveFile = async (req, res, next) => {
@@ -213,7 +215,7 @@ export const moveFile = async (req, res, next) => {
 		data: { folderId: destinationFolderId },
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "File moved", "success");
 };
 
 export const getFileDetailsById = async (req, res, next) => {
@@ -241,7 +243,7 @@ export const trashFile = async (req, res, next) => {
 
 	await prisma.file.update({ where: { id: fileId }, data: { trashed: true } });
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "File moved to trash", "success");
 };
 
 export const restoreFile = async (req, res, next) => {
@@ -249,7 +251,7 @@ export const restoreFile = async (req, res, next) => {
 
 	await prisma.file.update({ where: { id: fileId }, data: { trashed: false } });
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "File restored", "success");
 };
 
 export async function permanentlyDeleteFile(fileId) {
@@ -275,7 +277,7 @@ export const deleteFile = async (req, res, next) => {
 
 	await permanentlyDeleteFile(fileId);
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "File deleted", "success");
 };
 
 export const getFileSharingDetails = async (req, res, next) => {
@@ -323,5 +325,5 @@ export const shareFile = async (req, res, next) => {
 		create: { fileId: fileId, access, expiresAt },
 	});
 
-	res.json({ success: true });
+	res.json({ success: true, message: access === "PUBLIC" ? "File shared" : "Share settings updated" });
 };

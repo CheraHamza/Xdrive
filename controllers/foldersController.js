@@ -8,7 +8,7 @@ import {
 	addMinutes,
 	format,
 } from "date-fns";
-import { formatSharingDetails, mapFileIcons } from "./commonController.js";
+import { formatSharingDetails, mapFileIcons, redirectWithToast } from "./commonController.js";
 
 export const createFolder = async (req, res, next) => {
 	const rootFolderId = "root_" + req.user.id;
@@ -25,7 +25,7 @@ export const createFolder = async (req, res, next) => {
 		},
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "Folder created", "success");
 };
 
 export const getFolder = async (req, res, next) => {
@@ -78,14 +78,16 @@ export const starFolder = async (req, res, next) => {
 	const folderId = req.body.itemId;
 	const starred = req.body.starred === "true";
 
+	const nextStarred = !starred;
+
 	await prisma.folder.update({
 		where: { id: folderId },
 		data: {
-			starred: !starred,
+			starred: nextStarred,
 		},
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, nextStarred ? "Folder starred" : "Folder unstarred", "success");
 };
 
 const addFolderToArchive = async (folderId, archive, currentPath = "") => {
@@ -155,7 +157,7 @@ export const renameFolder = async (req, res, next) => {
 		},
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "Folder renamed", "success");
 };
 
 export const moveFolder = async (req, res, next) => {
@@ -167,7 +169,7 @@ export const moveFolder = async (req, res, next) => {
 		data: { parentId: destinationFolderId },
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "Folder moved", "success");
 };
 
 export const getFolderDetailsById = async (req, res, next) => {
@@ -203,7 +205,7 @@ export const trashFolder = async (req, res, next) => {
 		data: { trashed: true },
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "Folder moved to trash", "success");
 };
 
 export const restoreFolder = async (req, res, next) => {
@@ -214,7 +216,7 @@ export const restoreFolder = async (req, res, next) => {
 		data: { trashed: false },
 	});
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "Folder restored", "success");
 };
 
 async function getAllNestedFilePaths(folderId) {
@@ -238,7 +240,7 @@ async function getAllNestedFilePaths(folderId) {
 	return filePaths;
 }
 
-async function permanentlyDeleteFolder(folderId) {
+export async function permanentlyDeleteFolder(folderId) {
 	const filePathsToDelete = await getAllNestedFilePaths(folderId);
 
 	await Promise.all(
@@ -263,7 +265,7 @@ export const deleteFolder = async (req, res, next) => {
 
 	await permanentlyDeleteFolder(folderId);
 
-	res.redirect(req.get("Referrer") || "/");
+	return redirectWithToast(req, res, "Folder deleted", "success");
 };
 
 export const getFolderSharingDetails = async (req, res, next) => {
@@ -311,5 +313,5 @@ export const shareFolder = async (req, res, next) => {
 		create: { folderId: folderId, access, expiresAt },
 	});
 
-	res.json({ success: true });
+	res.json({ success: true, message: access === "PUBLIC" ? "Folder shared" : "Share settings updated" });
 };

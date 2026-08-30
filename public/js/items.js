@@ -7,6 +7,43 @@ import {
 	setShareModalView,
 } from "./modals.js";
 
+function showToast(message, type = "success", duration = 2600) {
+	const container = document.getElementById("toast-container");
+	if (!container || !message) return;
+
+	const toast = document.createElement("div");
+	toast.className = `toast ${type}`;
+	toast.setAttribute("role", "status");
+	toast.textContent = message;
+
+	const icon = document.createElement("span");
+	icon.className = "material-symbols-outlined toast-icon";
+	icon.textContent = type === "error" ? "error" : "check";
+	toast.prepend(icon);
+
+	container.appendChild(toast);
+
+	requestAnimationFrame(() => {
+		toast.classList.add("visible");
+	});
+
+	window.setTimeout(() => {
+		toast.classList.remove("visible");
+		window.setTimeout(() => toast.remove(), 200);
+	}, duration);
+}
+
+const toastMessage = new URLSearchParams(window.location.search).get("toast");
+const toastType = new URLSearchParams(window.location.search).get("toastType") || "success";
+
+if (toastMessage) {
+	showToast(decodeURIComponent(toastMessage), toastType);
+	const url = new URL(window.location.href);
+	url.searchParams.delete("toast");
+	url.searchParams.delete("toastType");
+	window.history.replaceState({}, "", url);
+}
+
 const itemElements = document.querySelectorAll(".item");
 
 // handle drop down menu
@@ -306,11 +343,13 @@ itemElements.forEach((item) => {
 				needsPageRefresh = true;
 
 				if (accessValue === "RESTRICTED") {
+					showToast(accessValue === "RESTRICTED" ? "Share settings updated" : "File shared", "success");
 					shareModal?.close();
 				} else {
 					await openShareModal(itemId, itemType);
 				}
 			} else {
+				showToast("Share could not be updated", "error");
 				console.error("Server error while updating share settings");
 			}
 		} catch (err) {
