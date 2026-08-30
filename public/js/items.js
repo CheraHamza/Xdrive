@@ -34,7 +34,8 @@ function showToast(message, type = "success", duration = 2600) {
 }
 
 const toastMessage = new URLSearchParams(window.location.search).get("toast");
-const toastType = new URLSearchParams(window.location.search).get("toastType") || "success";
+const toastType =
+	new URLSearchParams(window.location.search).get("toastType") || "success";
 
 if (toastMessage) {
 	showToast(decodeURIComponent(toastMessage), toastType);
@@ -45,6 +46,66 @@ if (toastMessage) {
 }
 
 const itemElements = document.querySelectorAll(".item");
+
+function setupCustomTooltip(item) {
+	const tooltip = document.createElement("div");
+	tooltip.className = "custom-tooltip";
+	document.body.appendChild(tooltip);
+	item._tooltip = tooltip;
+
+	let tooltipTimer = null;
+	let lastPointerX = 0;
+	let lastPointerY = 0;
+
+	const hideTooltip = () => {
+		if (tooltipTimer) {
+			clearTimeout(tooltipTimer);
+			tooltipTimer = null;
+		}
+		tooltip.classList.remove("visible");
+	};
+
+	const positionTooltip = (x, y) => {
+		tooltip.style.left = `${x + 12}px`;
+		tooltip.style.top = `${y + 10}px`;
+	};
+
+	const showTooltip = (event) => {
+		if (item.classList.contains("tooltip-disabled")) return;
+
+		lastPointerX = event.clientX;
+		lastPointerY = event.clientY;
+
+		const text = item.dataset.tooltip || item.dataset.name || item.id;
+		if (!text) return;
+
+		if (tooltipTimer) {
+			clearTimeout(tooltipTimer);
+		}
+
+		tooltipTimer = setTimeout(() => {
+			tooltip.textContent = text;
+			tooltip.classList.add("visible");
+			positionTooltip(lastPointerX, lastPointerY);
+		}, 500);
+	};
+
+	item.addEventListener("mouseenter", showTooltip);
+	item.addEventListener("mousemove", (event) => {
+		lastPointerX = event.clientX;
+		lastPointerY = event.clientY;
+
+		if (tooltip.classList.contains("visible")) {
+			positionTooltip(lastPointerX, lastPointerY);
+		}
+	});
+	item.addEventListener("mouseleave", hideTooltip);
+	item.addEventListener("click", hideTooltip);
+}
+
+itemElements.forEach((item) => {
+	setupCustomTooltip(item);
+});
 
 // handle drop down menu
 
@@ -65,11 +126,16 @@ itemElements.forEach((item) => {
 			if (otherItem !== item) {
 				const otherDropdown = otherItem.querySelector(".item-dropdown");
 				if (otherDropdown) otherDropdown.classList.remove("active");
+				otherItem.classList.remove("tooltip-disabled");
 			}
 		});
 
 		const isOpening = !dropdown.classList.contains("active");
 		dropdown.classList.toggle("active");
+		item.classList.toggle("tooltip-disabled", isOpening);
+		if (item._tooltip) {
+			item._tooltip.classList.remove("visible");
+		}
 
 		if (isOpening) {
 			dropdown.style.left = "";
@@ -100,6 +166,10 @@ document.addEventListener("click", () => {
 	itemElements.forEach((item) => {
 		const dropdown = item.querySelector(".item-dropdown");
 		dropdown.classList.remove("active");
+		item.classList.remove("tooltip-disabled");
+		if (item._tooltip) {
+			item._tooltip.classList.remove("visible");
+		}
 	});
 });
 
@@ -343,7 +413,12 @@ itemElements.forEach((item) => {
 				needsPageRefresh = true;
 
 				if (accessValue === "RESTRICTED") {
-					showToast(accessValue === "RESTRICTED" ? "Share settings updated" : "File shared", "success");
+					showToast(
+						accessValue === "RESTRICTED"
+							? "Share settings updated"
+							: "File shared",
+						"success",
+					);
 					shareModal?.close();
 				} else {
 					await openShareModal(itemId, itemType);
