@@ -33,6 +33,8 @@ function showToast(message, type = "success", duration = 2600) {
 	}, duration);
 }
 
+window.showToast = showToast;
+
 const toastMessage = new URLSearchParams(window.location.search).get("toast");
 const toastType =
 	new URLSearchParams(window.location.search).get("toastType") || "success";
@@ -46,6 +48,159 @@ if (toastMessage) {
 }
 
 const itemElements = document.querySelectorAll(".item");
+
+const shareModalEl = document.querySelector(".modal.share-item");
+let currentShareItem = { id: null, type: null };
+
+async function openShareModal(itemId, itemType) {
+	currentShareItem = { id: itemId, type: itemType };
+
+	const form = shareModal.form;
+	form.reset();
+	setShareModalView("config");
+
+	const itemIdInput = form.querySelector("#itemId");
+	const titleEl = form.querySelector(".title");
+	const accessSelect = form.querySelector("select#access");
+	const durationSelect = form.querySelector("select#duration");
+	const daysInput = form.querySelector("input#days");
+	const hoursInput = form.querySelector("input#hours");
+	const minutesInput = form.querySelector("input#minutes");
+
+	form.action = `/share-${itemType}`;
+	if (itemIdInput) itemIdInput.value = itemId;
+	if (titleEl) titleEl.textContent = `Share ${itemType}`;
+
+	try {
+		const response = await fetch(`/${itemType}-sharing-details/${itemId}`);
+		const data = await response.json();
+		const sharingDetails = data.sharingDetails;
+
+		if (sharingDetails) {
+			if (accessSelect) {
+				accessSelect.value = sharingDetails.access;
+				accessSelect.dispatchEvent(new Event("change"));
+			}
+
+			const isTimed = Boolean(sharingDetails.expiresAt);
+
+			if (durationSelect) {
+				durationSelect.value = isTimed ? "timed" : "forever";
+				durationSelect.dispatchEvent(new Event("change"));
+			}
+
+			if (isTimed && sharingDetails.remainingTime) {
+				if (daysInput) daysInput.value = sharingDetails.remainingTime.days || 0;
+				if (hoursInput)
+					hoursInput.value = sharingDetails.remainingTime.hours || 0;
+				if (minutesInput)
+					minutesInput.value = sharingDetails.remainingTime.minutes || 0;
+			}
+
+			if (!sharingDetails.isExpired && sharingDetails.access === "PUBLIC") {
+				const shareLinkInput = shareModalEl?.querySelector("#shareLinkInput");
+				const badge = shareModalEl?.querySelector("#linkExpirationBadge");
+
+				if (shareLinkInput) shareLinkInput.value = sharingDetails.link || "";
+
+				if (badge) {
+					if (isTimed && sharingDetails.remainingTime) {
+						const { days, hours, minutes } = sharingDetails.remainingTime;
+						badge.textContent = `Expires in: ${days}d ${hours}h ${minutes}m`;
+					} else {
+						badge.textContent = "Link does not expire.";
+					}
+				}
+
+				setShareModalView("link");
+			}
+		} else {
+			if (accessSelect) {
+				accessSelect.value = "RESTRICTED";
+				accessSelect.dispatchEvent(new Event("change"));
+			}
+		}
+	} catch (error) {
+		console.error("Failed to fetch sharing details:", error);
+	}
+
+	shareModal?.open();
+	shareModalEl?.querySelector("#shareLinkInput")?.blur();
+}
+
+window.openShareModal = openShareModal;
+
+shareModalEl
+	?.querySelector("#editShareSettingsBtn")
+	?.addEventListener("click", () => {
+		setShareModalView("config");
+	});
+
+shareModalEl?.querySelector("#doneShareBtn")?.addEventListener("click", () => {
+	shareModal?.close();
+});
+
+shareModal?.form.addEventListener("submit", async (e) => {
+	e.preventDefault();
+
+	const form = e.target;
+	const { id: itemId, type: itemType } = currentShareItem;
+
+	if (!itemId || !itemType) return;
+
+	const accessValue = form.access.value;
+
+	const payload = {
+		itemId: itemId,
+		access: accessValue,
+		duration: form.duration?.value || "forever",
+		days: form.days?.value || 0,
+		hours: form.hours?.value || 0,
+		minutes: form.minutes?.value || 0,
+	};
+
+	try {
+		const shareRoute = `/share-${itemType}`;
+		const response = await fetch(shareRoute, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+
+		if (response.ok) {
+			const toastMessage =
+				accessValue === "PUBLIC"
+					? "Share link generated"
+					: "Share settings updated";
+			const isSharePage = window.location.pathname.startsWith("/share/");
+			const isSharedPage = window.location.pathname === "/shared";
+
+			if (isSharePage || isSharedPage) {
+				const destination = new URL(
+					isSharePage ? "/" : window.location.href,
+					window.location.origin,
+				);
+				destination.searchParams.set("toast", toastMessage);
+				destination.searchParams.set("toastType", "success");
+				window.location.assign(destination);
+				return;
+			}
+
+			if (accessValue === "RESTRICTED") {
+				showToast(toastMessage, "success");
+				shareModal?.close();
+			} else {
+				showToast(toastMessage, "success");
+				await openShareModal(itemId, itemType);
+			}
+		} else {
+			showToast("Share could not be updated", "error");
+			console.error("Server error while updating share settings");
+		}
+	} catch (err) {
+		console.error("Failed to update share settings:", err);
+	}
+});
 
 function setupCustomTooltip(item) {
 	const tooltip = document.createElement("div");
@@ -264,172 +419,6 @@ itemElements.forEach((item) => {
 		deleteModal.form.querySelector(".item-name").textContent = `'${itemName}'`;
 
 		deleteModal?.open();
-	});
-
-	// Share
-
-	let currentShareItem = { id: null, type: null };
-
-	const shareModalEl = document.querySelector(".modal.share-item");
-
-	async function openShareModal(itemId, itemType) {
-		// Store active item context
-		currentShareItem = { id: itemId, type: itemType };
-
-		const form = shareModal.form;
-
-		// Reset form
-		form.reset();
-		setShareModalView("config");
-
-		// DOM element references inside shareModal
-		const itemIdInput = form.querySelector("#itemId");
-		const titleEl = form.querySelector(".title");
-		const accessSelect = form.querySelector("select#access");
-		const durationSelect = form.querySelector("select#duration");
-		const daysInput = form.querySelector("input#days");
-		const hoursInput = form.querySelector("input#hours");
-		const minutesInput = form.querySelector("input#minutes");
-
-		// Configure form target
-		form.action = `/share-${itemType}`;
-		if (itemIdInput) itemIdInput.value = itemId;
-		if (titleEl) titleEl.textContent = `Share ${itemType}`;
-
-		try {
-			// Fetch sharing metadata from server
-			const response = await fetch(`/${itemType}-sharing-details/${itemId}`);
-			const data = await response.json();
-			const sharingDetails = data.sharingDetails;
-
-			if (sharingDetails) {
-				// Populate access setting (PUBLIC vs RESTRICTED)
-				if (accessSelect) {
-					accessSelect.value = sharingDetails.access;
-					accessSelect.dispatchEvent(new Event("change"));
-				}
-
-				const isTimed = Boolean(sharingDetails.expiresAt);
-
-				if (durationSelect) {
-					durationSelect.value = isTimed ? "timed" : "forever";
-					durationSelect.dispatchEvent(new Event("change"));
-				}
-
-				if (isTimed && sharingDetails.remainingTime) {
-					if (daysInput)
-						daysInput.value = sharingDetails.remainingTime.days || 0;
-					if (hoursInput)
-						hoursInput.value = sharingDetails.remainingTime.hours || 0;
-					if (minutesInput)
-						minutesInput.value = sharingDetails.remainingTime.minutes || 0;
-				}
-
-				if (!sharingDetails.isExpired && sharingDetails.access === "PUBLIC") {
-					const shareLinkInput = shareModalEl?.querySelector("#shareLinkInput");
-					const badge = shareModalEl?.querySelector("#linkExpirationBadge");
-
-					if (shareLinkInput) shareLinkInput.value = sharingDetails.link || "";
-
-					if (badge) {
-						if (isTimed && sharingDetails.remainingTime) {
-							const { days, hours, minutes } = sharingDetails.remainingTime;
-							badge.textContent = `Expires in: ${days}d ${hours}h ${minutes}m`;
-						} else {
-							badge.textContent = "Link does not expire.";
-						}
-					}
-
-					setShareModalView("link");
-				}
-			} else {
-				// Default state for items that have NOT been shared yet
-
-				if (accessSelect) {
-					accessSelect.value = "RESTRICTED";
-					accessSelect.dispatchEvent(new Event("change"));
-				}
-			}
-		} catch (error) {
-			console.error("Failed to fetch sharing details:", error);
-		}
-
-		shareModal?.open();
-
-		shareModalEl?.querySelector("#shareLinkInput")?.blur();
-	}
-
-	shareModalEl
-		?.querySelector("#editShareSettingsBtn")
-		?.addEventListener("click", () => {
-			setShareModalView("config");
-		});
-
-	shareModalEl
-		?.querySelector("#doneShareBtn")
-		?.addEventListener("click", () => {
-			shareModal?.close();
-		});
-
-	// share form submit handling
-
-	shareModal?.form.addEventListener("submit", async (e) => {
-		e.preventDefault();
-
-		const form = e.target;
-		const { id: itemId, type: itemType } = currentShareItem;
-
-		if (!itemId || !itemType) return;
-
-		const accessValue = form.access.value;
-
-		const payload = {
-			itemId: itemId,
-			access: accessValue,
-			duration: form.duration?.value || "forever",
-			days: form.days?.value || 0,
-			hours: form.hours?.value || 0,
-			minutes: form.minutes?.value || 0,
-		};
-
-		try {
-			const response = await fetch(`share-${itemType}`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(payload),
-			});
-
-			let needsPageRefresh = false;
-
-			shareModal?.onClose(() => {
-				const isSharedPage = window.location.pathname.includes("/shared");
-
-				if (needsPageRefresh && isSharedPage) {
-					window.location.reload();
-				}
-			});
-
-			if (response.ok) {
-				needsPageRefresh = true;
-
-				if (accessValue === "RESTRICTED") {
-					showToast(
-						accessValue === "RESTRICTED"
-							? "Share settings updated"
-							: "File shared",
-						"success",
-					);
-					shareModal?.close();
-				} else {
-					await openShareModal(itemId, itemType);
-				}
-			} else {
-				showToast("Share could not be updated", "error");
-				console.error("Server error while updating share settings");
-			}
-		} catch (err) {
-			console.error("Failed to update share settings:", err);
-		}
 	});
 
 	const shareBtn = dropdown.querySelector("button.share-item");

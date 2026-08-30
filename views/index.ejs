@@ -34,7 +34,7 @@
       <% } %>
       <% if (locals.title === "Share") {%>
       <%- include("partials/item-card") %>
-      <% } %>
+      <% } else { %>
 
       <div class="items-container">
         <% if (locals.folders && locals.folders.length > 0) {%>
@@ -54,6 +54,8 @@
         </div>
         <% } %>
       </div>
+
+      <% } %>
 
     </section>
   </div>

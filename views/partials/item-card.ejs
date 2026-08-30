@@ -2,7 +2,7 @@
 <% const item = locals.item %>
 
 <div class="item-card" data-type="<%= locals.itemType %>" data-id="<%= item.id %>" data-url="/<%= item.path %>">
-  <div class="item-container">
+  <div class="item-card-content">
     <div class="icon-wrapper">
       <div class="thumbnail-wrapper">
         <% if (isFolder) { %>
@@ -23,6 +23,18 @@
         <span class="material-symbols-outlined icon">open_in_new</span>
         <span>Open</span>
       </button>
+
+      <% if (locals.currentUser && item.userId === locals.currentUser.id) { %>
+      <button class="go-to-location-btn" type="button" data-location-url="<%= item.locationUrl %>">
+        <span class="material-symbols-outlined icon">folder_open</span>
+        <span>Location</span>
+      </button>
+
+      <button class="update-share-btn" type="button" data-item-id="<%= item.id %>" data-item-type="<%= locals.itemType %>">
+        <span class="material-symbols-outlined icon">share</span>
+        <span>Update</span>
+      </button>
+      <% } %>
 
       <form class="download-form" action="<%= isFolder ? '/download-folder' : '/download-file' %>" method="post">
         <% if (isFolder) { %>
@@ -78,4 +90,33 @@
         if (fileURL) window.open(fileURL, "_blank");
       }
     };
+
+    const goToLocationBtn = itemCard.querySelector(".go-to-location-btn");
+    goToLocationBtn?.addEventListener("click", () => {
+      const locationUrl = goToLocationBtn.dataset.locationUrl;
+      if (locationUrl) window.location.href = locationUrl;
+    });
+
+    const updateShareBtn = itemCard.querySelector(".update-share-btn");
+    updateShareBtn?.addEventListener("click", async () => {
+      const itemId = updateShareBtn.dataset.itemId;
+      const itemType = updateShareBtn.dataset.itemType;
+
+      if (!itemId || !itemType) return;
+
+      if (typeof window.openShareModal === "function") {
+        await window.openShareModal(itemId, itemType);
+        return;
+      }
+
+      const shareModal = document.querySelector(".modal.share-item");
+      const form = shareModal?.querySelector("form");
+      const itemIdInput = form?.querySelector("#itemId");
+
+      if (shareModal && form && itemIdInput) {
+        form.action = `/share-${itemType}`;
+        itemIdInput.value = itemId;
+        shareModal.classList.add("active");
+      }
+    });
   </script>

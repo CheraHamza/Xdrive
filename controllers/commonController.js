@@ -288,12 +288,14 @@ export const getShare = async (req, res, next) => {
 				file: {
 					include: {
 						user: { select: { id: true, name: true } },
+						folder: { select: { id: true, parentId: true, name: true } },
 					},
 				},
 				folder: {
 					include: {
 						files: { select: { size: true } },
 						user: { select: { id: true, name: true } },
+						parent: { select: { id: true, name: true } },
 						_count: {
 							select: {
 								files: { where: { trashed: false } },
@@ -337,6 +339,7 @@ export const getShare = async (req, res, next) => {
 
 		if (itemType === "file") {
 			mapFileIcons([item]);
+			item.locationUrl = item.folderId ? `/folder/${item.folderId}` : "/";
 			item.details = {
 				type: item.type,
 				size: (item.size / (1024 * 1024)).toFixed(2),
@@ -344,6 +347,7 @@ export const getShare = async (req, res, next) => {
 			};
 		} else {
 			const totalSize = item.files.reduce((acc, f) => acc + f.size, 0);
+			item.locationUrl = item.parentId ? `/folder/${item.parentId}` : "/";
 
 			item.details = {
 				type: "Folder",

@@ -5,6 +5,8 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 30px;
+	align-content: flex-start;
+	padding: 4px 2px 2px;
 }
 
 .custom-tooltip {
@@ -156,48 +158,51 @@
 
 .item-icon {
 	&.other {
-		color: #b7b7b7;
+		color: #b9bcc3;
 	}
 
 	&.image {
-		color: #5fa3ff;
+		color: #46c7a6;
 	}
 
 	&.movie {
-		color: #ff6b6b;
+		color: #ff6f61;
 	}
 
 	&.audio {
-		color: #b86cff;
+		color: #b97ef7;
 	}
 
 	&.pdf {
-		color: #ff5d5d;
+		color: #ff8a65;
 	}
 
-	&.document,
+	&.document {
+		color: #4c8ef7;
+	}
+
 	&.text {
-		color: #4a90e2;
+		color: #5ea1ff;
 	}
 
 	&.spreadsheet {
-		color: #3cc980;
+		color: #50c878;
 	}
 
 	&.presentation {
-		color: #f2b94b;
+		color: #f7b955;
 	}
 
 	&.code {
-		color: #6ea8ff;
+		color: #8a7cf7;
 	}
 
 	&.zip {
-		color: #9aa0a6;
+		color: #a1a8b3;
 	}
 
 	&.folder {
-		color: #d6a57d;
+		color: #d89a5d;
 		font-variation-settings: "FILL" 1;
 	}
 }

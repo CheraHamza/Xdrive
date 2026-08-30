@@ -7,7 +7,7 @@
 @use "components/itemCard";
 @use "components/modal";
 
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,article,audio_file,arrow_drop_down,arrow_drop_up,check,check_box,cloud,code,content_copy,create_new_folder,delete,delete_forever,description,download,draft,drive_file_move,edit_square,folder,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,mail,movie,more_vert,open_in_new,picture_as_pdf,public,search,settings,share,slideshow,star,table_chart,text_snippet,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,article,audio_file,arrow_drop_down,arrow_drop_up,check,check_box,cloud,code,content_copy,create_new_folder,delete,delete_forever,description,download,draft,drive_file_move,edit_square,folder,folder_open,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,mail,movie,more_vert,open_in_new,picture_as_pdf,public,search,settings,share,slideshow,star,table_chart,text_snippet,upload_file,visibility,visibility_off&display=block");
 
 * {
 	box-sizing: border-box;
@@ -136,10 +136,13 @@ a {
 }
 
 .home-page {
-	min-height: 100%;
+	height: 100dvh;
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
+	min-height: 0;
+
+	gap: 5px;
 
 	&.has-navbar {
 		grid-template-columns: 250px 1fr;
@@ -149,14 +152,29 @@ a {
 		height: 100%;
 		display: flex;
 		flex-direction: column;
-		padding: 30px;
+		padding: 20px;
+		min-height: 0;
+		overflow: hidden;
+
+		& > hr {
+			width: 100vw;
+			margin-left: -20px;
+			border: 0;
+			border-top: 1px solid rgba(180, 184, 192, 0.3);
+			margin-top: 10px;
+		}
 
 		.items-container {
-			height: 100%;
+			flex: 1;
 			display: flex;
 			flex-direction: column;
 			gap: 20px;
-
+			min-height: 0;
+			padding: 18px 16px 14px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 14px;
+			background: rgba(120, 126, 138, 0.019);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 			overflow-y: auto;
 			scrollbar-width: thin;
 			scrollbar-color: var.$light-gray var.$dark-gray;
@@ -172,10 +190,34 @@ a {
 	display: flex;
 	align-items: center;
 	gap: 5px;
+	min-width: 0;
+	max-width: 100%;
 
 	margin-block: 30px 10px;
 
+	& > .material-symbols-outlined {
+		flex: 0 0 auto;
+	}
+
 	h1 {
-		font-size: 25px;
+		font-size: 21px;
+		min-width: 0;
+		max-width: 28%;
+		flex: 0 1 auto;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		a {
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		&.current {
+			max-width: none;
+			flex: 0 1 auto;
+		}
 	}
 }

@@ -1,7 +1,9 @@
 <div class="location-bar">
   <% if (locals.location) { %>
   <% location.forEach((path, index) => { %>
-  <h1><a href="<%= path.url %>"><%= path.name %></a></h1>
+  <h1 class="breadcrumb <%= index === location.length - 1 ? 'current' : '' %>" title="<%= path.name %>">
+    <a href="<%= path.url %>"><%= path.name %></a>
+  </h1>
   <% if (index < location.length - 1) {%>
   <span class="material-symbols-outlined">keyboard_arrow_right</span>
   <% }}) } %>

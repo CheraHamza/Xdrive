@@ -39,6 +39,10 @@
     <% } %>
 </header>
 
+<% if (locals.title === 'Share') { %>
+<hr>
+<% } %>
+
 <script defer>
   const settingsBtn = document.querySelector('.settings-btn');
   const settingsDropdown = document.querySelector('.settings-dropdown');

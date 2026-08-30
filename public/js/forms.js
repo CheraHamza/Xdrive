@@ -88,14 +88,20 @@ durationSelect?.addEventListener("change", (e) => {
 copyLinkBtn?.addEventListener("click", async (e) => {
 	if (!shareLinkInput || !shareLinkInput.value) return;
 
-	await navigator.clipboard.writeText(shareLinkInput.value);
+	try {
+		await navigator.clipboard.writeText(shareLinkInput.value);
+		window.showToast?.("Link copied to clipboard");
 
-	const icon = copyLinkBtn.querySelector(".material-symbols-outlined");
-	if (icon) {
-		icon.textContent = "check";
-		setTimeout(() => {
-			icon.textContent = "content_copy";
-		}, 2000);
+		const icon = copyLinkBtn.querySelector(".material-symbols-outlined");
+		if (icon) {
+			icon.textContent = "check";
+			setTimeout(() => {
+				icon.textContent = "content_copy";
+			}, 2000);
+		}
+	} catch (error) {
+		console.error("Failed to copy share link:", error);
+		window.showToast?.("Could not copy link", "error");
 	}
 });
 
