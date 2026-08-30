@@ -1,12 +1,20 @@
 import { prisma } from "../lib/prisma.js";
 import { intervalToDuration, isBefore } from "date-fns";
+import { permanentlyDeleteFile } from "./filesController.js";
 
 export function mapFileIcons(files) {
 	const iconMap = {
 		image: "image",
 		movie: "movie",
-		other: "draft",
+		audio: "audio_file",
+		pdf: "picture_as_pdf",
+		document: "description",
+		spreadsheet: "table_chart",
+		presentation: "slideshow",
+		code: "code",
+		text: "article",
 		zip: "folder_zip",
+		other: "draft",
 	};
 
 	files.forEach((file) => {

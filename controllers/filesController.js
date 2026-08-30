@@ -60,13 +60,77 @@ export const postUpload = [
 				"bz2",
 				"xz",
 			];
+			const documentExtensions = [
+				"doc",
+				"docx",
+				"odt",
+				"rtf",
+				"txt",
+				"md",
+			];
+			const spreadsheetExtensions = [
+				"xls",
+				"xlsx",
+				"csv",
+				"ods",
+			];
+			const presentationExtensions = [
+				"ppt",
+				"pptx",
+				"odp",
+			];
+			const codeExtensions = [
+				"js",
+				"jsx",
+				"ts",
+				"tsx",
+				"json",
+				"html",
+				"css",
+				"scss",
+				"sass",
+				"py",
+				"java",
+				"c",
+				"cpp",
+				"cs",
+				"php",
+				"sql",
+				"xml",
+				"yaml",
+				"yml",
+			];
 
 			if (mainType === "image") {
 				return "image";
 			}
 
+			if (mainType === "audio") {
+				return "audio";
+			}
+
 			if (mainType === "video") {
 				return "movie";
+			}
+
+			if (extension === "pdf") {
+				return "pdf";
+			}
+
+			if (spreadsheetExtensions.includes(extension)) {
+				return "spreadsheet";
+			}
+
+			if (presentationExtensions.includes(extension)) {
+				return "presentation";
+			}
+
+			if (codeExtensions.includes(extension)) {
+				return "code";
+			}
+
+			if (documentExtensions.includes(extension) || mainType === "text") {
+				return "document";
 			}
 
 			if (archiveExtensions.includes(extension)) {

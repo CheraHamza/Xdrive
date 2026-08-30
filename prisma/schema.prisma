@@ -85,6 +85,13 @@ model Share {
 enum Type {
   image
   movie
+  audio
+  pdf
+  document
+  spreadsheet
+  presentation
+  code
+  text
   zip
   other
 }

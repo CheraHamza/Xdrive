@@ -130,23 +130,48 @@
 
 .item-icon {
 	&.other {
-		color: #c4c59c;
+		color: #b7b7b7;
 	}
 
 	&.image {
-		color: rgb(143, 178, 224);
+		color: #5fa3ff;
 	}
 
 	&.movie {
-		color: var.$light-red;
+		color: #ff6b6b;
+	}
+
+	&.audio {
+		color: #b86cff;
+	}
+
+	&.pdf {
+		color: #ff5d5d;
+	}
+
+	&.document,
+	&.text {
+		color: #4a90e2;
+	}
+
+	&.spreadsheet {
+		color: #3cc980;
+	}
+
+	&.presentation {
+		color: #f2b94b;
+	}
+
+	&.code {
+		color: #6ea8ff;
 	}
 
 	&.zip {
-		color: rgb(160, 160, 160);
+		color: #9aa0a6;
 	}
 
 	&.folder {
-		color: #a58e7f;
+		color: #d6a57d;
 		font-variation-settings: "FILL" 1;
 	}
 }
