@@ -37,6 +37,9 @@
       <% } else { %>
 
       <div class="items-container">
+        <% const hasItems = (locals.folders && locals.folders.length > 0) || (locals.files && locals.files.length > 0); %>
+
+        <% if (hasItems) { %>
         <% if (locals.folders && locals.folders.length > 0) {%>
         <p class="text-label thin gray">Folders</p>
         <div class="folders-container">
@@ -52,6 +55,9 @@
           <%- include("partials/grid-item", {item: file, isFolder: false}) %>
           <% }); %>
         </div>
+        <% } %>
+        <% } else { %>
+        <%- include("partials/empty-state") %>
         <% } %>
       </div>
 

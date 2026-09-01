@@ -1,0 +1,34 @@
+<div class="empty-state-container">
+  <div class="empty-state-content">
+    <% 
+      let imageSrc, emptyMessage, emptySubtext;
+      
+      if (locals.title === "Search") {
+        imageSrc = "/icons/no_search_results.svg";
+        emptyMessage = "No results found";
+        emptySubtext = "Try different keywords or filters";
+      } else {
+        imageSrc = "/icons/empty_directory.svg";
+        if (locals.title === "Starred") {
+          emptyMessage = "No starred files yet";
+          emptySubtext = "Star files to save them for quick access";
+        } else if (locals.title === "Shared") {
+          emptyMessage = "No shared files";
+          emptySubtext = "Start sharing to collaborate with others";
+        } else if (locals.title === "Trash") {
+          emptyMessage = "Trash is empty";
+          emptySubtext = "Deleted files will appear here";
+        } else if (locals.title && locals.title !== "Home") {
+          emptyMessage = "This folder is empty";
+          emptySubtext = "Upload or create files to get started";
+        } else {
+          emptyMessage = "Nothing here yet";
+          emptySubtext = "Create a folder or upload files to get started";
+        }
+      }
+    %>
+    <img src="<%= imageSrc %>" alt="<%= emptyMessage %>" class="empty-state-image">
+    <h2 class="empty-state-title"><%= emptyMessage %></h2>
+    <p class="empty-state-subtitle"><%= emptySubtext %></p>
+  </div>
+</div>

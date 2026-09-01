@@ -345,6 +345,7 @@
   align-self: end;
   padding: 10px;
   border-radius: 20px;
+  margin-bottom: 10px;
 }
 
 .incBtn {
@@ -1243,6 +1244,45 @@ header .auth-btns {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.empty-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  padding: 40px 20px;
+}
+
+.empty-state-image {
+  width: 128px;
+  height: 128px;
+  opacity: 0.8;
+}
+
+.empty-state-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #e2e2e5;
+  margin: 0;
+  font-family: "Geist";
+}
+
+.empty-state-subtitle {
+  font-size: 14px;
+  color: #929497;
+  margin: 0;
+  font-family: "Geist";
 }
 
 * {
