@@ -55,4 +55,25 @@
 
 
   </div>
+
+  <% if (locals.currentUser) { %>
+  <div class="account-banner">
+    <div class="account-summary">
+      <div class="avatar" style="--avatar-hue: <%= (locals.currentUser.name || 'U').charCodeAt(0) * 7 %>deg">
+        <%= (locals.currentUser.name || "U").charAt(0).toUpperCase() %>
+      </div>
+      <div class="account-info">
+        <div class="account-name" title="<%= locals.currentUser.name || 'User' %>">
+          <%= locals.currentUser.name || "User" %>
+        </div>
+        <div class="storage-label">
+          <%= locals.storageUsage?.percentage || 0 %>% of <%= locals.storageUsage?.limitLabel || "quota" %>
+        </div>
+      </div>
+    </div>
+    <div class="storage-bar" role="progressbar" aria-label="Storage used" aria-valuemin="0" aria-valuemax="100" ariavaluenow="<%= locals.storageUsage?.percentage || 0 %>">
+      <div class="storage-bar-fill" style="width: <%= locals.storageUsage?.percentage || 0 %>%"></div>
+    </div>
+  </div>
+  <% } %>
 </nav>

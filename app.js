@@ -6,6 +6,7 @@ import { sessionMiddleware } from "./config/passport.js";
 import passport from "passport";
 import "./config/passport.js";
 import dotenv from "dotenv";
+import { prisma } from "./lib/prisma.js";
 
 dotenv.config();
 
@@ -23,9 +24,31 @@ app.use(sessionMiddleware());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
 	res.locals.currentUser = req.user || null;
 	res.locals.isAuthenticated = req.isAuthenticated();
+
+	if (!req.user) {
+		return next();
+	}
+
+	try {
+		const storageLimitMb = 100;
+		const storageLimit = storageLimitMb * 1024 * 1024;
+		const storage = await prisma.file.aggregate({
+			_sum: { size: true },
+			where: { userId: req.user.id },
+		});
+		const usedBytes = storage._sum.size || 0;
+
+		res.locals.storageUsage = {
+			percentage: Math.min(100, Math.round((usedBytes / storageLimit) * 100)),
+			limitLabel: `${storageLimitMb} MB`,
+		};
+	} catch (error) {
+		return next(error);
+	}
+
 	next();
 });
 

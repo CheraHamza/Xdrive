@@ -732,6 +732,60 @@ input:focus {
   flex-direction: column;
   gap: 5px;
 }
+.navbar .account-banner {
+  width: 100%;
+  margin-top: auto;
+  padding: 20px 0 0;
+  border-top: 1px solid rgba(146, 148, 151, 0.2196078431);
+}
+.navbar .account-banner .account-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.navbar .account-banner .avatar {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background-color: hsl(var(--avatar-hue), 45%, 72%);
+  color: #121416;
+  font-size: 18px;
+  font-weight: 600;
+}
+.navbar .account-banner .account-info {
+  min-width: 0;
+}
+.navbar .account-banner .account-name,
+.navbar .account-banner .storage-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.navbar .account-banner .account-name {
+  font-weight: 600;
+}
+.navbar .account-banner .storage-label {
+  margin-top: 3px;
+  color: #929497;
+  font-size: 12px;
+}
+.navbar .account-banner .storage-bar {
+  height: 5px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: rgba(146, 148, 151, 0.2196078431);
+}
+.navbar .account-banner .storage-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background-color: #bec8d2;
+  transition: width 0.25s ease;
+}
 .navbar .new-btn-wrapper {
   width: 100%;
   position: relative;
