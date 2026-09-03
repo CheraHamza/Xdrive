@@ -26,6 +26,18 @@ export function mapFileIcons(files) {
 	});
 }
 
+export function getFileDownloadName(file) {
+	const originalExtension = path.extname(file.filename || file.path || "");
+	if (
+		!originalExtension ||
+		file.name.toLowerCase().endsWith(originalExtension.toLowerCase())
+	) {
+		return file.name;
+	}
+
+	return `${file.name}${originalExtension}`;
+}
+
 export function redirectWithToast(req, res, message, type = "success") {
 	const target = req.get("Referrer") || "/";
 	const separator = target.includes("?") ? "&" : "?";
@@ -548,7 +560,9 @@ const addSharedFolderToArchive = async (
 
 	folder.files.forEach((file) => {
 		if (!file.trashed && fs.existsSync(file.path)) {
-			archive.file(file.path, { name: path.join(currentPath, file.name) });
+			archive.file(file.path, {
+				name: path.join(currentPath, getFileDownloadName(file)),
+			});
 		}
 	});
 
@@ -642,7 +656,7 @@ export const downloadSharedFile = async (req, res, next) => {
 
 		return res.download(
 			downloadableFile.path,
-			downloadableFile.name,
+			getFileDownloadName(downloadableFile),
 			(error) => {
 				if (error && !res.headersSent) {
 					return res.status(500).json({ error: "Download failed" });

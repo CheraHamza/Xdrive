@@ -5,6 +5,7 @@ import { ZipArchive } from "archiver";
 import { addDays, addHours, addMinutes, format } from "date-fns";
 import {
 	formatSharingDetails,
+	getFileDownloadName,
 	mapFileIcons,
 	redirectWithToast,
 } from "./commonController.js";
@@ -163,9 +164,9 @@ const addFolderToArchive = async (folderId, archive, currentPath = "") => {
 		const filePath = file.path;
 
 		if (fs.existsSync(filePath)) {
-			const internalZipPath = path.join(currentPath, file.name);
-
-			archive.file(filePath, { name: internalZipPath });
+			archive.file(filePath, {
+				name: path.join(currentPath, getFileDownloadName(file)),
+			});
 		}
 	});
 

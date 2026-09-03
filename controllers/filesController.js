@@ -4,7 +4,11 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { addDays, addHours, addMinutes, format } from "date-fns";
-import { formatSharingDetails, redirectWithToast } from "./commonController.js";
+import {
+	formatSharingDetails,
+	getFileDownloadName,
+	redirectWithToast,
+} from "./commonController.js";
 import {
 	verifyFileOwnership,
 	verifyFolderOwnership,
@@ -13,7 +17,7 @@ import {
 import {
 	validateFileName,
 	validateShareSettings,
-	runValidation
+	runValidation,
 } from "../middleware/validators.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -249,7 +253,7 @@ export const downloadFile = async (req, res, next) => {
 			return res.status(404).json({ error: "File not found on server" });
 		}
 
-		res.download(filePath, file.name, (err) => {
+		res.download(filePath, getFileDownloadName(file), (err) => {
 			if (err) {
 				if (!res.headersSent) {
 					return res.status(500).json({ error: "Download failed" });
@@ -286,10 +290,25 @@ export const renameFile = async (req, res, next) => {
 			);
 		}
 
+		const originalExtension = path.extname(file.filename || file.path || "");
+		const trimmedName = newFileName.trim();
+		const displayName =
+			originalExtension &&
+			trimmedName.toLowerCase().endsWith(originalExtension.toLowerCase())
+				? trimmedName.slice(0, -originalExtension.length).trim()
+				: trimmedName;
+
+		if (!displayName) {
+			return res.status(400).json({
+				success: false,
+				errors: { name: ["File name cannot be empty"] },
+			});
+		}
+
 		await prisma.file.update({
 			where: { id: fileId },
 			data: {
-				name: newFileName.trim(),
+				name: displayName,
 			},
 		});
 
