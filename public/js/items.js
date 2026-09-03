@@ -269,6 +269,63 @@ itemElements.forEach((item) => {
 
 // handle drop down menu
 
+let activeDropdown = null;
+let positionFrame = null;
+
+function positionDropdown(menuBtn, dropdown) {
+	if (!dropdown.classList.contains("active")) return;
+
+	const dropdownRect = dropdown.getBoundingClientRect();
+	const buttonRect = menuBtn.getBoundingClientRect();
+	const margin = 15;
+	const gap = -5;
+	const spaceRight = window.innerWidth - buttonRect.right - gap - margin;
+	const spaceLeft = buttonRect.left - gap - margin;
+	const preferredLeft =
+		spaceRight >= dropdownRect.width
+			? buttonRect.right + gap
+			: spaceLeft >= dropdownRect.width
+				? buttonRect.left - dropdownRect.width - gap
+				: spaceRight >= spaceLeft
+					? buttonRect.right + gap
+					: buttonRect.left - dropdownRect.width - gap;
+	const maxLeft = window.innerWidth - dropdownRect.width - margin;
+	const left = Math.max(margin, Math.min(preferredLeft, maxLeft));
+	const spaceBelow = window.innerHeight - buttonRect.bottom - gap - margin;
+	const spaceAbove = buttonRect.top - gap - margin;
+	const preferredTop =
+		spaceBelow >= dropdownRect.height
+			? buttonRect.bottom + gap
+			: spaceAbove >= dropdownRect.height
+				? buttonRect.top - dropdownRect.height - gap
+				: spaceBelow >= spaceAbove
+					? buttonRect.bottom + gap
+					: buttonRect.top - dropdownRect.height - gap;
+	const maxTop = window.innerHeight - dropdownRect.height - margin;
+
+	dropdown.style.left = `${left}px`;
+	dropdown.style.right = "auto";
+	dropdown.style.top = `${Math.max(margin, Math.min(preferredTop, maxTop))}px`;
+	dropdown.style.bottom = "auto";
+}
+
+function repositionActiveDropdown() {
+	if (!activeDropdown || positionFrame) return;
+
+	positionFrame = requestAnimationFrame(() => {
+		positionFrame = null;
+		if (activeDropdown) {
+			positionDropdown(activeDropdown.menuBtn, activeDropdown.dropdown);
+		}
+	});
+}
+
+window.addEventListener("resize", repositionActiveDropdown);
+document.addEventListener("scroll", repositionActiveDropdown, {
+	capture: true,
+	passive: true,
+});
+
 itemElements.forEach((item) => {
 	const menuBtn = item.querySelector(".item-menu-btn");
 	const dropdown = item.querySelector(".item-dropdown");
@@ -303,21 +360,10 @@ itemElements.forEach((item) => {
 			dropdown.style.top = "";
 			dropdown.style.bottom = "";
 
-			const rect = dropdown.getBoundingClientRect();
-			const windowWidth = window.innerWidth;
-			const windowHight = window.innerHeight;
-
-			if (rect.right > windowWidth) {
-				dropdown.style.right = "25px";
-			} else {
-				dropdown.style.left = "25px";
-			}
-
-			if (rect.bottom > windowHight) {
-				dropdown.style.bottom = "25px";
-			} else {
-				dropdown.style.top = "25px ";
-			}
+			activeDropdown = { menuBtn, dropdown };
+			positionDropdown(menuBtn, dropdown);
+		} else {
+			activeDropdown = null;
 		}
 	});
 });
@@ -331,6 +377,7 @@ document.addEventListener("click", () => {
 			item._tooltip.classList.remove("visible");
 		}
 	});
+	activeDropdown = null;
 });
 
 // item interactions
@@ -353,7 +400,15 @@ itemElements.forEach((item) => {
 		}
 	};
 
-	item.addEventListener("dblclick", handleOpen);
+	item.addEventListener("click", (event) => {
+		if (
+			event.target.closest(".item-menu-wrapper, .item-dropdown, .star-form")
+		) {
+			return;
+		}
+
+		handleOpen();
+	});
 
 	const openBtn = dropdown.querySelector("button.open-item");
 	openBtn?.addEventListener("click", handleOpen);

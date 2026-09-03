@@ -1,5 +1,8 @@
 <header>
   <% if (locals.isAuthenticated) { %>
+  <button class="mobile-nav-toggle" type="button" aria-label="Open navigation" aria-controls="primary-navigation" aria-expanded="false">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
   <div class="input-wrapper">
     <form action="/search" method="get">
       <span class="material-symbols-outlined search-icon big">search</span>
@@ -44,6 +47,33 @@
 <% } %>
 
 <script defer>
+  const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+  const primaryNavigation = document.querySelector('#primary-navigation');
+  const navOverlay = document.querySelector('.nav-overlay');
+
+  const closeMobileNav = () => {
+    primaryNavigation?.classList.remove('open');
+    navOverlay?.classList.remove('open');
+    mobileNavToggle?.setAttribute('aria-expanded', 'false');
+    mobileNavToggle?.setAttribute('aria-label', 'Open navigation');
+  };
+
+  mobileNavToggle?.addEventListener('click', () => {
+    const isOpen = primaryNavigation?.classList.toggle('open');
+    navOverlay?.classList.toggle('open', isOpen);
+    mobileNavToggle.setAttribute('aria-expanded', String(Boolean(isOpen)));
+    mobileNavToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+  });
+
+  navOverlay?.addEventListener('click', closeMobileNav);
+  document.querySelector('.new-btn')?.addEventListener('click', closeMobileNav);
+  primaryNavigation?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMobileNav);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMobileNav();
+  });
+
   const settingsBtn = document.querySelector('.settings-btn');
   const settingsDropdown = document.querySelector('.settings-dropdown');
 

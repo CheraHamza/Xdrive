@@ -8,7 +8,6 @@
 
 	border: none;
 	border-radius: 5px;
-	outline: none;
 
 	cursor: pointer;
 
@@ -21,8 +20,7 @@
 	background-color: $bg-color;
 	border: 2px solid $bg-color;
 
-	&:hover,
-	&:focus {
+	&:hover {
 		background-color: $text-color;
 		color: $bg-color;
 	}

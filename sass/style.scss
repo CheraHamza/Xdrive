@@ -201,6 +201,16 @@ a {
 	}
 }
 
+@media (max-width: 700px) {
+	.home-page.has-navbar {
+		grid-template-columns: 1fr;
+
+		.main-wrapper {
+			padding: 14px;
+		}
+	}
+}
+
 .location-bar {
 	display: flex;
 	align-items: center;
