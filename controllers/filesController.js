@@ -291,15 +291,9 @@ export const renameFile = async (req, res, next) => {
 			);
 		}
 
-		const originalExtension = path.extname(file.filename || file.path || "");
 		const trimmedName = newFileName.trim();
-		const displayName =
-			originalExtension &&
-			trimmedName.toLowerCase().endsWith(originalExtension.toLowerCase())
-				? trimmedName.slice(0, -originalExtension.length).trim()
-				: trimmedName;
 
-		if (!displayName) {
+		if (!trimmedName) {
 			return res.status(400).json({
 				success: false,
 				errors: { name: ["File name cannot be empty"] },
@@ -309,7 +303,7 @@ export const renameFile = async (req, res, next) => {
 		await prisma.file.update({
 			where: { id: fileId },
 			data: {
-				name: displayName,
+				name: trimmedName,
 			},
 		});
 
