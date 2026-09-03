@@ -32,7 +32,31 @@
         <span>Empty trash</span>
       </button>
       <% } %>
-      <% if (locals.title === "Share") {%>
+      <% if (locals.isSharedBrowse) { %>
+      <div class="items-container">
+        <% const hasItems = (locals.folders && locals.folders.length > 0) || (locals.files && locals.files.length > 0); %>
+        <% if (hasItems) { %>
+        <% if (locals.folders && locals.folders.length > 0) { %>
+        <p class="text-label thin gray">Folders</p>
+        <div class="folders-container">
+          <% folders.forEach(folder => { %>
+          <%- include("partials/grid-item", {item: folder, isFolder: true, sharedBrowse: true}) %>
+          <% }) %>
+        </div>
+        <% } %>
+        <% if (locals.files && locals.files.length > 0) { %>
+        <p class="text-label thin gray">Files</p>
+        <div class="files-container">
+          <% files.forEach(file => { %>
+          <%- include("partials/grid-item", {item: file, isFolder: false, sharedBrowse: true}) %>
+          <% }) %>
+        </div>
+        <% } %>
+        <% } else { %>
+        <%- include("partials/empty-state") %>
+        <% } %>
+      </div>
+      <% } else if (locals.title === "Share") {%>
       <%- include("partials/item-card") %>
       <% } else { %>
 

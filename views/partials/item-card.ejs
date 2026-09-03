@@ -1,7 +1,7 @@
 <% const isFolder = locals.itemType === 'folder' || false; %>
 <% const item = locals.item %>
 
-<div class="item-card" data-type="<%= locals.itemType %>" data-id="<%= item.id %>" data-url="/<%= item.path %>">
+<div class="item-card" data-type="<%= locals.itemType %>" data-id="<%= item.id %>" data-open-url="<%= item.sharedOpenUrl || '' %>" data-url="/<%= item.path %>">
   <div class="item-card-content">
     <div class="icon-wrapper">
       <div class="thumbnail-wrapper">
@@ -18,7 +18,7 @@
       </div>
       <div class="item-name"><%= item?.name %></div>
     </div>
-    <div class="action-btns-wrapper" >
+    <div class="action-btns-wrapper">
       <button class="open-item" onclick="handleOpen()">
         <span class="material-symbols-outlined icon">open_in_new</span>
         <span>Open</span>
@@ -36,12 +36,13 @@
       </button>
       <% } %>
 
-      <form class="download-form" action="<%= isFolder ? '/download-folder' : '/download-file' %>" method="post">
+      <form class="download-form" action="<%= locals.isSharedBrowse || locals.title === 'Share' ? `/share/${item.shareToken}/download` : (isFolder ? '/download-folder' : '/download-file') %>" method="<%= locals.isSharedBrowse || locals.title === 'Share' ? 'get' : 'post' %>">
         <% if (isFolder) { %>
         <input id="folderId" name="folderId" type="hidden" value="<%= item?.id %>">
         <% } else { %>
-        <input id="fileName" name="fileName" type="hidden" value="<%= item?.name %>">
-        <input id="filePath" name="filePath" type="hidden" value="<%= item?.path %>">
+        <% if (!locals.isSharedBrowse && locals.title !== 'Share') { %>
+        <input id="fileId" name="fileId" type="hidden" value="<%= item?.id %>">
+        <% } %>
         <% } %>
 
         <button class="download-item" type="submit">
@@ -84,7 +85,7 @@
 
     const handleOpen = () => {
       if (isFolder) {
-        window.location.href = `/folder/${itemId}`;
+        window.location.href = itemCard.getAttribute("data-open-url") || `/folder/${itemId}`;
       } else {
         const fileURL = itemCard.getAttribute("data-url");
         if (fileURL) window.open(fileURL, "_blank");

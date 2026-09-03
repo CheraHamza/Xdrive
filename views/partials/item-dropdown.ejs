@@ -9,15 +9,20 @@
     <span>Open</span>
   </button>
 
+  <% if (locals.sharedBrowse) { %>
+  <form class="download-form" action="<%= item.sharedDownloadUrl %>" method="get">
+    <button class="download-item" type="submit">
+      <span class="material-symbols-outlined icon">download</span>
+      <span>Download</span>
+    </button>
+  </form>
+  <% } else { %>
   <form class="download-form" action="<%= isFolder ? '/download-folder' : '/download-file' %>" method="post">
     <% if (isFolder) { %>
-
     <input id="folderId" name="folderId" type="hidden" value="<%= item?.id %>">
     <% } else { %>
-    <input id="fileName" name="fileName" type="hidden" value="<%= item?.name %>">
-    <input id="filePath" name="filePath" type="hidden" value="<%= item?.path %>">
+    <input id="fileId" name="fileId" type="hidden" value="<%= item?.id %>">
     <% } %>
-
     <button class="download-item" type="submit">
       <span class="material-symbols-outlined icon">download</span>
       <span>Download</span>
@@ -51,6 +56,7 @@
       <span>Move to trash</span>
     </button>
   </form>
+  <% } %>
 
 
   <% } else { %>

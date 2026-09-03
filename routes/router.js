@@ -42,6 +42,8 @@ import {
 	getRoot,
 	getSearch,
 	getShare,
+	browseSharedFolder,
+	downloadSharedFile,
 	getShared,
 	getStarred,
 	getTrash,
@@ -55,6 +57,8 @@ router.get("/starred", isAuth, getStarred);
 router.get("/trash", isAuth, getTrash);
 router.get("/search", isAuth, getSearch);
 router.get("/share/:id", getShare);
+router.get("/share/:id/folder/:folderId", browseSharedFolder);
+router.get("/share/:id/download", downloadSharedFile);
 router.get("/shared", isAuth, getShared);
 router.get("/folder-tree", isAuth, getFolderTree);
 router.post("/empty-trash", isAuth, emptyTrash);

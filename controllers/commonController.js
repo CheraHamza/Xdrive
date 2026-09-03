@@ -1,4 +1,7 @@
 import { prisma } from "../lib/prisma.js";
+import fs from "fs";
+import path from "path";
+import { ZipArchive } from "archiver";
 import { intervalToDuration, isBefore } from "date-fns";
 import { permanentlyDeleteFile } from "./filesController.js";
 import { permanentlyDeleteFolder } from "./foldersController.js";
@@ -51,7 +54,6 @@ export const getRoot = async (req, res, next) => {
 			children: { where: { trashed: false } },
 		},
 	});
-
 	mapFileIcons(rootFolder.files);
 
 	const location = [
@@ -70,55 +72,193 @@ export const getRoot = async (req, res, next) => {
 	});
 };
 
-export const getStarred = async (req, res, next) => {
-	const starredFolders = await prisma.folder.findMany({
-		where: { starred: true, trashed: false },
+async function folderBelongsToSharedRoot(folderId, rootFolderId, userId) {
+	let currentId = folderId;
+
+	while (currentId) {
+		const folder = await prisma.folder.findUnique({
+			where: { id: currentId },
+			select: { id: true, parentId: true, userId: true },
+		});
+
+		if (!folder || folder.userId !== userId) return false;
+		if (folder.id === rootFolderId) return true;
+		currentId = folder.parentId;
+	}
+
+	return false;
+}
+
+async function getSharedFolderContents(token, folderId, user) {
+	const share = await prisma.share.findUnique({
+		where: { shareToken: token },
+		include: { folder: { select: { id: true, userId: true, trashed: true } } },
 	});
 
-	const starredFiles = await prisma.file.findMany({
-		where: { starred: true, trashed: false },
-	});
+	if (
+		!share ||
+		share.access !== "PUBLIC" ||
+		(share.expiresAt && isBefore(new Date(share.expiresAt), new Date())) ||
+		!share.folder ||
+		share.folder.trashed ||
+		!(await folderBelongsToSharedRoot(
+			folderId,
+			share.folder.id,
+			share.folder.userId,
+		))
+	) {
+		return null;
+	}
 
-	mapFileIcons(starredFiles);
-
-	const location = [
-		{
-			name: "Starred",
-			url: "/starred",
+	const folder = await prisma.folder.findUnique({
+		where: { id: folderId },
+		include: {
+			files: { where: { trashed: false } },
+			children: { where: { trashed: false } },
+			user: { select: { id: true, name: true } },
+			parent: { select: { id: true, name: true, parentId: true } },
 		},
-	];
-	res.render("index", {
-		title: "Starred",
-		files: starredFiles,
-		folders: starredFolders,
-		location,
 	});
+
+	if (!folder || folder.trashed) return null;
+
+	const location = [];
+	let currentFolder = folder;
+	while (currentFolder) {
+		location.unshift({
+			name: currentFolder.name,
+			url:
+				currentFolder.id === share.folder.id
+					? `/share/${token}`
+					: `/share/${token}/folder/${currentFolder.id}`,
+		});
+
+		if (currentFolder.id === share.folder.id) break;
+		if (!currentFolder.parentId) break;
+		currentFolder = await prisma.folder.findUnique({
+			where: { id: currentFolder.parentId },
+			select: { id: true, name: true, parentId: true },
+		});
+	}
+
+	mapFileIcons(folder.files);
+	const sharedBaseUrl = `/share/${token}`;
+	const isOwner = folder.userId === user?.id;
+	folder.children.forEach((child) => {
+		child.sharedOpenUrl = `${sharedBaseUrl}/folder/${child.id}`;
+		child.sharedDownloadUrl = `${sharedBaseUrl}/download?itemId=${child.id}`;
+	});
+	folder.files.forEach((file) => {
+		file.sharedDownloadUrl = `${sharedBaseUrl}/download?itemId=${file.id}`;
+	});
+
+	const totalSize = folder.files.reduce((total, file) => total + file.size, 0);
+	folder.shareToken = token;
+	folder.sharedOpenUrl = isOwner
+		? `/folder/${folder.id}`
+		: `${sharedBaseUrl}/folder/${folder.id}`;
+	folder.details = {
+		type: "Folder",
+		size: (totalSize / (1024 * 1024)).toFixed(2),
+		owner: folder.user.name || "Unknown",
+		Nfiles: folder.files.length,
+		Nfolders: folder.children.length,
+	};
+
+	return { folder, location, isOwner };
+}
+
+export async function browseSharedFolder(req, res, next) {
+	try {
+		const token = req.params.id;
+		const folderId = req.params.folderId;
+		const contents = await getSharedFolderContents(token, folderId, req.user);
+
+		if (!contents) {
+			return res.status(404).render("404", {
+				message: "Shared folder not found or unavailable.",
+			});
+		}
+
+		const location = [
+			{
+				name: contents.isOwner ? "Shared" : "Shared with you",
+				url: contents.isOwner && req.user ? "/shared" : `/share/${token}`,
+			},
+			...contents.location,
+		];
+
+		return res.render("index", {
+			title: contents.folder.name,
+			item: contents.folder,
+			itemType: "folder",
+			files: contents.folder.files,
+			folders: contents.folder.children,
+			location,
+			isSharedBrowse: true,
+		});
+	} catch (error) {
+		return next(error);
+	}
+}
+
+export const getStarred = async (req, res, next) => {
+	try {
+		const starredFolders = await prisma.folder.findMany({
+			where: { userId: req.user.id, starred: true, trashed: false },
+		});
+
+		const starredFiles = await prisma.file.findMany({
+			where: { userId: req.user.id, starred: true, trashed: false },
+		});
+
+		mapFileIcons(starredFiles);
+
+		const location = [
+			{
+				name: "Starred",
+				url: "/starred",
+			},
+		];
+		res.render("index", {
+			title: "Starred",
+			files: starredFiles,
+			folders: starredFolders,
+			location,
+		});
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const getTrash = async (req, res, next) => {
-	const trashedFolders = await prisma.folder.findMany({
-		where: { trashed: true },
-	});
+	try {
+		const trashedFolders = await prisma.folder.findMany({
+			where: { userId: req.user.id, trashed: true },
+		});
 
-	const trashedFiles = await prisma.file.findMany({
-		where: { trashed: true },
-	});
+		const trashedFiles = await prisma.file.findMany({
+			where: { userId: req.user.id, trashed: true },
+		});
 
-	mapFileIcons(trashedFiles);
+		mapFileIcons(trashedFiles);
 
-	const location = [
-		{
-			name: "Trash",
-			url: "/trash",
-		},
-	];
+		const location = [
+			{
+				name: "Trash",
+				url: "/trash",
+			},
+		];
 
-	res.render("index", {
-		title: "Trash",
-		files: trashedFiles,
-		folders: trashedFolders,
-		location,
-	});
+		res.render("index", {
+			title: "Trash",
+			files: trashedFiles,
+			folders: trashedFolders,
+			location,
+		});
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const emptyTrash = async (req, res, next) => {
@@ -130,7 +270,7 @@ export const emptyTrash = async (req, res, next) => {
 	});
 
 	await Promise.all(
-		trashedFolders.map((folder) => permanentlyDeleteFolder(folder.id)),
+		trashedFolders.map((folder) => permanentlyDeleteFolder(folder.id, userId)),
 	);
 
 	const trashedFiles = await prisma.file.findMany({
@@ -138,7 +278,9 @@ export const emptyTrash = async (req, res, next) => {
 		select: { id: true },
 	});
 
-	await Promise.all(trashedFiles.map((file) => permanentlyDeleteFile(file.id)));
+	await Promise.all(
+		trashedFiles.map((file) => permanentlyDeleteFile(file.id, userId)),
+	);
 
 	return redirectWithToast(req, res, "Trash emptied", "success");
 };
@@ -177,50 +319,62 @@ export const getFolderTree = async (req, res, next) => {
 };
 
 export const getSearch = async (req, res, next) => {
-	let searchQuery = req.query.search;
+	try {
+		let searchQuery = req.query.search;
 
-	if (Array.isArray(searchQuery)) {
-		searchQuery = searchQuery[0];
-	}
+		if (Array.isArray(searchQuery)) {
+			searchQuery = searchQuery[0];
+		}
 
-	searchQuery = typeof searchQuery === "string" ? searchQuery.trim() : "";
+		searchQuery = typeof searchQuery === "string" ? searchQuery.trim() : "";
 
-	const location = [
-		{
-			name: "Search results",
-			url: "",
-		},
-		{
-			name: `'${searchQuery}'`,
-			url: "",
-		},
-	];
+		const location = [
+			{
+				name: "Search results",
+				url: "",
+			},
+			{
+				name: `'${searchQuery}'`,
+				url: "",
+			},
+		];
 
-	if (!searchQuery) {
-		return res.render("index", {
+		if (!searchQuery) {
+			return res.render("index", {
+				title: "Search",
+				folders: [],
+				files: [],
+				location,
+				searchQuery,
+			});
+		}
+
+		const matchingFolders = await prisma.folder.findMany({
+			where: {
+				userId: req.user.id,
+				name: { startsWith: searchQuery, mode: "insensitive" },
+			},
+		});
+
+		const matchingFiles = await prisma.file.findMany({
+			where: {
+				userId: req.user.id,
+				name: { startsWith: searchQuery, mode: "insensitive" },
+			},
+		});
+
+		mapFileIcons(matchingFiles);
+
+		res.render("index", {
 			title: "Search",
-			folders: [],
-			files: [],
+			folders: matchingFolders,
+			files: matchingFiles,
 			location,
 			searchQuery,
 		});
+	} catch (err) {
+		return next(err);
 	}
-
-	const matchingFolders = await prisma.folder.findMany({
-		where: { name: { startsWith: searchQuery, mode: "insensitive" } },
-	});
-
-	const matchingFiles = await prisma.file.findMany({
-		where: { name: { startsWith: searchQuery, mode: "insensitive" } },
-	});
-
-	res.render("index", {
-		title: "Search",
-		folders: matchingFolders,
-		files: matchingFiles,
-		location,
-		searchQuery,
-	});
 };
 
 export async function formatSharingDetails(sharingDetails, req) {
@@ -330,6 +484,7 @@ export const getShare = async (req, res, next) => {
 				.status(404)
 				.render("404", { message: "Shared item is unavailable." });
 		}
+		item.shareToken = sharedItem.shareToken;
 
 		const currentUserId = req.user?.id;
 		const ownerName =
@@ -346,12 +501,16 @@ export const getShare = async (req, res, next) => {
 				owner: ownerName,
 			};
 		} else {
-			const totalSize = item.files.reduce((acc, f) => acc + f.size, 0);
-			item.locationUrl = item.parentId ? `/folder/${item.parentId}` : "/";
-
+			const isOwner = req.user?.id === item.user.id;
+			item.sharedOpenUrl = isOwner
+				? `/folder/${item.id}`
+				: `/share/${sharedItem.shareToken}/folder/${item.id}`;
 			item.details = {
 				type: "Folder",
-				size: (totalSize / (1024 * 1024)).toFixed(2),
+				size: (
+					item.files.reduce((total, file) => total + file.size, 0) /
+					(1024 * 1024)
+				).toFixed(2),
 				owner: ownerName,
 				Nfiles: item._count?.files || 0,
 				Nfolders: item._count?.children || 0,
@@ -375,40 +534,166 @@ export const getShare = async (req, res, next) => {
 	}
 };
 
+const addSharedFolderToArchive = async (
+	folderId,
+	archive,
+	currentPath = "",
+) => {
+	const folder = await prisma.folder.findUnique({
+		where: { id: folderId },
+		include: { files: true, children: true },
+	});
+
+	if (!folder || folder.trashed) return;
+
+	folder.files.forEach((file) => {
+		if (!file.trashed && fs.existsSync(file.path)) {
+			archive.file(file.path, { name: path.join(currentPath, file.name) });
+		}
+	});
+
+	await Promise.all(
+		folder.children.map((childFolder) =>
+			addSharedFolderToArchive(
+				childFolder.id,
+				archive,
+				path.join(currentPath, childFolder.name),
+			),
+		),
+	);
+};
+
+export const downloadSharedFile = async (req, res, next) => {
+	try {
+		const sharedItem = await prisma.share.findUnique({
+			where: { shareToken: req.params.id },
+			include: { file: true, folder: true },
+		});
+
+		if (
+			!sharedItem ||
+			sharedItem.access !== "PUBLIC" ||
+			(sharedItem.expiresAt &&
+				isBefore(new Date(sharedItem.expiresAt), new Date())) ||
+			(sharedItem.file && sharedItem.file.trashed) ||
+			(sharedItem.folder && sharedItem.folder.trashed) ||
+			(!sharedItem.file && !sharedItem.folder)
+		) {
+			return res
+				.status(404)
+				.json({ error: "Shared file not found or unavailable" });
+		}
+
+		let downloadableFile = sharedItem.file;
+		let downloadableFolder = sharedItem.folder;
+		const requestedItemId = req.query.itemId;
+
+		if (requestedItemId && sharedItem.folder) {
+			const requestedFolder = await getSharedFolderContents(
+				req.params.id,
+				requestedItemId,
+			);
+
+			if (requestedFolder) {
+				downloadableFolder = requestedFolder.folder;
+				downloadableFile = null;
+			} else {
+				const requestedFile = await prisma.file.findUnique({
+					where: { id: requestedItemId },
+					include: { folder: { select: { id: true } } },
+				});
+				const isSharedFile =
+					requestedFile &&
+					!requestedFile.trashed &&
+					requestedFile.folder &&
+					(await folderBelongsToSharedRoot(
+						requestedFile.folder.id,
+						sharedItem.folder.id,
+						sharedItem.folder.userId,
+					));
+
+				if (!isSharedFile) {
+					return res.status(404).json({
+						error: "Shared file not found or unavailable",
+					});
+				}
+				downloadableFile = requestedFile;
+				downloadableFolder = null;
+			}
+		}
+
+		if (downloadableFolder) {
+			res.attachment(`${downloadableFolder.name}.zip`);
+
+			const archive = new ZipArchive({ zlib: { level: 9 } });
+			archive.pipe(res);
+			await addSharedFolderToArchive(
+				downloadableFolder.id,
+				archive,
+				downloadableFolder.name,
+			);
+			await archive.finalize();
+			return;
+		}
+
+		if (!downloadableFile || !fs.existsSync(downloadableFile.path)) {
+			return res.status(404).json({ error: "File not found on server" });
+		}
+
+		return res.download(
+			downloadableFile.path,
+			downloadableFile.name,
+			(error) => {
+				if (error && !res.headersSent) {
+					return res.status(500).json({ error: "Download failed" });
+				}
+			},
+		);
+	} catch (error) {
+		return next(error);
+	}
+};
+
 export const getShared = async (req, res, next) => {
-	const sharedFolders = await prisma.folder.findMany({
-		where: {
-			share: {
-				access: "PUBLIC",
-				OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+	try {
+		const sharedFolders = await prisma.folder.findMany({
+			where: {
+				userId: req.user.id,
+				share: {
+					access: "PUBLIC",
+					OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+				},
+				trashed: false,
 			},
-			trashed: false,
-		},
-	});
+		});
 
-	const sharedFiles = await prisma.file.findMany({
-		where: {
-			share: {
-				access: "PUBLIC",
-				OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+		const sharedFiles = await prisma.file.findMany({
+			where: {
+				userId: req.user.id,
+				share: {
+					access: "PUBLIC",
+					OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+				},
+				trashed: false,
 			},
-			trashed: false,
-		},
-	});
+		});
 
-	mapFileIcons(sharedFiles);
+		mapFileIcons(sharedFiles);
 
-	const location = [
-		{
-			name: "Shared",
-			url: "/shared",
-		},
-	];
+		const location = [
+			{
+				name: "Shared",
+				url: "/shared",
+			},
+		];
 
-	res.render("index", {
-		title: "Shared",
-		files: sharedFiles,
-		folders: sharedFolders,
-		location,
-	});
+		res.render("index", {
+			title: "Shared",
+			files: sharedFiles,
+			folders: sharedFolders,
+			location,
+		});
+	} catch (err) {
+		return next(err);
+	}
 };
