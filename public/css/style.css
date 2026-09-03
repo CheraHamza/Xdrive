@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,article,audio_file,arrow_drop_down,arrow_drop_up,check,check_box,cloud,code,content_copy,create_new_folder,delete,delete_forever,description,download,draft,drive_file_move,edit_square,error,folder,folder_open,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,mail,movie,more_vert,open_in_new,picture_as_pdf,public,search,settings,share,slideshow,star,table_chart,text_snippet,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -12,6 +11,13 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+}
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/material-symbols-outlined.woff2") format("woff2");
 }
 .nav-btns button {
   width: 100%;
@@ -1459,6 +1465,19 @@ a:hover, a:focus {
 }
 
 .material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
   user-select: none;
 }
 
