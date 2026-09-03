@@ -75,13 +75,24 @@ export const getFolder = async (req, res, next) => {
 				.render("error", { message: "Folder not found or unauthorized" });
 		}
 
-		mapFileIcons(folder.files);
-
 		const allFolders = await prisma.folder.findMany({
 			where: { userId: req.user.id },
 		});
 
 		const folderMap = new Map(allFolders.map((f) => [f.id, f]));
+		let currentFolder = folder;
+		while (currentFolder) {
+			if (currentFolder.trashed) {
+				return res
+					.status(404)
+					.render("error", { message: "Folder not found or unavailable" });
+			}
+			currentFolder = currentFolder.parentId
+				? folderMap.get(currentFolder.parentId)
+				: null;
+		}
+
+		mapFileIcons(folder.files);
 
 		const location = [];
 
@@ -367,25 +378,29 @@ export const restoreFolder = async (req, res, next) => {
 	}
 };
 
-async function getAllNestedFilePaths(folderId) {
+async function getNestedFolderData(folderId) {
 	const folderData = await prisma.folder.findUnique({
 		where: { id: folderId },
 		select: {
-			files: { select: { path: true } },
+			files: { select: { id: true, path: true } },
 			children: { select: { id: true } },
 		},
 	});
 
-	if (!folderData) return [];
+	if (!folderData) return { folderIds: [], files: [] };
 
-	let filePaths = folderData.files.map((file) => file.path);
+	const nestedData = {
+		folderIds: [folderId],
+		files: [...folderData.files],
+	};
 
 	for (const childFolder of folderData.children) {
-		const childPaths = await getAllNestedFilePaths(childFolder.id);
-		filePaths = filePaths.concat(childPaths);
+		const childData = await getNestedFolderData(childFolder.id);
+		nestedData.folderIds.push(...childData.folderIds);
+		nestedData.files.push(...childData.files);
 	}
 
-	return filePaths;
+	return nestedData;
 }
 
 export async function permanentlyDeleteFolder(folderId, userId) {
@@ -398,23 +413,36 @@ export async function permanentlyDeleteFolder(folderId, userId) {
 		throw new Error("Folder not found or unauthorized");
 	}
 
-	const filePathsToDelete = await getAllNestedFilePaths(folderId);
+	const nestedData = await getNestedFolderData(folderId);
 
 	await Promise.all(
-		filePathsToDelete.map(async (filePath) => {
+		nestedData.files.map(async (file) => {
 			try {
-				await fs.promises.unlink(filePath);
+				await fs.promises.unlink(file.path);
 			} catch (err) {
 				if (err.code !== "ENOENT") {
-					console.error(`Failed to delete file on disk at ${filePath}`, err);
+					console.error(`Failed to delete file on disk at ${file.path}`, err);
 				}
 			}
 		}),
 	);
 
-	await prisma.folder.delete({
-		where: { id: folderId },
-	});
+	await prisma.$transaction([
+		prisma.share.deleteMany({
+			where: {
+				OR: [
+					{ folderId: { in: nestedData.folderIds } },
+					{ fileId: { in: nestedData.files.map((file) => file.id) } },
+				],
+			},
+		}),
+		prisma.file.deleteMany({
+			where: { id: { in: nestedData.files.map((file) => file.id) } },
+		}),
+		prisma.folder.deleteMany({
+			where: { id: { in: nestedData.folderIds } },
+		}),
+	]);
 }
 
 export const deleteFolder = async (req, res, next) => {

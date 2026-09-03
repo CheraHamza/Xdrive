@@ -391,6 +391,8 @@ itemElements.forEach((item) => {
 
 	// Open
 	const handleOpen = () => {
+		if (item.dataset.trashed === "true") return;
+
 		if (itemType == "folder") {
 			window.location.href =
 				item.getAttribute("data-open-url") || `/folder/${itemId}`;

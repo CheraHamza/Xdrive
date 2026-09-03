@@ -278,11 +278,17 @@ export const emptyTrash = async (req, res, next) => {
 
 	const trashedFolders = await prisma.folder.findMany({
 		where: { userId, trashed: true },
-		select: { id: true },
+		select: { id: true, parentId: true },
 	});
+	const trashedFolderIds = new Set(trashedFolders.map((folder) => folder.id));
+	const topLevelTrashedFolders = trashedFolders.filter(
+		(folder) => !folder.parentId || !trashedFolderIds.has(folder.parentId),
+	);
 
 	await Promise.all(
-		trashedFolders.map((folder) => permanentlyDeleteFolder(folder.id, userId)),
+		topLevelTrashedFolders.map((folder) =>
+			permanentlyDeleteFolder(folder.id, userId),
+		),
 	);
 
 	const trashedFiles = await prisma.file.findMany({
@@ -330,6 +336,34 @@ export const getFolderTree = async (req, res, next) => {
 	res.json({ success: true, folderTree });
 };
 
+async function getVisibleFolderIds(userId) {
+	const userFolders = await prisma.folder.findMany({
+		where: { userId },
+		select: { id: true, parentId: true, trashed: true },
+	});
+	const foldersById = new Map(userFolders.map((folder) => [folder.id, folder]));
+	const visibleFolderIds = new Set();
+
+	const isFolderVisible = (folderId, visiting = new Set()) => {
+		if (!folderId) return true;
+		if (visibleFolderIds.has(folderId)) return true;
+		if (visiting.has(folderId)) return false;
+
+		const folder = foldersById.get(folderId);
+		if (!folder || folder.trashed) return false;
+
+		visiting.add(folderId);
+		const visible = isFolderVisible(folder.parentId, visiting);
+		visiting.delete(folderId);
+
+		if (visible) visibleFolderIds.add(folderId);
+		return visible;
+	};
+
+	userFolders.forEach((folder) => isFolderVisible(folder.id));
+	return visibleFolderIds;
+}
+
 export const getSearch = async (req, res, next) => {
 	try {
 		let searchQuery = req.query.search;
@@ -361,26 +395,36 @@ export const getSearch = async (req, res, next) => {
 			});
 		}
 
+		const visibleFolderIds = await getVisibleFolderIds(req.user.id);
+
 		const matchingFolders = await prisma.folder.findMany({
 			where: {
 				userId: req.user.id,
+				trashed: false,
 				name: { startsWith: searchQuery, mode: "insensitive" },
 			},
 		});
+		const visibleMatchingFolders = matchingFolders.filter((folder) =>
+			visibleFolderIds.has(folder.id),
+		);
 
 		const matchingFiles = await prisma.file.findMany({
 			where: {
 				userId: req.user.id,
+				trashed: false,
 				name: { startsWith: searchQuery, mode: "insensitive" },
 			},
 		});
+		const visibleMatchingFiles = matchingFiles.filter(
+			(file) => !file.folderId || visibleFolderIds.has(file.folderId),
+		);
 
-		mapFileIcons(matchingFiles);
+		mapFileIcons(visibleMatchingFiles);
 
 		res.render("index", {
 			title: "Search",
-			folders: matchingFolders,
-			files: matchingFiles,
+			folders: visibleMatchingFolders,
+			files: visibleMatchingFiles,
 			location,
 			searchQuery,
 		});
@@ -670,6 +714,8 @@ export const downloadSharedFile = async (req, res, next) => {
 
 export const getShared = async (req, res, next) => {
 	try {
+		const visibleFolderIds = await getVisibleFolderIds(req.user.id);
+
 		const sharedFolders = await prisma.folder.findMany({
 			where: {
 				userId: req.user.id,
@@ -680,6 +726,9 @@ export const getShared = async (req, res, next) => {
 				trashed: false,
 			},
 		});
+		const visibleSharedFolders = sharedFolders.filter((folder) =>
+			visibleFolderIds.has(folder.id),
+		);
 
 		const sharedFiles = await prisma.file.findMany({
 			where: {
@@ -691,8 +740,11 @@ export const getShared = async (req, res, next) => {
 				trashed: false,
 			},
 		});
+		const visibleSharedFiles = sharedFiles.filter(
+			(file) => !file.folderId || visibleFolderIds.has(file.folderId),
+		);
 
-		mapFileIcons(sharedFiles);
+		mapFileIcons(visibleSharedFiles);
 
 		const location = [
 			{
@@ -703,8 +755,8 @@ export const getShared = async (req, res, next) => {
 
 		res.render("index", {
 			title: "Shared",
-			files: sharedFiles,
-			folders: sharedFolders,
+			files: visibleSharedFiles,
+			folders: visibleSharedFolders,
 			location,
 		});
 	} catch (err) {

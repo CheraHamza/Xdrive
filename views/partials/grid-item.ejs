@@ -1,6 +1,6 @@
 <% const isFolder = locals.isFolder || false; %>
 <% const item = locals.item; %>
-<div class="item" id="<%= item?.id %>" data-type="<%= isFolder ? 'folder' : 'file' %>" data-name="<%= item?.name %>" tabindex="0" data-tooltip="<%= item?.name %>" data-open-url="<%= item?.sharedOpenUrl || '' %>" <% if (!isFolder) {%> data-url="/<%=item?.path%>" <% } %>>
+<div class="item" id="<%= item?.id %>" data-type="<%= isFolder ? 'folder' : 'file' %>" data-name="<%= item?.name %>" data-trashed="<%= item?.trashed ? 'true' : 'false' %>" tabindex="0" data-tooltip="<%= item?.name %>" data-open-url="<%= item?.sharedOpenUrl || '' %>" <% if (!isFolder) {%> data-url="/<%=item?.path%>" <% } %>>
   <div class="preview-wrapper">
     <% if (isFolder) { %>
     <span class="material-symbols-outlined item-icon folder">folder</span>
