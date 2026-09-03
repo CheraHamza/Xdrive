@@ -43,6 +43,63 @@ inputWrappers.forEach((wrapper) => {
 	}
 });
 
+const actionForms = document.querySelectorAll(
+	".add-folder-form, .rename-item-form",
+);
+
+actionForms.forEach((form) => {
+	form.querySelectorAll("[data-error-for]").forEach((error) => {
+		const field = form.querySelector(`[name="${error.dataset.errorFor}"]`);
+		field?.addEventListener("input", () => {
+			error.textContent = "";
+			error.classList.remove("active");
+		});
+		field?.addEventListener("change", () => {
+			error.textContent = "";
+			error.classList.remove("active");
+		});
+	});
+
+	form.addEventListener("submit", async (event) => {
+		event.preventDefault();
+
+		form.querySelectorAll(".error-msg").forEach((error) => {
+			error.textContent = "";
+			error.classList.remove("active");
+		});
+
+		let response;
+		try {
+			response = await fetch(form.action, {
+				method: form.method || "post",
+				body: new URLSearchParams(new FormData(form)),
+			});
+		} catch (error) {
+			console.error("Form submission failed:", error);
+			return;
+		}
+
+		if (response.ok && response.redirected) {
+			window.location.href = response.url;
+			return;
+		}
+
+		if (!response.ok) {
+			try {
+				const result = await response.json();
+				Object.entries(result.errors || {}).forEach(([field, messages]) => {
+					const error = form.querySelector(`[data-error-for="${field}"]`);
+					if (!error) return;
+					error.textContent = messages[0];
+					error.classList.add("active");
+				});
+			} catch (err) {
+				console.error("Non-JSON error returned from server:", err);
+			}
+		}
+	});
+});
+
 const shareModalEl = document.querySelector(".modal.share-item");
 const shareForm = document.querySelector(".share-item-form");
 

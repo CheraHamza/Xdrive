@@ -10,6 +10,14 @@ function setupModal(backdropSelector) {
 	let mouseDownTarget = null;
 	let onCloseCallback = null;
 
+	function clearErrors() {
+		if (!form) return;
+		form.querySelectorAll("[data-error-for]").forEach((error) => {
+			error.textContent = "";
+			error.classList.remove("active");
+		});
+	}
+
 	backdrop.addEventListener("mousedown", (e) => {
 		mouseDownTarget = e.target;
 	});
@@ -35,6 +43,7 @@ function setupModal(backdropSelector) {
 	});
 
 	function open() {
+		clearErrors();
 		backdrop.classList.add("active");
 		if (primaryInput) {
 			primaryInput.focus();
@@ -43,8 +52,11 @@ function setupModal(backdropSelector) {
 
 	function close() {
 		backdrop.classList.remove("active");
-		if (form) form.reset();
-
+		if (form) {
+			form.reset();
+			clearErrors();
+		}
+		
 		if (typeof onCloseCallback == "function") {
 			onCloseCallback();
 		}

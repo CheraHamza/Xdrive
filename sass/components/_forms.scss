@@ -225,6 +225,29 @@ input {
 		flex-direction: column;
 		gap: 20px;
 
+		.input-err-wrapper {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+		}
+
+		.error-msg {
+			display: none;
+			font-family: var.$secondary-font;
+			font-size: 11px;
+			font-weight: 100;
+			color: var.$light-red;
+
+			&.active {
+				display: inline-block;
+			}
+
+			&::first-letter {
+				text-transform: capitalize;
+			}
+		}
+
 		select {
 			width: fit-content;
 			padding: 5px;

@@ -2,92 +2,150 @@ import { prisma } from "../lib/prisma.js";
 import fs from "fs";
 import path from "path";
 import { ZipArchive } from "archiver";
+import { addDays, addHours, addMinutes, format } from "date-fns";
 import {
-	addDays,
-	addHours,
-	addMinutes,
-	format,
-} from "date-fns";
-import { formatSharingDetails, mapFileIcons, redirectWithToast } from "./commonController.js";
+	formatSharingDetails,
+	mapFileIcons,
+	redirectWithToast,
+} from "./commonController.js";
+import {
+	verifyFolderOwnership,
+	verifyDestinationFolder,
+} from "../middleware/authorizationHelpers.js";
+import {
+	validateFolderName,
+	validateShareSettings,
+	runValidation,
+} from "../middleware/validators.js";
 
 export const createFolder = async (req, res, next) => {
-	const rootFolderId = "root_" + req.user.id;
-	const currentFolderId = req.body.currentFolderId || rootFolderId;
+	try {
+		const rootFolderId = "root_" + req.user.id;
+		const currentFolderId = req.body.currentFolderId || rootFolderId;
+		const newFolderName = req.body.foldername;
+		const nameValidation = validateFolderName(newFolderName);
+		if (!nameValidation.valid) {
+			return res.status(400).json({
+				success: false,
+				errors: { foldername: [nameValidation.error] },
+			});
+		}
 
-	const newFolderName = req.body.foldername;
+		// Verify parent folder exists and belongs to user
+		const parentFolder = await verifyFolderOwnership(
+			currentFolderId,
+			req.user.id,
+		);
+		if (!parentFolder) {
+			return redirectWithToast(req, res, "Invalid parent folder", "error");
+		}
 
-	await prisma.folder.create({
-		data: {
-			name: newFolderName,
-			createdAt: new Date(),
-			user: { connect: { id: req.user.id } },
-			parent: { connect: { id: currentFolderId } },
-		},
-	});
+		await prisma.folder.create({
+			data: {
+				name: newFolderName.trim(),
+				createdAt: new Date(),
+				user: { connect: { id: req.user.id } },
+				parent: { connect: { id: currentFolderId } },
+			},
+		});
 
-	return redirectWithToast(req, res, "Folder created", "success");
+		return redirectWithToast(req, res, "Folder created", "success");
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const getFolder = async (req, res, next) => {
-	const folderId = req.params.folderId;
+	try {
+		const folderId = req.params.folderId;
 
-	const folder = await prisma.folder.findUnique({
-		where: { id: folderId },
-		include: {
-			files: { where: { trashed: false } },
-			children: { where: { trashed: false } },
-		},
-	});
-
-	mapFileIcons(folder.files);
-
-	const allFolders = await prisma.folder.findMany({
-		where: { userId: req.user.id },
-	});
-
-	const folderMap = new Map(allFolders.map((f) => [f.id, f]));
-
-	const location = [];
-
-	let currentId = folderId;
-
-	while (currentId) {
-		const currentFolder = folderMap.get(currentId);
-		if (!currentFolder) break;
-
-		location.unshift({
-			name: currentFolder.name,
-			url:
-				currentFolder.id === `root_${req.user.id}`
-					? "/"
-					: `/folder/${currentFolder.id}`,
+		const folder = await prisma.folder.findUnique({
+			where: { id: folderId },
+			include: {
+				files: { where: { trashed: false } },
+				children: { where: { trashed: false } },
+			},
 		});
-		currentId = currentFolder.parentId;
-	}
 
-	res.render("index", {
-		title: folder.name,
-		files: folder.files,
-		folders: folder.children,
-		currentFolderId: folder.id,
-		location,
-	});
+		// Verify folder exists and belongs to user
+		if (!folder || folder.userId !== req.user.id) {
+			return res
+				.status(403)
+				.render("error", { message: "Folder not found or unauthorized" });
+		}
+
+		mapFileIcons(folder.files);
+
+		const allFolders = await prisma.folder.findMany({
+			where: { userId: req.user.id },
+		});
+
+		const folderMap = new Map(allFolders.map((f) => [f.id, f]));
+
+		const location = [];
+
+		let currentId = folderId;
+
+		while (currentId) {
+			const currentFolder = folderMap.get(currentId);
+			if (!currentFolder) break;
+
+			location.unshift({
+				name: currentFolder.name,
+				url:
+					currentFolder.id === `root_${req.user.id}`
+						? "/"
+						: `/folder/${currentFolder.id}`,
+			});
+			currentId = currentFolder.parentId;
+		}
+
+		res.render("index", {
+			title: folder.name,
+			files: folder.files,
+			folders: folder.children,
+			currentFolderId: folder.id,
+			location,
+		});
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const starFolder = async (req, res, next) => {
-	const folderId = req.body.itemId;
-	const starred = req.body.starred === "true";
+	try {
+		const folderId = req.body.itemId;
+		const starred = req.body.starred === "true";
 
-	const nextStarred = !starred;
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return redirectWithToast(
+				req,
+				res,
+				"Folder not found or unauthorized",
+				"error",
+			);
+		}
 
-	await prisma.folder.update({
-		where: { id: folderId },
-		data: {
-			starred: nextStarred,
-		},
-	});
+		const nextStarred = !starred;
 
-	return redirectWithToast(req, res, nextStarred ? "Folder starred" : "Folder unstarred", "success");
+		await prisma.folder.update({
+			where: { id: folderId },
+			data: {
+				starred: nextStarred,
+			},
+		});
+
+		return redirectWithToast(
+			req,
+			res,
+			nextStarred ? "Folder starred" : "Folder unstarred",
+			"success",
+		);
+	} catch (err) {
+		return next(err);
+	}
 };
 
 const addFolderToArchive = async (folderId, archive, currentPath = "") => {
@@ -123,12 +181,10 @@ export const downloadFolder = async (req, res, next) => {
 	try {
 		const folderId = req.body.folderId;
 
-		const folder = await prisma.folder.findUnique({
-			where: { id: folderId },
-		});
-
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
 		if (!folder) {
-			return res.status(404).send("Folder not found");
+			return res.status(404).send("Folder not found or unauthorized");
 		}
 
 		res.attachment(`${folder.name}.zip`);
@@ -147,76 +203,167 @@ export const downloadFolder = async (req, res, next) => {
 };
 
 export const renameFolder = async (req, res, next) => {
-	const folderId = req.body.itemId;
-	const newFolderName = req.body.name;
+	try {
+		const folderId = req.body.itemId;
+		const newFolderName = req.body.name;
+		const nameValidation = validateFolderName(newFolderName);
+		if (!nameValidation.valid) {
+			return res.status(400).json({
+				success: false,
+				errors: { name: [nameValidation.error] },
+			});
+		}
 
-	await prisma.folder.update({
-		where: { id: folderId },
-		data: {
-			name: newFolderName,
-		},
-	});
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return redirectWithToast(
+				req,
+				res,
+				"Folder not found or unauthorized",
+				"error",
+			);
+		}
 
-	return redirectWithToast(req, res, "Folder renamed", "success");
+		await prisma.folder.update({
+			where: { id: folderId },
+			data: {
+				name: newFolderName.trim(),
+			},
+		});
+
+		return redirectWithToast(req, res, "Folder renamed", "success");
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const moveFolder = async (req, res, next) => {
-	const folderId = req.body.itemId;
-	const destinationFolderId = req.body.destinationFolderId;
+	try {
+		const folderId = req.body.itemId;
+		const destinationFolderId = req.body.destinationFolderId;
 
-	await prisma.folder.update({
-		where: { id: folderId },
-		data: { parentId: destinationFolderId },
-	});
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return redirectWithToast(
+				req,
+				res,
+				"Folder not found or unauthorized",
+				"error",
+			);
+		}
 
-	return redirectWithToast(req, res, "Folder moved", "success");
+		// Verify destination folder exists and belongs to user
+		const destinationFolder = await verifyDestinationFolder(
+			destinationFolderId,
+			req.user.id,
+		);
+		if (!destinationFolder) {
+			return redirectWithToast(
+				req,
+				res,
+				"Destination folder not found or unauthorized",
+				"error",
+			);
+		}
+
+		await prisma.folder.update({
+			where: { id: folderId },
+			data: { parentId: destinationFolderId },
+		});
+
+		return redirectWithToast(req, res, "Folder moved", "success");
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const getFolderDetailsById = async (req, res, next) => {
-	const itemId = req.params.id;
+	try {
+		const itemId = req.params.id;
 
-	const details = {};
+		const folder = await prisma.folder.findUnique({
+			where: { id: itemId },
+			include: { files: true, parent: true, user: true },
+		});
 
-	const folder = await prisma.folder.findUnique({
-		where: { id: itemId },
-		include: { files: true, parent: true, user: true },
-	});
+		if (!folder || folder.userId !== req.user.id) {
+			return res
+				.status(403)
+				.json({ error: "Folder not found or unauthorized" });
+		}
 
-	details.name = folder.name;
-	details.type = "Folder";
-	details.time = format(new Date(folder.createdAt), "dd MMM yyyy HH:mm:ss");
-	details.size = (
-		folder.files.reduce((acc, file) => {
-			return acc + file.size;
-		}, 0) /
-		(1024 * 1024)
-	).toFixed(2);
-	details.location = folder.parent.name;
-	details.owner = folder.user.id === req.user.id ? "Me" : folder.user.name;
+		const details = {};
 
-	res.json({ success: true, details });
+		details.name = folder.name;
+		details.type = "Folder";
+		details.time = format(new Date(folder.createdAt), "dd MMM yyyy HH:mm:ss");
+		details.size = (
+			folder.files.reduce((acc, file) => {
+				return acc + file.size;
+			}, 0) /
+			(1024 * 1024)
+		).toFixed(2);
+		details.location = folder.parent.name;
+		details.owner = folder.user.id === req.user.id ? "Me" : folder.user.name;
+
+		res.json({ success: true, details });
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const trashFolder = async (req, res, next) => {
-	const folderId = req.body.itemId;
+	try {
+		const folderId = req.body.itemId;
 
-	await prisma.folder.update({
-		where: { id: folderId },
-		data: { trashed: true },
-	});
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return redirectWithToast(
+				req,
+				res,
+				"Folder not found or unauthorized",
+				"error",
+			);
+		}
 
-	return redirectWithToast(req, res, "Folder moved to trash", "success");
+		await prisma.folder.update({
+			where: { id: folderId },
+			data: { trashed: true },
+		});
+
+		return redirectWithToast(req, res, "Folder moved to trash", "success");
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const restoreFolder = async (req, res, next) => {
-	const folderId = req.body.itemId;
+	try {
+		const folderId = req.body.itemId;
 
-	await prisma.folder.update({
-		where: { id: folderId },
-		data: { trashed: false },
-	});
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return redirectWithToast(
+				req,
+				res,
+				"Folder not found or unauthorized",
+				"error",
+			);
+		}
 
-	return redirectWithToast(req, res, "Folder restored", "success");
+		await prisma.folder.update({
+			where: { id: folderId },
+			data: { trashed: false },
+		});
+
+		return redirectWithToast(req, res, "Folder restored", "success");
+	} catch (err) {
+		return next(err);
+	}
 };
 
 async function getAllNestedFilePaths(folderId) {
@@ -240,7 +387,16 @@ async function getAllNestedFilePaths(folderId) {
 	return filePaths;
 }
 
-export async function permanentlyDeleteFolder(folderId) {
+export async function permanentlyDeleteFolder(folderId, userId) {
+	const folder = await prisma.folder.findUnique({
+		where: { id: folderId },
+	});
+
+	// Verify ownership if userId is provided
+	if (userId && (!folder || folder.userId !== userId)) {
+		throw new Error("Folder not found or unauthorized");
+	}
+
 	const filePathsToDelete = await getAllNestedFilePaths(folderId);
 
 	await Promise.all(
@@ -261,16 +417,39 @@ export async function permanentlyDeleteFolder(folderId) {
 }
 
 export const deleteFolder = async (req, res, next) => {
-	const folderId = req.body.itemId;
+	try {
+		const folderId = req.body.itemId;
 
-	await permanentlyDeleteFolder(folderId);
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return redirectWithToast(
+				req,
+				res,
+				"Folder not found or unauthorized",
+				"error",
+			);
+		}
 
-	return redirectWithToast(req, res, "Folder deleted", "success");
+		await permanentlyDeleteFolder(folderId, req.user.id);
+
+		return redirectWithToast(req, res, "Folder deleted", "success");
+	} catch (err) {
+		return next(err);
+	}
 };
 
 export const getFolderSharingDetails = async (req, res, next) => {
 	try {
 		const folderId = req.params.id;
+
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return res
+				.status(403)
+				.json({ error: "Folder not found or unauthorized" });
+		}
 
 		const rawShare = await prisma.share.findUnique({
 			where: { folderId: folderId },
@@ -285,33 +464,51 @@ export const getFolderSharingDetails = async (req, res, next) => {
 };
 
 export const shareFolder = async (req, res, next) => {
-	const folderId = req.body.itemId;
-	const { access, duration, days = 0, hours = 0, minutes = 0 } = req.body;
+	try {
+		const validation = await runValidation(req, validateShareSettings);
+		if (!validation.success) return res.status(400).json(validation);
 
-	let expiresAt = null;
+		const folderId = req.body.itemId;
+		const { access, duration, days = 0, hours = 0, minutes = 0 } = req.body;
 
-	if (access === "PUBLIC" && duration === "timed") {
-		let now = new Date();
-
-		const numDays = Number(days) || 0;
-		const numHours = Number(hours) || 0;
-		const numMinutes = Number(minutes) || 0;
-
-		if (numDays > 0) now = addDays(now, numDays);
-		if (numHours > 0) now = addHours(now, numHours);
-		if (numMinutes > 0) now = addMinutes(now, numMinutes);
-
-		// Only assign if at least one unit of duration was provided
-		if (numDays > 0 || numHours > 0 || numMinutes > 0) {
-			expiresAt = now;
+		// Verify folder exists and belongs to user
+		const folder = await verifyFolderOwnership(folderId, req.user.id);
+		if (!folder) {
+			return res
+				.status(403)
+				.json({ error: "Folder not found or unauthorized" });
 		}
+
+		let expiresAt = null;
+
+		if (access === "PUBLIC" && duration === "timed") {
+			let now = new Date();
+
+			const numDays = Number(days) || 0;
+			const numHours = Number(hours) || 0;
+			const numMinutes = Number(minutes) || 0;
+
+			if (numDays > 0) now = addDays(now, numDays);
+			if (numHours > 0) now = addHours(now, numHours);
+			if (numMinutes > 0) now = addMinutes(now, numMinutes);
+
+			// Only assign if at least one unit of duration was provided
+			if (numDays > 0 || numHours > 0 || numMinutes > 0) {
+				expiresAt = now;
+			}
+		}
+
+		await prisma.share.upsert({
+			where: { folderId: folderId },
+			update: { access, expiresAt },
+			create: { folderId: folderId, access, expiresAt },
+		});
+
+		res.json({
+			success: true,
+			message: access === "PUBLIC" ? "Folder shared" : "Share settings updated",
+		});
+	} catch (err) {
+		return next(err);
 	}
-
-	await prisma.share.upsert({
-		where: { folderId: folderId },
-		update: { access, expiresAt },
-		create: { folderId: folderId, access, expiresAt },
-	});
-
-	res.json({ success: true, message: access === "PUBLIC" ? "Folder shared" : "Share settings updated" });
 };

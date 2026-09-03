@@ -194,8 +194,13 @@ shareModal?.form.addEventListener("submit", async (e) => {
 				await openShareModal(itemId, itemType);
 			}
 		} else {
-			showToast("Share could not be updated", "error");
-			console.error("Server error while updating share settings");
+			const result = await response.json();
+			Object.entries(result.errors || {}).forEach(([field, messages]) => {
+				const error = form.querySelector(`[data-error-for="${field}"]`);
+				if (!error) return;
+				error.textContent = messages[0];
+				error.classList.add("active");
+			});
 		}
 	} catch (err) {
 		console.error("Failed to update share settings:", err);
@@ -340,7 +345,8 @@ itemElements.forEach((item) => {
 	// Open
 	const handleOpen = () => {
 		if (itemType == "folder") {
-			window.location.href = `/folder/${itemId}`;
+			window.location.href =
+				item.getAttribute("data-open-url") || `/folder/${itemId}`;
 		} else {
 			const fileURL = item.getAttribute("data-url");
 			if (fileURL) window.open(fileURL, "_blank");

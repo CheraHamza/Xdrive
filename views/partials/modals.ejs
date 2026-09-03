@@ -26,7 +26,10 @@
     <input type="hidden" id="currentFolderId" name="currentFolderId" value="<%= locals.currentFolderId?? '' %>">
 
     <label for="foldername" class="big text-label">New Folder</label>
-    <input class="normal" id="foldername" type="text" name="foldername" placeholder="New folder">
+    <div class="input-err-wrapper">
+      <span class="error-msg" data-error-for="foldername"></span>
+      <input class="normal" id="foldername" type="text" name="foldername" placeholder="New folder">
+    </div>
 
     <div class="btns-wrapper">
       <button type="button" class="cancel-btn medium text-label">Cancel</button>
@@ -41,7 +44,10 @@
 
     <input type="hidden" name="itemId" id="itemId">
     <label for="name" class="big text-label">Rename</label>
-    <input class="normal" id="name" type="text" name="name" placeholder="New name">
+    <div class="input-err-wrapper">
+      <span class="error-msg" data-error-for="name"></span>
+      <input class="normal" id="name" type="text" name="name" placeholder="New name">
+    </div>
 
     <div class="btns-wrapper">
       <button type="button" class="cancel-btn medium text-label">Cancel</button>
@@ -140,6 +146,7 @@
 
       <div class="access-wrapper">
         <label for="access" class="gray text-label small">General access:</label>
+        <span class="error-msg" data-error-for="access"></span>
         <select name="access" id="access" class="text-label">
           <option value="RESTRICTED">Restricted</option>
           <option value="PUBLIC">Public</option>
@@ -158,9 +165,10 @@
       <div class="timer-wrapper">
 
         <div class="text-label gray small header">Set timer</div>
-
+        <span class="error-msg" data-error-for="duration"></span>
         <div class="incrementer-wrapper">
           <div class="incrementer">
+            <span class="error-msg" data-error-for="days"></span>
             <button type="button" class="incBtn days-up">
               <span class="material-symbols-outlined">arrow_drop_up</span>
             </button>
@@ -173,6 +181,7 @@
           <label for="days" class="gray text-label small">Days</label>
 
           <div class="incrementer">
+            <span class="error-msg" data-error-for="hours"></span>
             <button type="button" class="incBtn hours-up">
               <span class="material-symbols-outlined">arrow_drop_up</span>
             </button>
@@ -185,6 +194,7 @@
           <label for="hours" class="gray text-label small">Hours</label>
 
           <div class="incrementer">
+            <span class="error-msg" data-error-for="minutes"></span>
             <button type="button" class="incBtn minutes-up">
               <span class="material-symbols-outlined">arrow_drop_up</span>
             </button>

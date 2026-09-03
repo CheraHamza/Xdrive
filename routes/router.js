@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { isAuth, isAnonymous } from "../config/passport.js";
-import express from "express";
+
 import {
 	getLogin,
 	postLogin,
@@ -8,6 +8,7 @@ import {
 	postSignup,
 	postLogout,
 } from "../controllers/authentication.js";
+
 import {
 	downloadFile,
 	postUpload,

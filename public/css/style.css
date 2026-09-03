@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,article,audio_file,arrow_drop_down,arrow_drop_up,check,check_box,cloud,code,content_copy,create_new_folder,delete,delete_forever,description,download,draft,drive_file_move,edit_square,folder,folder_open,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,mail,movie,more_vert,open_in_new,picture_as_pdf,public,search,settings,share,slideshow,star,table_chart,text_snippet,upload_file,visibility,visibility_off&display=block");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&icon_names=add,article,audio_file,arrow_drop_down,arrow_drop_up,check,check_box,cloud,code,content_copy,create_new_folder,delete,delete_forever,description,download,draft,drive_file_move,edit_square,error,folder,folder_open,folder_zip,group,help,history,home,image,info,keyboard_arrow_down,keyboard_arrow_right,lock,mail,movie,more_vert,open_in_new,picture_as_pdf,public,search,settings,share,slideshow,star,table_chart,text_snippet,upload_file,visibility,visibility_off&display=block");
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.ttf") format("truetype");
@@ -646,6 +646,25 @@ input:focus {
   flex-direction: column;
   gap: 20px;
 }
+.share-config-view .share-item-form .input-err-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.share-config-view .share-item-form .error-msg {
+  display: none;
+  font-family: "JetBrains Mono";
+  font-size: 11px;
+  font-weight: 100;
+  color: #ffb4ab;
+}
+.share-config-view .share-item-form .error-msg.active {
+  display: inline-block;
+}
+.share-config-view .share-item-form .error-msg::first-letter {
+  text-transform: capitalize;
+}
 .share-config-view .share-item-form select {
   width: fit-content;
   padding: 5px;
@@ -1224,6 +1243,19 @@ header .auth-btns {
   gap: 10px;
   justify-content: end;
 }
+.modal > * .error-msg {
+  display: none;
+  font-family: "JetBrains Mono";
+  font-size: 11px;
+  font-weight: 100;
+  color: #ffb4ab;
+}
+.modal > * .error-msg.active {
+  display: inline-block;
+}
+.modal > * .error-msg::first-letter {
+  text-transform: capitalize;
+}
 .modal.item-details .rows-container {
   display: flex;
   flex-direction: column;
@@ -1443,6 +1475,7 @@ a:hover, a:focus {
 }
 .home-page .main-wrapper .items-container p {
   font-size: 14px;
+  user-select: none;
 }
 
 .location-bar {

@@ -39,7 +39,7 @@
     <% } %>
 </header>
 
-<% if (locals.title === 'Share') { %>
+<% if (!locals.isAuthenticated) { %>
 <hr>
 <% } %>
 

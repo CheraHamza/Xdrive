@@ -84,6 +84,22 @@
 
 			justify-content: end;
 		}
+
+		.error-msg {
+			display: none;
+			font-family: var.$secondary-font;
+			font-size: 11px;
+			font-weight: 100;
+			color: var.$light-red;
+
+			&.active {
+				display: inline-block;
+			}
+
+			&::first-letter {
+				text-transform: capitalize;
+			}
+		}
 	}
 
 	&.item-details .rows-container {
