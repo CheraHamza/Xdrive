@@ -244,6 +244,14 @@ function setupCustomTooltip(item) {
 		}
 
 		tooltipTimer = setTimeout(() => {
+			tooltipTimer = null;
+			if (
+				item.classList.contains("tooltip-disabled") ||
+				item.querySelector(".item-dropdown.active")
+			) {
+				return;
+			}
+
 			tooltip.textContent = text;
 			tooltip.classList.add("visible");
 			positionTooltip(lastPointerX, lastPointerY);
@@ -261,6 +269,7 @@ function setupCustomTooltip(item) {
 	});
 	item.addEventListener("mouseleave", hideTooltip);
 	item.addEventListener("click", hideTooltip);
+	item._hideTooltip = hideTooltip;
 }
 
 itemElements.forEach((item) => {
@@ -350,9 +359,7 @@ itemElements.forEach((item) => {
 		const isOpening = !dropdown.classList.contains("active");
 		dropdown.classList.toggle("active");
 		item.classList.toggle("tooltip-disabled", isOpening);
-		if (item._tooltip) {
-			item._tooltip.classList.remove("visible");
-		}
+		item._hideTooltip?.();
 
 		if (isOpening) {
 			dropdown.style.left = "";
