@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xdrive - <%= title || "Something went wrong" %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/icons/light-logo.svg">
+</head>
+
+
+<body>
+  <div class="error-page">
+    <%- include("partials/logo-composite") %>
+
+    <main class="error-panel">
+      <div class="error-copy">
+        <p class="error-kicker text-label small">XDRIVE / ERROR</p>
+        <h1 class="big medium"><%= title || "Something went wrong" %></h1>
+        <p class="text-label gray small"><%= message || "We could not complete that request." %></p>
+      </div>
+
+      <button class="error-action-btn text-label normal" onclick="window.location.href='/'">Return to Xdrive</button>
+    </main>
+  </div>
+</body>
+
+</html>

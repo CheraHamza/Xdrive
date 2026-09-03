@@ -57,6 +57,40 @@ app.use("/files", express.static(path.join(__dirname, "files")));
 app.use(express.json());
 app.use("/", router);
 
+app.use((req, res, next) => {
+	if (req.accepts("json") && !req.accepts("html")) {
+		return res.status(404).json({ error: "Resource not found" });
+	}
+
+	return res.status(404).render("error", {
+		title: "Page not found",
+		message: "The page you requested does not exist.",
+	});
+});
+
+app.use((error, req, res, next) => {
+	if (res.headersSent) return next(error);
+
+	const statusCode = Number.isInteger(error.statusCode)
+		? error.statusCode
+		: Number.isInteger(error.status)
+			? error.status
+			: 500;
+	const message = statusCode >= 500
+		? "Something went wrong while processing your request."
+		: error.message;
+
+	if (req.accepts("json") && !req.accepts("html")) {
+		return res.status(statusCode).json({ error: message });
+	}
+
+	console.error(error);
+	return res.status(statusCode).render("error", {
+		title: statusCode >= 500 ? "Something went wrong" : "Request could not be completed",
+		message,
+	});
+});
+
 app.listen(3000, (error) => {
 	if (error) {
 		throw error;

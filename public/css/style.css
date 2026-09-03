@@ -465,6 +465,28 @@
   border-radius: 20px;
 }
 
+.error-action-btn {
+  width: 100%;
+  background-color: transparent;
+  color: #1a1c1e;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.12s ease-in-out;
+  background-color: #bec8d2;
+  border: 2px solid #bec8d2;
+}
+.error-action-btn:hover, .error-action-btn:focus {
+  background-color: #1a1c1e;
+  color: #bec8d2;
+}
+.error-action-btn {
+  width: fit-content;
+  padding: 11px 16px;
+  border-radius: 30px;
+}
+
 input {
   width: 100%;
   color: #e2e2e5;
@@ -1317,6 +1339,65 @@ header .auth-btns {
   font-family: "Geist";
 }
 
+.error-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 42px;
+  padding: 32px 20px;
+  background: #121416;
+}
+.error-page .logo-composite {
+  align-self: center;
+}
+
+.error-panel {
+  width: min(100%, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: start;
+  padding: 34px;
+  background-color: #1a1c1e;
+  border: 1px solid rgba(146, 148, 151, 0.1490196078);
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.1882352941);
+}
+
+.error-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 2px;
+}
+.error-copy .error-kicker {
+  color: #ffb4ab;
+  letter-spacing: 0.08em;
+}
+.error-copy h1 {
+  line-height: 1.2;
+}
+.error-copy p:last-child {
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .error-page {
+    gap: 30px;
+  }
+  .error-panel {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 26px 22px;
+  }
+  .error-action {
+    grid-column: 1;
+    justify-self: stretch;
+    text-align: center;
+  }
+}
 * {
   box-sizing: border-box;
   margin: 0;
