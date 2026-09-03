@@ -16,6 +16,7 @@ import {
 } from "../middleware/authorizationHelpers.js";
 import {
 	validateFileName,
+	validateFileSize,
 	validateShareSettings,
 	runValidation,
 } from "../middleware/validators.js";
