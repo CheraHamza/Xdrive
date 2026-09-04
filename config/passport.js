@@ -7,14 +7,14 @@ import bcrypt from "bcryptjs";
 
 export function sessionMiddleware() {
 	return session({
-		secret: process.env.SECRET,
+		secret: process.env.SESSION_SECRET,
 		resave: false,
 		saveUninitialized: false,
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000,
 		}),
 		cookie: {
-			maxAge: 1000 * 60 * 60 * 24,
+			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 		},
 	});
 }
