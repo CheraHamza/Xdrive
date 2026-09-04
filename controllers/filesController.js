@@ -125,53 +125,46 @@ export const postUpload = [
 			const { originalname, mimetype, size } = req.file;
 			const safeFileName = `${Date.now()}-${originalname.replace(/\s+/g, "_")}`;
 			const storagePath = `${req.user.id}/${safeFileName}`;
-			const uploadResult = await prisma.$transaction(async (transaction) => {
-				await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${req.user.id}))`;
-
-				const storage = await transaction.file.aggregate({
-					_sum: { size: true },
-					where: { userId: req.user.id },
-				});
-				const usedBytes = storage._sum.size || 0;
-				if (usedBytes + size > STORAGE_LIMIT) {
-					const remainingBytes = Math.max(STORAGE_LIMIT - usedBytes, 0);
-					const remainingMb = (remainingBytes / (1024 * 1024)).toFixed(2);
-					return {
-						errorMessage: `Not enough storage space. You have ${remainingMb} MB remaining.`,
-					};
-				}
-
-				const { error: uploadError } = await supabase.storage
-					.from("user-uploads")
-					.upload(storagePath, req.file.buffer, {
-						contentType: mimetype,
-						upsert: false,
-					});
-				if (uploadError) throw uploadError;
-
-				try {
-					await transaction.file.create({
-						data: {
-							name: originalname,
-							filename: safeFileName,
-							type: getFileType(mimetype, originalname),
-							uploadedAt: new Date(),
-							path: storagePath,
-							size,
-							user: { connect: { id: req.user.id } },
-							folder: { connect: { id: currentFolderId } },
-						},
-					});
-				} catch (error) {
-					await supabase.storage.from("user-uploads").remove([storagePath]);
-					throw error;
-				}
-
-				return { errorMessage: null };
+			const storage = await prisma.file.aggregate({
+				_sum: { size: true },
+				where: { userId: req.user.id },
 			});
+			const usedBytes = storage._sum.size || 0;
+			if (usedBytes + size > STORAGE_LIMIT) {
+				const remainingBytes = Math.max(STORAGE_LIMIT - usedBytes, 0);
+				const remainingMb = (remainingBytes / (1024 * 1024)).toFixed(2);
+				return redirectWithToast(
+					req,
+					res,
+					`Not enough storage space. You have ${remainingMb} MB remaining.`,
+					"error",
+				);
+			}
 
-			if (uploadResult.errorMessage) {
-				return redirectWithToast(req, res, uploadResult.errorMessage, "error");
+			const { error: uploadError } = await supabase.storage
+				.from("user-uploads")
+				.upload(storagePath, req.file.buffer, {
+					contentType: mimetype,
+					upsert: false,
+				});
+			if (uploadError) throw uploadError;
+
+			try {
+				await prisma.file.create({
+					data: {
+						name: originalname,
+						filename: safeFileName,
+						type: getFileType(mimetype, originalname),
+						uploadedAt: new Date(),
+						path: storagePath,
+						size,
+						user: { connect: { id: req.user.id } },
+						folder: { connect: { id: currentFolderId } },
+					},
+				});
+			} catch (error) {
+				await supabase.storage.from("user-uploads").remove([storagePath]);
+				throw error;
 			}
 
 			return redirectWithToast(req, res, "File uploaded", "success");
