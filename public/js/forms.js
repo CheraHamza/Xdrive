@@ -1,5 +1,33 @@
 const passwordWrappers = document.querySelectorAll(".input-wrapper.password");
 
+document.addEventListener(
+	"submit",
+	(event) => {
+		const form = event.target;
+		if (!(form instanceof HTMLFormElement)) return;
+		if (form.dataset.loading === "false") return;
+
+		const action = form.getAttribute("action") || "";
+		const fallbackMessage =
+			action === "/search"
+				? "Searching..."
+				: action.includes("download") || action.includes("/share/")
+					? "Preparing download..."
+					: action.includes("trash")
+						? "Moving item to trash..."
+						: action.includes("restore")
+							? "Restoring item..."
+							: action.includes("delete")
+								? "Deleting item..."
+								: action.includes("upload")
+									? "Uploading file..."
+									: "Saving changes...";
+
+		window.showLoading?.(form.dataset.loadingText || fallbackMessage);
+	},
+	true,
+);
+
 passwordWrappers.forEach((wrapper) => {
 	const passwordInput = wrapper.querySelector("input");
 
@@ -85,6 +113,7 @@ actionForms.forEach((form) => {
 		}
 
 		if (!response.ok) {
+			window.hideLoading?.();
 			try {
 				const result = await response.json();
 				Object.entries(result.errors || {}).forEach(([field, messages]) => {

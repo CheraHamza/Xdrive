@@ -23,7 +23,7 @@
 </div>
 
 <div class="modal add-folder">
-  <form class="add-folder-form" action="/createFolder" method="post">
+  <form class="add-folder-form" action="/createFolder" method="post" data-loading-text="Creating folder...">
 
     <input type="hidden" id="currentFolderId" name="currentFolderId" value="<%= locals.currentFolderId?? '' %>">
 
@@ -42,7 +42,7 @@
 </div>
 
 <div class="modal rename-item">
-  <form class="rename-item-form" method="post">
+  <form class="rename-item-form" method="post" data-loading-text="Renaming item...">
 
     <input type="hidden" name="itemId" id="itemId">
     <label for="name" class="big text-label">Rename</label>
@@ -61,7 +61,7 @@
 
 
 <div class="modal move-item">
-  <form class="move-item-form" method="post">
+  <form class="move-item-form" method="post" data-loading-text="Moving item...">
     <input type="hidden" name="itemId" id="itemIdToMove">
     <input type="hidden" name="destinationFolderId" id="destinationFolderId">
 
@@ -113,7 +113,7 @@
 </div>
 
 <div class="modal delete-item">
-  <form method="post">
+  <form method="post" data-loading-text="Deleting item permanently...">
     <input id="itemId" name="itemId" type="hidden">
 
     <div class="title big text-label">Delete forever?</div>
@@ -127,7 +127,7 @@
 </div>
 
 <div class="modal empty-trash">
-  <form action="/empty-trash" method="post">
+  <form action="/empty-trash" method="post" data-loading-text="Emptying trash...">
     <div class="title big text-label">Delete forever?</div>
     <p class="thin gray text-label">All items in the trash will be deleted forever. This can't be undone.</p>
 

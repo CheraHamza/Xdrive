@@ -10,14 +10,14 @@
   </button>
 
   <% if (locals.sharedBrowse) { %>
-  <form class="download-form" action="<%= item.sharedDownloadUrl %>" method="get">
+  <form class="download-form" action="<%= item.sharedDownloadUrl %>" method="get" data-loading-text="Preparing download...">
     <button class="download-item" type="submit">
       <span class="material-symbols-outlined icon">download</span>
       <span>Download</span>
     </button>
   </form>
   <% } else { %>
-  <form class="download-form" action="<%= isFolder ? '/download-folder' : '/download-file' %>" method="post">
+  <form class="download-form" action="<%= isFolder ? '/download-folder' : '/download-file' %>" method="post" data-loading-text="Preparing download...">
     <% if (isFolder) { %>
     <input id="folderId" name="folderId" type="hidden" value="<%= item?.id %>">
     <% } else { %>
@@ -49,7 +49,7 @@
     <span>Share</span>
   </button>
 
-  <form method="post" action="<%= isFolder ? '/trash-folder' : '/trash-file' %>">
+  <form method="post" action="<%= isFolder ? '/trash-folder' : '/trash-file' %>" data-loading-text="Moving item to trash...">
     <input type="hidden" name="itemId" value="<%= item.id %>">
     <button type="submit" class="trash-item">
       <span class="material-symbols-outlined icon">delete</span>
@@ -61,7 +61,7 @@
 
   <% } else { %>
 
-  <form method="post" action="<%= isFolder ? '/restore-folder' : '/restore-file' %>">
+  <form method="post" action="<%= isFolder ? '/restore-folder' : '/restore-file' %>" data-loading-text="Restoring item...">
     <input name="itemId" type="hidden" value="<%= item.id %>">
     <button type="submit" class="restore-item">
       <span class="material-symbols-outlined icon">history</span>

@@ -37,7 +37,7 @@
       </button>
       <% } %>
 
-      <form class="download-form" action="<%= locals.isSharedBrowse || locals.title === 'Share' ? `/share/${item.shareToken}/download` : (isFolder ? '/download-folder' : '/download-file') %>" method="<%= locals.isSharedBrowse || locals.title === 'Share' ? 'get' : 'post' %>">
+      <form class="download-form" action="<%= locals.isSharedBrowse || locals.title === 'Share' ? `/share/${item.shareToken}/download` : (isFolder ? '/download-folder' : '/download-file') %>" method="<%= locals.isSharedBrowse || locals.title === 'Share' ? 'get' : 'post' %>" data-loading-text="Preparing download...">
         <% if (isFolder) { %>
         <input id="folderId" name="folderId" type="hidden" value="<%= item?.id %>">
         <% } else { %>

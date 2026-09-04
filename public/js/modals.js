@@ -56,7 +56,7 @@ function setupModal(backdropSelector) {
 			form.reset();
 			clearErrors();
 		}
-		
+
 		if (typeof onCloseCallback == "function") {
 			onCloseCallback();
 		}
@@ -263,7 +263,8 @@ document
 
 uploadField?.addEventListener("change", () => {
 	if (uploadField.files.length > 0 && uploadForm) {
-		uploadForm.submit();
+		window.showLoading?.("Uploading file...");
+		uploadForm.requestSubmit();
 	}
 });
 

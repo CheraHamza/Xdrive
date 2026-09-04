@@ -24,7 +24,7 @@
       </div>
 
 
-      <form action="/login" method="post">
+      <form action="/login" method="post" data-loading-text="Signing in...">
         <div class="input-err-wrapper">
           <span class="error-msg"><%= locals.errors?.email?.[0]%></span>
           <div class="input-wrapper email">

@@ -29,7 +29,7 @@
       </div>
 
 
-      <form action="/signup" method="post">
+      <form action="/signup" method="post" data-loading-text="Creating account...">
         <div class="input-err-wrapper">
           <span class="error-msg"><%= locals.errors?.name?.[0] %></span>
           <div class="input-wrapper name">

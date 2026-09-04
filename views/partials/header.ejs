@@ -4,7 +4,7 @@
     <span class="material-symbols-outlined">menu</span>
   </button>
   <div class="input-wrapper">
-    <form action="/search" method="get">
+    <form action="/search" method="get" data-loading-text="Searching...">
       <span class="material-symbols-outlined search-icon big">search</span>
       <input type="search" name="search" id="search" placeholder="Search in Xdrive" value="<%= locals.searchQuery ? locals.searchQuery : "" %>">
     </form>
@@ -23,7 +23,7 @@
           <span class="material-symbols-outlined icon">help</span>
           <span class="">Support</span>
         </button>
-        <form action="/logout" method="post">
+        <form action="/logout" method="post" data-loading-text="Signing out...">
           <button class="logout-btn text-label">Log out</button>
         </form>
       </div>

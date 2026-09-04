@@ -14,6 +14,11 @@
 </head>
 
 <body>
+  <div id="global-loading" class="global-loading hidden" aria-live="polite" aria-busy="true">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <div id="loading-text" class="loading-text">Loading...</div>
+  </div>
+
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
   <div class="page-container home-page <%= locals.isAuthenticated ? "has-navbar" : "" %>">

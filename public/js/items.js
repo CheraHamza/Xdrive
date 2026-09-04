@@ -7,7 +7,7 @@ import {
 	setShareModalView,
 } from "./modals.js";
 
-function showToast(message, type = "success", duration = 2600) {
+function showToast(message, type = "success", duration = 3500) {
 	const container = document.getElementById("toast-container");
 	if (!container || !message) return;
 
@@ -35,6 +35,27 @@ function showToast(message, type = "success", duration = 2600) {
 
 window.showToast = showToast;
 
+const loadingOverlay = document.getElementById("global-loading");
+const loadingText = document.getElementById("loading-text");
+
+function showLoading(message = "Loading...") {
+	if (!loadingOverlay || !loadingText) return;
+	loadingText.textContent = message;
+	loadingOverlay.classList.remove("hidden");
+	loadingOverlay.classList.add("visible");
+}
+
+function hideLoading() {
+	if (!loadingOverlay) return;
+	loadingOverlay.classList.remove("visible");
+	loadingOverlay.classList.add("hidden");
+}
+
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;
+
+window.addEventListener("load", hideLoading);
+
 const toastMessage = new URLSearchParams(window.location.search).get("toast");
 const toastType =
 	new URLSearchParams(window.location.search).get("toastType") || "success";
@@ -54,6 +75,7 @@ let currentShareItem = { id: null, type: null };
 
 async function openShareModal(itemId, itemType) {
 	currentShareItem = { id: itemId, type: itemType };
+	showLoading("Loading share settings...");
 
 	const form = shareModal.form;
 	form.reset();
@@ -122,6 +144,8 @@ async function openShareModal(itemId, itemType) {
 		}
 	} catch (error) {
 		console.error("Failed to fetch sharing details:", error);
+	} finally {
+		hideLoading();
 	}
 
 	shareModal?.open();
@@ -158,6 +182,12 @@ shareModal?.form.addEventListener("submit", async (e) => {
 		hours: form.hours?.value || 0,
 		minutes: form.minutes?.value || 0,
 	};
+
+	showLoading(
+		accessValue === "PUBLIC"
+			? "Generating share link..."
+			: "Saving share settings...",
+	);
 
 	try {
 		const shareRoute = `/share-${itemType}`;
@@ -204,6 +234,8 @@ shareModal?.form.addEventListener("submit", async (e) => {
 		}
 	} catch (err) {
 		console.error("Failed to update share settings:", err);
+	} finally {
+		hideLoading();
 	}
 });
 
@@ -255,7 +287,7 @@ function setupCustomTooltip(item) {
 			tooltip.textContent = text;
 			tooltip.classList.add("visible");
 			positionTooltip(lastPointerX, lastPointerY);
-		}, 500);
+		}, 750);
 	};
 
 	item.addEventListener("mouseenter", showTooltip);
@@ -444,40 +476,45 @@ itemElements.forEach((item) => {
 	// Details
 	const detailsBtn = dropdown.querySelector("button.item-details");
 	detailsBtn?.addEventListener("click", async () => {
+		showLoading("Loading details...");
 		const isFolder = itemType === "folder";
 
 		let dataPoint = `/${itemType}-details/${itemId}`;
 
-		const response = await fetch(dataPoint);
-		const data = await response.json();
-		const details = data.details;
+		try {
+			const response = await fetch(dataPoint);
+			const data = await response.json();
+			const details = data.details;
 
-		const modalTitle =
-			detailsModal.immediateChildren[0].querySelector(".title");
-		modalTitle.textContent = isFolder ? "Folder Details" : "File Details";
-		const nameField =
-			detailsModal.immediateChildren[0].querySelector(".name-value");
-		nameField.textContent = details.name;
-		const typeField =
-			detailsModal.immediateChildren[0].querySelector(".type-value");
-		typeField.textContent = details.type;
-		const sizeField =
-			detailsModal.immediateChildren[0].querySelector(".size-value");
-		sizeField.textContent = details.size + " MB";
-		const locationField =
-			detailsModal.immediateChildren[0].querySelector(".location-value");
-		locationField.textContent = details.location;
-		const ownerField =
-			detailsModal.immediateChildren[0].querySelector(".owner-value");
-		ownerField.textContent = details.owner;
-		const timeLabel =
-			detailsModal.immediateChildren[0].querySelector(".time-lable");
-		timeLabel.textContent = isFolder ? "Created" : "Uploaded";
-		const timeField =
-			detailsModal.immediateChildren[0].querySelector(".time-value");
-		timeField.textContent = details.time;
+			const modalTitle =
+				detailsModal.immediateChildren[0].querySelector(".title");
+			modalTitle.textContent = isFolder ? "Folder Details" : "File Details";
+			const nameField =
+				detailsModal.immediateChildren[0].querySelector(".name-value");
+			nameField.textContent = details.name;
+			const typeField =
+				detailsModal.immediateChildren[0].querySelector(".type-value");
+			typeField.textContent = details.type;
+			const sizeField =
+				detailsModal.immediateChildren[0].querySelector(".size-value");
+			sizeField.textContent = details.size + " MB";
+			const locationField =
+				detailsModal.immediateChildren[0].querySelector(".location-value");
+			locationField.textContent = details.location;
+			const ownerField =
+				detailsModal.immediateChildren[0].querySelector(".owner-value");
+			ownerField.textContent = details.owner;
+			const timeLabel =
+				detailsModal.immediateChildren[0].querySelector(".time-lable");
+			timeLabel.textContent = isFolder ? "Created" : "Uploaded";
+			const timeField =
+				detailsModal.immediateChildren[0].querySelector(".time-value");
+			timeField.textContent = details.time;
 
-		detailsModal?.open();
+			detailsModal?.open();
+		} finally {
+			hideLoading();
+		}
 	});
 
 	// Delete
