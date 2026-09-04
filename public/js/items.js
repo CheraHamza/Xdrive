@@ -258,8 +258,25 @@ function setupCustomTooltip(item) {
 	};
 
 	const positionTooltip = (x, y) => {
-		tooltip.style.left = `${x + 12}px`;
-		tooltip.style.top = `${y + 10}px`;
+		const viewportPadding = 12;
+		const cursorGap = 12;
+		const tooltipRect = tooltip.getBoundingClientRect();
+		const maxLeft = window.innerWidth - tooltipRect.width - viewportPadding;
+		const maxTop = window.innerHeight - tooltipRect.height - viewportPadding;
+
+		const rightPosition = x + cursorGap;
+		const leftPosition = x - tooltipRect.width - cursorGap;
+		const horizontalPosition =
+			rightPosition <= maxLeft ? rightPosition : leftPosition;
+
+		tooltip.style.left = `${Math.max(
+			viewportPadding,
+			Math.min(horizontalPosition, maxLeft),
+		)}px`;
+		tooltip.style.top = `${Math.max(
+			viewportPadding,
+			Math.min(y + 10, maxTop),
+		)}px`;
 	};
 
 	const showTooltip = (event) => {
