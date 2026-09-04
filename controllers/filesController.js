@@ -1,8 +1,6 @@
 import { prisma } from "../lib/prisma.js";
+import { supabase } from "../lib/supabase.js";
 import multer from "multer";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import { addDays, addHours, addMinutes, format } from "date-fns";
 import {
 	formatSharingDetails,
@@ -20,39 +18,90 @@ import {
 	validateShareSettings,
 	runValidation,
 } from "../middleware/validators.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		const userId = req.user.id;
-		const uploadPath = path.resolve(__dirname, "../files/users", userId);
-
-		if (!fs.existsSync(uploadPath)) {
-			fs.mkdirSync(uploadPath, { recursive: true });
-		}
-
-		cb(null, uploadPath);
-	},
-	filename: (req, file, cb) => {
-		const uniquePrefix = Date.now() + "-";
-		cb(null, uniquePrefix + file.originalname);
-	},
-});
+import { MAX_FILE_SIZE, STORAGE_LIMIT } from "../config/limits.js";
 
 const upload = multer({
-	storage: storage,
+	storage: multer.memoryStorage(),
 	limits: {
-		fileSize: 100 * 1024 * 1024, // 100MB max
+		fileSize: MAX_FILE_SIZE,
 	},
-	fileFilter: (req, file, cb) => {
-		// Allow all file types for now
+	fileFilter: (_req, _file, cb) => {
 		cb(null, true);
 	},
 });
 
+function handleUploadError(error, req, res, next) {
+	if (!error) return next();
+
+	if (error.code === "LIMIT_FILE_SIZE") {
+		return redirectWithToast(
+			req,
+			res,
+			"File is too large. Each file must be 5 MB or smaller.",
+			"error",
+		);
+	}
+
+	return next(error);
+}
+
+const getFileType = (mimetype, originalname) => {
+	const mainType = mimetype.split("/")[0];
+	const extension = originalname
+		.substring(originalname.lastIndexOf(".") + 1)
+		.toLowerCase();
+	const archiveExtensions = [
+		"zip",
+		"rar",
+		"7z",
+		"tar",
+		"gz",
+		"tgz",
+		"bz2",
+		"xz",
+	];
+	const documentExtensions = ["doc", "docx", "odt", "rtf", "txt", "md"];
+	const spreadsheetExtensions = ["xls", "xlsx", "csv", "ods"];
+	const presentationExtensions = ["ppt", "pptx", "odp"];
+	const codeExtensions = [
+		"js",
+		"jsx",
+		"ts",
+		"tsx",
+		"json",
+		"html",
+		"css",
+		"scss",
+		"sass",
+		"py",
+		"java",
+		"c",
+		"cpp",
+		"cs",
+		"php",
+		"sql",
+		"xml",
+		"yaml",
+		"yml",
+	];
+
+	if (mainType === "image") return "image";
+	if (mainType === "audio") return "audio";
+	if (mainType === "video") return "movie";
+	if (extension === "pdf") return "pdf";
+	if (spreadsheetExtensions.includes(extension)) return "spreadsheet";
+	if (presentationExtensions.includes(extension)) return "presentation";
+	if (codeExtensions.includes(extension)) return "code";
+	if (documentExtensions.includes(extension) || mainType === "text")
+		return "document";
+	if (archiveExtensions.includes(extension)) return "zip";
+
+	return "other";
+};
+
 export const postUpload = [
 	upload.single("file"),
+	handleUploadError,
 	async (req, res, next) => {
 		try {
 			if (!req.file) {
@@ -65,137 +114,106 @@ export const postUpload = [
 			// Verify folder exists and belongs to user
 			const folder = await verifyFolderOwnership(currentFolderId, req.user.id);
 			if (!folder) {
-				// Delete uploaded file if folder verification fails
-				try {
-					await fs.promises.unlink(req.file.path);
-				} catch (err) {
-					console.error("Failed to cleanup file:", err);
-				}
 				return redirectWithToast(req, res, "Invalid folder", "error");
 			}
 
-			const fileSizeValidation = validateFileSize(req.file.size);
+			const fileSizeValidation = validateFileSize(req.file.size, MAX_FILE_SIZE);
 			if (!fileSizeValidation.valid) {
-				try {
-					await fs.promises.unlink(req.file.path);
-				} catch (err) {
-					console.error("Failed to cleanup file:", err);
-				}
 				return redirectWithToast(req, res, fileSizeValidation.error, "error");
 			}
 
-			const {
-				originalname,
-				filename,
-				mimetype,
-				size,
-				path: filePath,
-			} = req.file;
+			const { originalname, mimetype, size } = req.file;
+			const safeFileName = `${Date.now()}-${originalname.replace(/\s+/g, "_")}`;
+			const storagePath = `${req.user.id}/${safeFileName}`;
+			const uploadResult = await prisma.$transaction(async (transaction) => {
+				await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${req.user.id}))`;
 
-			const fileType = () => {
-				const mainType = mimetype.split("/")[0];
-				const extension = originalname
-					.substring(originalname.lastIndexOf(".") + 1)
-					.toLowerCase();
-				const archiveExtensions = [
-					"zip",
-					"rar",
-					"7z",
-					"tar",
-					"gz",
-					"tgz",
-					"bz2",
-					"xz",
-				];
-				const documentExtensions = ["doc", "docx", "odt", "rtf", "txt", "md"];
-				const spreadsheetExtensions = ["xls", "xlsx", "csv", "ods"];
-				const presentationExtensions = ["ppt", "pptx", "odp"];
-				const codeExtensions = [
-					"js",
-					"jsx",
-					"ts",
-					"tsx",
-					"json",
-					"html",
-					"css",
-					"scss",
-					"sass",
-					"py",
-					"java",
-					"c",
-					"cpp",
-					"cs",
-					"php",
-					"sql",
-					"xml",
-					"yaml",
-					"yml",
-				];
-
-				if (mainType === "image") {
-					return "image";
+				const storage = await transaction.file.aggregate({
+					_sum: { size: true },
+					where: { userId: req.user.id },
+				});
+				const usedBytes = storage._sum.size || 0;
+				if (usedBytes + size > STORAGE_LIMIT) {
+					const remainingBytes = Math.max(STORAGE_LIMIT - usedBytes, 0);
+					const remainingMb = (remainingBytes / (1024 * 1024)).toFixed(2);
+					return {
+						errorMessage: `Not enough storage space. You have ${remainingMb} MB remaining.`,
+					};
 				}
 
-				if (mainType === "audio") {
-					return "audio";
+				const { error: uploadError } = await supabase.storage
+					.from("user-uploads")
+					.upload(storagePath, req.file.buffer, {
+						contentType: mimetype,
+						upsert: false,
+					});
+				if (uploadError) throw uploadError;
+
+				try {
+					await transaction.file.create({
+						data: {
+							name: originalname,
+							filename: safeFileName,
+							type: getFileType(mimetype, originalname),
+							uploadedAt: new Date(),
+							path: storagePath,
+							size,
+							user: { connect: { id: req.user.id } },
+							folder: { connect: { id: currentFolderId } },
+						},
+					});
+				} catch (error) {
+					await supabase.storage.from("user-uploads").remove([storagePath]);
+					throw error;
 				}
 
-				if (mainType === "video") {
-					return "movie";
-				}
-
-				if (extension === "pdf") {
-					return "pdf";
-				}
-
-				if (spreadsheetExtensions.includes(extension)) {
-					return "spreadsheet";
-				}
-
-				if (presentationExtensions.includes(extension)) {
-					return "presentation";
-				}
-
-				if (codeExtensions.includes(extension)) {
-					return "code";
-				}
-
-				if (documentExtensions.includes(extension) || mainType === "text") {
-					return "document";
-				}
-
-				if (archiveExtensions.includes(extension)) {
-					return "zip";
-				}
-
-				return "other";
-			};
-
-			const storagePath = filePath.substring(filePath.indexOf("files"));
-
-			await prisma.file.create({
-				data: {
-					name: originalname,
-					filename: filename,
-					type: fileType(),
-					uploadedAt: new Date(),
-					path: storagePath,
-					size: size,
-					user: {
-						connect: { id: req.user.id },
-					},
-					folder: {
-						connect: { id: currentFolderId },
-					},
-				},
+				return { errorMessage: null };
 			});
+
+			if (uploadResult.errorMessage) {
+				return redirectWithToast(req, res, uploadResult.errorMessage, "error");
+			}
 
 			return redirectWithToast(req, res, "File uploaded", "success");
 		} catch (err) {
+			if (
+				err?.status === 413 ||
+				err?.statusCode === 413 ||
+				/size|quota|limit|payload/i.test(err?.message || "")
+			) {
+				return redirectWithToast(
+					req,
+					res,
+					"The upload was rejected because the file is too large or exceeds your storage limit.",
+					"error",
+				);
+			}
 			return next(err);
 		}
 	},
 ];
+
+export const openFile = async (req, res, next) => {
+	try {
+		const fileId = req.params.id;
+		const file = await getFileForDownload(fileId, req.user.id);
+		if (!file) {
+			return res.status(404).json({ error: "File not found or unauthorized" });
+		}
+
+		const { data, error } = await supabase.storage
+			.from("user-uploads")
+			.createSignedUrl(file.path, 60);
+
+		if (error || !data) {
+			return res.status(404).json({ error: "File not found in storage" });
+		}
+
+		return res.redirect(data.signedUrl);
+	} catch (err) {
+		return next(err);
+	}
+};
 
 export const starFile = async (req, res, next) => {
 	try {
@@ -247,21 +265,23 @@ export const downloadFile = async (req, res, next) => {
 			return res.status(404).json({ error: "File not found or unauthorized" });
 		}
 
-		const filePath = file.path;
+		const { data, error } = await supabase.storage
+			.from("user-uploads")
+			.download(file.path);
 
-		// Verify file exists on disk
-		if (!fs.existsSync(filePath)) {
-			return res.status(404).json({ error: "File not found on server" });
+		if (error || !data) {
+			return res.status(404).json({ error: "File not found in storage" });
 		}
 
-		res.download(filePath, getFileDownloadName(file), (err) => {
-			if (err) {
-				if (!res.headersSent) {
-					return res.status(500).json({ error: "Download failed" });
-				}
-				console.error("Download error:", err);
-			}
-		});
+		const arrayBuffer = await data.arrayBuffer();
+
+		res.setHeader(
+			"Content-Disposition",
+			`attachment; filename="${getFileDownloadName(file)}"`,
+		);
+		res.setHeader("Content-Type", "application/octet-stream");
+
+		return res.send(Buffer.from(arrayBuffer));
 	} catch (err) {
 		return next(err);
 	}
@@ -444,12 +464,12 @@ export async function permanentlyDeleteFile(fileId, userId) {
 		throw new Error("File not found or unauthorized");
 	}
 
-	try {
-		await fs.promises.unlink(file.path);
-	} catch (err) {
-		if (err.code !== "ENOENT") {
-			console.error(`Failed to delete file on disk at ${file.path}:`, err);
-		}
+	const { error } = await supabase.storage
+		.from("user-uploads")
+		.remove([file.path]);
+
+	if (error) {
+		throw new Error(`Failed to delete file from storage: ${error.message}`);
 	}
 
 	await prisma.file.delete({
@@ -476,6 +496,14 @@ export const deleteFile = async (req, res, next) => {
 
 		return redirectWithToast(req, res, "File deleted", "success");
 	} catch (err) {
+		if (err?.message?.toLowerCase().includes("storage")) {
+			return redirectWithToast(
+				req,
+				res,
+				"File could not be deleted from storage. Try again.",
+				"error",
+			);
+		}
 		return next(err);
 	}
 };

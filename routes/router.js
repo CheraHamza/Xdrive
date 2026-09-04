@@ -10,6 +10,7 @@ import {
 } from "../controllers/authentication.js";
 
 import {
+	openFile,
 	downloadFile,
 	postUpload,
 	renameFile,
@@ -44,6 +45,7 @@ import {
 	getShare,
 	browseSharedFolder,
 	downloadSharedFile,
+	openSharedFile,
 	getShared,
 	getStarred,
 	getTrash,
@@ -58,6 +60,7 @@ router.get("/trash", isAuth, getTrash);
 router.get("/search", isAuth, getSearch);
 router.get("/share/:id", getShare);
 router.get("/share/:id/folder/:folderId", browseSharedFolder);
+router.get("/share/:id/open", openSharedFile);
 router.get("/share/:id/download", downloadSharedFile);
 router.get("/shared", isAuth, getShared);
 router.get("/folder-tree", isAuth, getFolderTree);
@@ -72,6 +75,7 @@ router.post("/logout", isAuth, postLogout);
 
 // files
 router.post("/upload", isAuth, postUpload);
+router.get("/open-file/:id", isAuth, openFile);
 router.post("/star-file", isAuth, starFile);
 router.post("/download-file", isAuth, downloadFile);
 router.post("/rename-file", isAuth, renameFile);

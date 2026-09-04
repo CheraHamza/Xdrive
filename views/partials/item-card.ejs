@@ -1,16 +1,17 @@
 <% const isFolder = locals.itemType === 'folder' || false; %>
 <% const item = locals.item %>
+<% const previewUrl = item?.sharedOpenUrl || `/open-file/${item?.id}`; %>
 
-<div class="item-card" data-type="<%= locals.itemType %>" data-id="<%= item.id %>" data-open-url="<%= item.sharedOpenUrl || '' %>" data-url="/<%= item.path %>">
+<div class="item-card" data-type="<%= locals.itemType %>" data-id="<%= item.id %>" data-open-url="<%= item.sharedOpenUrl || '' %>" data-url="<%= previewUrl %>">
   <div class="item-card-content">
     <div class="icon-wrapper">
       <div class="thumbnail-wrapper">
         <% if (isFolder) { %>
         <span class="material-symbols-outlined item-icon folder">folder</span>
         <% } else if (item?.type == "image") { %>
-        <img src="/<%= item?.path %>" class="<%= item?.name.endsWith('.gif') ? 'gif-thumbnail' : '' %>" alt="Preview">
+        <img src="<%= previewUrl %>" class="<%= item?.name.endsWith('.gif') ? 'gif-thumbnail' : '' %>" alt="Preview" loading="lazy" decoding="async" fetchpriority="low">
         <% } else if (item?.type == "movie") { %>
-        <video src="/<%= item?.path %>" preload="metadata" muted playsinline disablePictureInPicture></video>
+        <video src="<%= previewUrl %>" preload="metadata" muted playsinline disablePictureInPicture></video>
         <% } else { %><span class="material-symbols-outlined item-icon <%= item?.type %>">
           <%= item?.icon %>
         </span>

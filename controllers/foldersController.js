@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import fs from "fs";
+import { supabase } from "../lib/supabase.js";
 import path from "path";
 import { ZipArchive } from "archiver";
 import { addDays, addHours, addMinutes, format } from "date-fns";
@@ -160,6 +160,18 @@ export const starFolder = async (req, res, next) => {
 	}
 };
 
+const downloadFromSupabaseStorage = async (storagePath) => {
+	const { data, error } = await supabase.storage
+		.from("user-uploads")
+		.download(storagePath);
+
+	if (error || !data) {
+		throw new Error("File not found in storage");
+	}
+
+	return Buffer.from(await data.arrayBuffer());
+};
+
 const addFolderToArchive = async (folderId, archive, currentPath = "") => {
 	const folder = await prisma.folder.findUnique({
 		where: { id: folderId },
@@ -171,22 +183,28 @@ const addFolderToArchive = async (folderId, archive, currentPath = "") => {
 
 	if (!folder) return;
 
-	folder.files.forEach((file) => {
-		const filePath = file.path;
+	for (const file of folder.files) {
+		if (file.trashed) continue;
 
-		if (fs.existsSync(filePath)) {
-			archive.file(filePath, {
+		try {
+			const buffer = await downloadFromSupabaseStorage(file.path);
+			archive.append(buffer, {
 				name: path.join(currentPath, getFileDownloadName(file)),
 			});
+		} catch (err) {
+			console.warn(
+				`Skipping missing file in folder archive: ${file.path}`,
+				err,
+			);
 		}
-	});
+	}
 
-	const childPromises = folder.children.map((childFolder) => {
-		const nextPath = path.join(currentPath, childFolder.name);
-		return addFolderToArchive(childFolder.id, archive, nextPath);
-	});
-
-	await Promise.all(childPromises);
+	await Promise.all(
+		folder.children.map((childFolder) => {
+			const nextPath = path.join(currentPath, childFolder.name);
+			return addFolderToArchive(childFolder.id, archive, nextPath);
+		}),
+	);
 };
 
 export const downloadFolder = async (req, res, next) => {
@@ -414,18 +432,19 @@ export async function permanentlyDeleteFolder(folderId, userId) {
 	}
 
 	const nestedData = await getNestedFolderData(folderId);
+	const filePaths = nestedData.files.map((file) => file.path).filter(Boolean);
 
-	await Promise.all(
-		nestedData.files.map(async (file) => {
-			try {
-				await fs.promises.unlink(file.path);
-			} catch (err) {
-				if (err.code !== "ENOENT") {
-					console.error(`Failed to delete file on disk at ${file.path}`, err);
-				}
-			}
-		}),
-	);
+	if (filePaths.length > 0) {
+		const { error } = await supabase.storage
+			.from("user-uploads")
+			.remove(filePaths);
+
+		if (error) {
+			throw new Error(
+				`Failed to delete folder files from storage: ${error.message}`,
+			);
+		}
+	}
 
 	await prisma.$transaction([
 		prisma.share.deleteMany({
@@ -464,6 +483,14 @@ export const deleteFolder = async (req, res, next) => {
 
 		return redirectWithToast(req, res, "Folder deleted", "success");
 	} catch (err) {
+		if (err?.message?.toLowerCase().includes("storage")) {
+			return redirectWithToast(
+				req,
+				res,
+				"Folder files could not be deleted from storage. Try again.",
+				"error",
+			);
+		}
 		return next(err);
 	}
 };

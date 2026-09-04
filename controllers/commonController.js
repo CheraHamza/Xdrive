@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import fs from "fs";
+import { supabase } from "../lib/supabase.js";
 import path from "path";
 import { ZipArchive } from "archiver";
 import { intervalToDuration, isBefore } from "date-fns";
@@ -39,7 +39,18 @@ export function getFileDownloadName(file) {
 }
 
 export function redirectWithToast(req, res, message, type = "success") {
-	const target = req.get("Referrer") || "/";
+	const referrer = req.get("Referrer");
+	let target = "/";
+	if (referrer) {
+		try {
+			const url = new URL(referrer);
+			if (url.origin === `${req.protocol}://${req.get("host")}`) {
+				target = `${url.pathname}${url.search}`;
+			}
+		} catch {
+			// Use the home page when the referrer is malformed or external.
+		}
+	}
 	const separator = target.includes("?") ? "&" : "?";
 	const safeMessage = encodeURIComponent(message);
 
@@ -161,6 +172,7 @@ async function getSharedFolderContents(token, folderId, user) {
 		child.sharedDownloadUrl = `${sharedBaseUrl}/download?itemId=${child.id}`;
 	});
 	folder.files.forEach((file) => {
+		file.sharedOpenUrl = `${sharedBaseUrl}/open?itemId=${file.id}`;
 		file.sharedDownloadUrl = `${sharedBaseUrl}/download?itemId=${file.id}`;
 	});
 
@@ -274,33 +286,45 @@ export const getTrash = async (req, res, next) => {
 };
 
 export const emptyTrash = async (req, res, next) => {
-	const userId = req.user.id;
+	try {
+		const userId = req.user.id;
 
-	const trashedFolders = await prisma.folder.findMany({
-		where: { userId, trashed: true },
-		select: { id: true, parentId: true },
-	});
-	const trashedFolderIds = new Set(trashedFolders.map((folder) => folder.id));
-	const topLevelTrashedFolders = trashedFolders.filter(
-		(folder) => !folder.parentId || !trashedFolderIds.has(folder.parentId),
-	);
+		const trashedFolders = await prisma.folder.findMany({
+			where: { userId, trashed: true },
+			select: { id: true, parentId: true },
+		});
+		const trashedFolderIds = new Set(trashedFolders.map((folder) => folder.id));
+		const topLevelTrashedFolders = trashedFolders.filter(
+			(folder) => !folder.parentId || !trashedFolderIds.has(folder.parentId),
+		);
 
-	await Promise.all(
-		topLevelTrashedFolders.map((folder) =>
-			permanentlyDeleteFolder(folder.id, userId),
-		),
-	);
+		await Promise.all(
+			topLevelTrashedFolders.map((folder) =>
+				permanentlyDeleteFolder(folder.id, userId),
+			),
+		);
 
-	const trashedFiles = await prisma.file.findMany({
-		where: { userId, trashed: true },
-		select: { id: true },
-	});
+		const trashedFiles = await prisma.file.findMany({
+			where: { userId, trashed: true },
+			select: { id: true },
+		});
 
-	await Promise.all(
-		trashedFiles.map((file) => permanentlyDeleteFile(file.id, userId)),
-	);
+		await Promise.all(
+			trashedFiles.map((file) => permanentlyDeleteFile(file.id, userId)),
+		);
 
-	return redirectWithToast(req, res, "Trash emptied", "success");
+		return redirectWithToast(req, res, "Trash emptied", "success");
+	} catch (error) {
+		if (error?.message?.toLowerCase().includes("storage")) {
+			return redirectWithToast(
+				req,
+				res,
+				"Some trash items could not be deleted from storage. Try again.",
+				"error",
+			);
+		}
+		return next(error);
+	}
 };
 
 export const getFolderTree = async (req, res, next) => {
@@ -551,6 +575,7 @@ export const getShare = async (req, res, next) => {
 		if (itemType === "file") {
 			mapFileIcons([item]);
 			item.locationUrl = item.folderId ? `/folder/${item.folderId}` : "/";
+			item.sharedOpenUrl = `/share/${sharedItem.shareToken}/open?itemId=${item.id}`;
 			item.details = {
 				type: item.type,
 				size: (item.size / (1024 * 1024)).toFixed(2),
@@ -590,6 +615,18 @@ export const getShare = async (req, res, next) => {
 	}
 };
 
+const downloadFromSupabaseStorage = async (storagePath) => {
+	const { data, error } = await supabase.storage
+		.from("user-uploads")
+		.download(storagePath);
+
+	if (error || !data) {
+		throw new Error("File not found in storage");
+	}
+
+	return Buffer.from(await data.arrayBuffer());
+};
+
 const addSharedFolderToArchive = async (
 	folderId,
 	archive,
@@ -602,13 +639,18 @@ const addSharedFolderToArchive = async (
 
 	if (!folder || folder.trashed) return;
 
-	folder.files.forEach((file) => {
-		if (!file.trashed && fs.existsSync(file.path)) {
-			archive.file(file.path, {
+	for (const file of folder.files) {
+		if (file.trashed) continue;
+
+		try {
+			const buffer = await downloadFromSupabaseStorage(file.path);
+			archive.append(buffer, {
 				name: path.join(currentPath, getFileDownloadName(file)),
 			});
+		} catch (err) {
+			console.warn(`Skipping missing shared file: ${file.path}`, err);
 		}
-	});
+	}
 
 	await Promise.all(
 		folder.children.map((childFolder) =>
@@ -619,6 +661,67 @@ const addSharedFolderToArchive = async (
 			),
 		),
 	);
+};
+
+export const openSharedFile = async (req, res, next) => {
+	try {
+		const shareToken = req.params.id;
+		const fileId = req.query.itemId;
+
+		if (!fileId) {
+			return res.status(400).json({ error: "File ID is required" });
+		}
+
+		const sharedItem = await prisma.share.findUnique({
+			where: { shareToken },
+			include: { file: true, folder: true },
+		});
+
+		let sharedFile = sharedItem?.file;
+		if (!sharedFile && sharedItem?.folder) {
+			sharedFile = await prisma.file.findUnique({
+				where: { id: fileId },
+				include: { folder: { select: { id: true } } },
+			});
+
+			const belongsToSharedFolder =
+				sharedFile &&
+				!sharedFile.trashed &&
+				sharedFile.folder &&
+				(await folderBelongsToSharedRoot(
+					sharedFile.folder.id,
+					sharedItem.folder.id,
+					sharedItem.folder.userId,
+				));
+
+			if (!belongsToSharedFolder) sharedFile = null;
+		}
+
+		if (
+			!sharedItem ||
+			sharedItem.access !== "PUBLIC" ||
+			(sharedItem.expiresAt &&
+				isBefore(new Date(sharedItem.expiresAt), new Date())) ||
+			!sharedFile ||
+			sharedFile.id !== fileId
+		) {
+			return res
+				.status(404)
+				.json({ error: "Shared file not found or unavailable" });
+		}
+
+		const { data, error } = await supabase.storage
+			.from("user-uploads")
+			.createSignedUrl(sharedFile.path, 60);
+
+		if (error || !data) {
+			return res.status(404).json({ error: "File not found in storage" });
+		}
+
+		return res.redirect(data.signedUrl);
+	} catch (error) {
+		return next(error);
+	}
 };
 
 export const downloadSharedFile = async (req, res, next) => {
@@ -694,19 +797,22 @@ export const downloadSharedFile = async (req, res, next) => {
 			return;
 		}
 
-		if (!downloadableFile || !fs.existsSync(downloadableFile.path)) {
-			return res.status(404).json({ error: "File not found on server" });
+		if (!downloadableFile) {
+			return res.status(404).json({ error: "File not found in storage" });
 		}
 
-		return res.download(
-			downloadableFile.path,
-			getFileDownloadName(downloadableFile),
-			(error) => {
-				if (error && !res.headersSent) {
-					return res.status(500).json({ error: "Download failed" });
-				}
-			},
-		);
+		try {
+			const buffer = await downloadFromSupabaseStorage(downloadableFile.path);
+
+			res.setHeader(
+				"Content-Disposition",
+				`attachment; filename="${getFileDownloadName(downloadableFile)}"`,
+			);
+			res.setHeader("Content-Type", "application/octet-stream");
+			return res.send(buffer);
+		} catch (error) {
+			return res.status(404).json({ error: "File not found in storage" });
+		}
 	} catch (error) {
 		return next(error);
 	}

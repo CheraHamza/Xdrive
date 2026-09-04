@@ -7,6 +7,11 @@ import passport from "passport";
 import "./config/passport.js";
 import dotenv from "dotenv";
 import { prisma } from "./lib/prisma.js";
+import {
+	MAX_FILE_SIZE_MB,
+	STORAGE_LIMIT,
+	STORAGE_LIMIT_MB,
+} from "./config/limits.js";
 
 dotenv.config();
 
@@ -27,14 +32,13 @@ app.use(passport.session());
 app.use(async (req, res, next) => {
 	res.locals.currentUser = req.user || null;
 	res.locals.isAuthenticated = req.isAuthenticated();
+	res.locals.maxFileSizeMb = MAX_FILE_SIZE_MB;
 
 	if (!req.user) {
 		return next();
 	}
 
 	try {
-		const storageLimitMb = 100;
-		const storageLimit = storageLimitMb * 1024 * 1024;
 		const storage = await prisma.file.aggregate({
 			_sum: { size: true },
 			where: { userId: req.user.id },
@@ -42,8 +46,8 @@ app.use(async (req, res, next) => {
 		const usedBytes = storage._sum.size || 0;
 
 		res.locals.storageUsage = {
-			percentage: Math.min(100, Math.round((usedBytes / storageLimit) * 100)),
-			limitLabel: `${storageLimitMb} MB`,
+			percentage: Math.min(100, Math.round((usedBytes / STORAGE_LIMIT) * 100)),
+			limitLabel: `${STORAGE_LIMIT_MB} MB`,
 		};
 	} catch (error) {
 		return next(error);
@@ -51,8 +55,6 @@ app.use(async (req, res, next) => {
 
 	next();
 });
-
-app.use("/files", express.static(path.join(__dirname, "files")));
 
 app.use(express.json());
 app.use("/", router);
@@ -76,9 +78,10 @@ app.use((error, req, res, next) => {
 		: Number.isInteger(error.status)
 			? error.status
 			: 500;
-	const message = statusCode >= 500
-		? "Something went wrong while processing your request."
-		: error.message;
+	const message =
+		statusCode >= 500
+			? "Something went wrong while processing your request."
+			: error.message;
 
 	if (req.accepts("json") && !req.accepts("html")) {
 		return res.status(statusCode).json({ error: message });
@@ -86,14 +89,19 @@ app.use((error, req, res, next) => {
 
 	console.error(error);
 	return res.status(statusCode).render("error", {
-		title: statusCode >= 500 ? "Something went wrong" : "Request could not be completed",
+		title:
+			statusCode >= 500
+				? "Something went wrong"
+				: "Request could not be completed",
 		message,
 	});
 });
 
-app.listen(3000, (error) => {
+const port = process.env.PORT || 3000;
+
+app.listen(port, (error) => {
 	if (error) {
 		throw error;
 	}
-	console.log("app listening on port 3000!");
+	console.log(`app listening on port ${port}!`);
 });

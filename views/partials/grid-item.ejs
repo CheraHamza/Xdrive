@@ -1,13 +1,14 @@
 <% const isFolder = locals.isFolder || false; %>
 <% const item = locals.item; %>
-<div class="item" id="<%= item?.id %>" data-type="<%= isFolder ? 'folder' : 'file' %>" data-name="<%= item?.name %>" data-trashed="<%= item?.trashed ? 'true' : 'false' %>" tabindex="0" data-tooltip="<%= item?.name %>" data-open-url="<%= item?.sharedOpenUrl || '' %>" <% if (!isFolder) {%> data-url="/<%=item?.path%>" <% } %>>
+<% const previewUrl = item?.sharedOpenUrl || `/open-file/${item?.id}`; %>
+<div class="item" id="<%= item?.id %>" data-type="<%= isFolder ? 'folder' : 'file' %>" data-name="<%= item?.name %>" data-trashed="<%= item?.trashed ? 'true' : 'false' %>" tabindex="0" data-tooltip="<%= item?.name %>" data-open-url="<%= item?.sharedOpenUrl || '' %>" <% if (!isFolder) {%> data-url="<%= previewUrl %>" <% } %>>
   <div class="preview-wrapper">
     <% if (isFolder) { %>
     <span class="material-symbols-outlined item-icon folder">folder</span>
     <% } else if (item?.type == "image") { %>
-    <img src="/<%= item?.path %>" class="<%= item?.name.endsWith('.gif') ? 'gif-thumbnail' : '' %>" alt="Preview">
+    <img src="<%= previewUrl %>" class="<%= item?.name.endsWith('.gif') ? 'gif-thumbnail' : '' %>" alt="Preview" loading="lazy" decoding="async" fetchpriority="low">
     <% } else if (item?.type == "movie") { %>
-    <video src="/<%= item?.path %>" preload="metadata" muted playsinline disablePictureInPicture></video>
+    <video src="<%= previewUrl %>" preload="metadata" muted playsinline disablePictureInPicture></video>
     <% } else { %><span class="material-symbols-outlined item-icon <%= item?.type %>">
       <%= item?.icon %>
     </span>
