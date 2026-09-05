@@ -196,13 +196,19 @@ export const openFile = async (req, res, next) => {
 
 		const { data, error } = await supabase.storage
 			.from("user-uploads")
-			.createSignedUrl(file.path, 60);
+			.download(file.path);
 
 		if (error || !data) {
 			return res.status(404).json({ error: "File not found in storage" });
 		}
 
-		return res.redirect(data.signedUrl);
+		res.set("Cache-Control", "private, max-age=3600");
+		res.set("Content-Type", data.type || "application/octet-stream");
+		res.set(
+			"Content-Disposition",
+			`inline; filename="${getFileDownloadName(file).replace(/"/g, "")}"`,
+		);
+		return res.send(Buffer.from(await data.arrayBuffer()));
 	} catch (err) {
 		return next(err);
 	}

@@ -5,6 +5,7 @@ import { ZipArchive } from "archiver";
 import { intervalToDuration, isBefore } from "date-fns";
 import { permanentlyDeleteFile } from "./filesController.js";
 import { permanentlyDeleteFolder } from "./foldersController.js";
+import { getCachedPreviewUrl } from "../lib/previewCache.js";
 
 export function mapFileIcons(files) {
 	const iconMap = {
@@ -710,14 +711,17 @@ export const openSharedFile = async (req, res, next) => {
 				.json({ error: "Shared file not found or unavailable" });
 		}
 
-		const { data, error } = await supabase.storage
-			.from("user-uploads")
-			.createSignedUrl(sharedFile.path, 60);
+		const { data, error } = await getCachedPreviewUrl(
+			supabase,
+			"user-uploads",
+			sharedFile.path,
+		);
 
 		if (error || !data) {
 			return res.status(404).json({ error: "File not found in storage" });
 		}
 
+		res.set("Cache-Control", "private, max-age=3600");
 		return res.redirect(data.signedUrl);
 	} catch (error) {
 		return next(error);
