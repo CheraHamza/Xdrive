@@ -1,0 +1,16 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 0 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+            -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
+            --fail --silent --show-error
