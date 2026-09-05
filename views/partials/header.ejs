@@ -80,7 +80,7 @@
   const closeSettingsMenu = () => {
     settingsBtn?.classList.remove('active');
     if (settingsDropdown) {
-      settingsDropdown.style.display = 'none';
+      settingsDropdown.classList.remove('active');
     }
   };
 
@@ -89,7 +89,7 @@
     settingsBtn.classList.toggle('active');
 
     if (settingsBtn.classList.contains('active')) {
-      settingsDropdown.style.display = 'flex';
+      settingsDropdown.classList.add('active');
     } else {
       closeSettingsMenu();
     }

@@ -26,7 +26,7 @@
     <%- include("partials/modals") %>
     <%- include("partials/navbar") %>
     <% } %>
-    <section class="main-wrapper">
+    <section class="main-wrapper <%= locals.title === 'Share' ? 'item-detail-wrapper' : '' %>">
       <%- include("partials/header") %>
       <% if (locals.location) {%>
       <%- include("partials/location-bar") %>

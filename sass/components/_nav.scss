@@ -131,6 +131,23 @@
 		transform: translateX(-105%);
 		transition: transform 0.24s ease;
 
+		.logo-composite {
+			gap: 7px;
+
+			img.logo {
+				width: 42px;
+				height: 42px;
+			}
+
+			h1 {
+				font-size: 21px;
+			}
+
+			p {
+				font-size: 10px;
+			}
+		}
+
 		&.open {
 			transform: translateX(0);
 		}
@@ -144,7 +161,9 @@
 		background: rgba(8, 9, 10, 0.58);
 		visibility: hidden;
 		opacity: 0;
-		transition: opacity 0.24s ease, visibility 0.24s ease;
+		transition:
+			opacity 0.24s ease,
+			visibility 0.24s ease;
 
 		&.open {
 			visibility: visible;

@@ -103,14 +103,27 @@
 	position: fixed;
 	z-index: 100;
 
-	display: none;
-	&.active {
-		display: flex;
-	}
+	display: flex;
 	align-items: center;
 	justify-content: center;
 
 	background-color: #ffffff1f;
+	visibility: hidden;
+	opacity: 0;
+	pointer-events: none;
+	transition:
+		opacity 0.2s ease,
+		visibility 0.2s ease;
+
+	&.active {
+		visibility: visible;
+		opacity: 1;
+		pointer-events: auto;
+
+		& > * {
+			transform: translateY(0) scale(1);
+		}
+	}
 
 	& > * {
 		width: min(80%, 400px);
@@ -123,6 +136,8 @@
 		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.089);
 
 		border-radius: 5px;
+		transform: translateY(10px) scale(0.97);
+		transition: transform 0.2s ease;
 
 		.btns-wrapper {
 			display: flex;

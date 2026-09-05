@@ -132,10 +132,7 @@
 		width: 160px;
 		max-height: calc(100dvh - 24px);
 		overflow-y: auto;
-		display: none;
-		&.active {
-			display: flex;
-		}
+		display: flex;
 		flex-direction: column;
 		align-items: center;
 
@@ -147,6 +144,22 @@
 		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.062);
 
 		user-select: none;
+		visibility: hidden;
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(-5px) scale(0.98);
+		transform-origin: top center;
+		transition:
+			opacity 0.14s ease,
+			transform 0.14s ease,
+			visibility 0.14s ease;
+
+		&.active {
+			visibility: visible;
+			opacity: 1;
+			pointer-events: auto;
+			transform: translateY(0) scale(1);
+		}
 
 		form {
 			width: 100%;
@@ -226,6 +239,24 @@
 
 		.item-name-wrapper {
 			gap: 6px;
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.item {
+		.preview-wrapper {
+			max-width: 120px;
+		}
+
+		.item-name-wrapper {
+			.item-name {
+				font-size: 12px;
+			}
+
+			.item-icon {
+				font-size: 16px;
+			}
 		}
 	}
 }
