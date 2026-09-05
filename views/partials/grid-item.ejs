@@ -6,9 +6,11 @@
     <% if (isFolder) { %>
     <span class="material-symbols-outlined item-icon folder">folder</span>
     <% } else if (item?.type == "image") { %>
-    <img src="<%= previewUrl %>" class="<%= item?.name.endsWith('.gif') ? 'gif-thumbnail' : '' %>" alt="Preview" loading="lazy" decoding="async" fetchpriority="low">
+    <canvas class="preview-canvas" data-preview-kind="image" data-preview-name="<%= item?.name %>" data-preview-url="<%= previewUrl %>" aria-label="Image preview" hidden></canvas>
+    <span class="material-symbols-outlined item-icon preview-fallback image" aria-hidden="true">image</span>
     <% } else if (item?.type == "movie") { %>
-    <video src="<%= previewUrl %>" preload="metadata" muted playsinline disablePictureInPicture></video>
+    <canvas class="preview-canvas" data-preview-kind="video" data-preview-url="<%= previewUrl %>" aria-label="Video preview" hidden></canvas>
+    <span class="material-symbols-outlined item-icon preview-fallback movie" aria-hidden="true">movie</span>
     <% } else { %><span class="material-symbols-outlined item-icon <%= item?.type %>">
       <%= item?.icon %>
     </span>

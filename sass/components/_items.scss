@@ -75,8 +75,7 @@
 		align-items: center;
 		justify-content: center;
 
-		img,
-		video {
+		canvas {
 			width: 100%;
 			height: 100%;
 
@@ -88,8 +87,16 @@
 			object-position: center;
 		}
 
+		canvas[hidden] {
+			display: none !important;
+		}
+
 		.item-icon {
 			font-size: 100px;
+		}
+
+		.preview-fallback[hidden] {
+			display: none;
 		}
 	}
 

@@ -56,6 +56,128 @@ window.hideLoading = hideLoading;
 
 window.addEventListener("load", hideLoading);
 
+function showPreviewFallback(canvas) {
+	canvas.hidden = true;
+	const fallback = canvas.nextElementSibling;
+	if (fallback) fallback.hidden = false;
+}
+
+function showPreviewCanvas(canvas) {
+	canvas.hidden = false;
+	const fallback = canvas.nextElementSibling;
+	if (fallback) fallback.hidden = true;
+}
+
+function canRenderImagePreview(name) {
+	const extension = name?.split(".").pop()?.toLowerCase();
+	return ["jpg", "jpeg", "png", "gif", "webp", "bmp", "avif"].includes(
+		extension,
+	);
+}
+
+function getPreviewCanvasSize(width, height) {
+	const maxDimension = 1200;
+	const scale = Math.min(1, maxDimension / width, maxDimension / height);
+	return {
+		width: Math.max(1, Math.round(width * scale)),
+		height: Math.max(1, Math.round(height * scale)),
+	};
+}
+
+function getPreviewContext(canvas, width, height) {
+	const size = getPreviewCanvasSize(width, height);
+	canvas.width = size.width;
+	canvas.height = size.height;
+	return canvas.getContext("2d", { colorSpace: "srgb" });
+}
+
+function renderImagePreview(canvas) {
+	if (!canRenderImagePreview(canvas.dataset.previewName)) {
+		showPreviewFallback(canvas);
+		return;
+	}
+
+	const image = new Image();
+	image.decoding = "async";
+	image.crossOrigin = "anonymous";
+	image.onload = () => {
+		try {
+			const context = getPreviewContext(
+				canvas,
+				image.naturalWidth,
+				image.naturalHeight,
+			);
+			if (!context) throw new Error("Canvas rendering is unavailable");
+			context.drawImage(image, 0, 0, canvas.width, canvas.height);
+			showPreviewCanvas(canvas);
+		} catch (error) {
+			console.error("Failed to render image preview:", error);
+			showPreviewFallback(canvas);
+		}
+	};
+	image.onerror = () => showPreviewFallback(canvas);
+	image.src = canvas.dataset.previewUrl;
+}
+
+function renderVideoPreview(canvas) {
+	const video = document.createElement("video");
+	video.muted = true;
+	video.playsInline = true;
+	video.preload = "metadata";
+	video.crossOrigin = "anonymous";
+
+	const cleanup = () => {
+		video.pause();
+		video.removeAttribute("src");
+		video.load();
+	};
+
+	video.onerror = () => {
+		cleanup();
+		showPreviewFallback(canvas);
+	};
+
+	video.addEventListener("loadedmetadata", () => {
+		const seekTime = Number.isFinite(video.duration)
+			? Math.min(0.1, Math.max(0, video.duration - 0.01))
+			: 0;
+
+		const drawFrame = () => {
+			try {
+				const context = getPreviewContext(
+					canvas,
+					video.videoWidth,
+					video.videoHeight,
+				);
+				if (!context) throw new Error("Canvas rendering is unavailable");
+				context.drawImage(video, 0, 0, canvas.width, canvas.height);
+				showPreviewCanvas(canvas);
+			} catch (error) {
+				console.error("Failed to render video preview:", error);
+				showPreviewFallback(canvas);
+			} finally {
+				cleanup();
+			}
+		};
+
+		video.addEventListener("seeked", drawFrame, { once: true });
+		video.currentTime = seekTime;
+	});
+
+	video.src = canvas.dataset.previewUrl;
+	video.load();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.querySelectorAll("canvas.preview-canvas").forEach((canvas) => {
+		if (canvas.dataset.previewKind === "video") {
+			renderVideoPreview(canvas);
+		} else {
+			renderImagePreview(canvas);
+		}
+	});
+});
+
 const toastMessage = new URLSearchParams(window.location.search).get("toast");
 const toastType =
 	new URLSearchParams(window.location.search).get("toastType") || "success";
@@ -549,37 +671,4 @@ itemElements.forEach((item) => {
 	shareBtn?.addEventListener("click", () => {
 		openShareModal(itemId, itemType);
 	});
-});
-
-// Freeze Gifs
-
-document.addEventListener("DOMContentLoaded", () => {
-	const gifImages = document.querySelectorAll(".gif-thumbnail");
-
-	gifImages.forEach((img) => {
-		if (img.complete) {
-			freezeGif(img);
-		} else {
-			img.addEventListener("load", () => freezeGif(img));
-		}
-	});
-
-	function freezeGif(img) {
-		if (img.src.startsWith("data:image")) {
-			return;
-		}
-		try {
-			const canvas = document.createElement("canvas");
-			canvas.width = img.naturalWidth;
-			canvas.height = img.naturalHeight;
-
-			const ctx = canvas.getContext("2d");
-			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-			const staticDataUrl = canvas.toDataURL("image/png");
-			img.src = staticDataUrl;
-		} catch (error) {
-			console.error("Failed to freeze GIF thumbnail:", error);
-		}
-	}
 });
