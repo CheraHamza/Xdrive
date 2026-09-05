@@ -54,7 +54,11 @@ import {
 export const router = Router();
 
 // common
-router.get(["/", "/home"], isAuth, getRoot);
+router.get("/", (req, res, next) => {
+	if (req.isAuthenticated()) return getRoot(req, res, next);
+	return res.render("landing", { title: "Personal cloud storage" });
+});
+router.get("/home", isAuth, getRoot);
 router.get("/starred", isAuth, getStarred);
 router.get("/trash", isAuth, getTrash);
 router.get("/search", isAuth, getSearch);

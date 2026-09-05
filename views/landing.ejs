@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xdrive - <%= title %></title>
+  <link rel="icon" type="image/svg+xml" href="/icons/light-logo.svg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <main class="landing-page">
+    <header class="landing-header">
+      <%- include("partials/logo-composite") %>
+      <a class="landing-login-link" href="/login">Log in</a>
+    </header>
+
+    <section class="landing-content" aria-labelledby="landing-title">
+      <div class="landing-copy">
+        <p class="landing-kicker text-label">Your files, quietly in place.</p>
+        <h1 id="landing-title">A smaller, calmer home for your files.</h1>
+        <p class="landing-description">Upload, organize, preview, and share the files that matter without the clutter.</p>
+        <div class="landing-actions">
+          <a class="landing-primary-action" href="/signup">Create your account</a>
+          <a class="landing-secondary-action" href="/login">Log in</a>
+        </div>
+      </div>
+
+      <div class="landing-preview" aria-label="Xdrive workspace preview">
+        <div class="landing-preview-bar">
+          <span class="preview-dot"></span>
+          <span class="preview-dot"></span>
+          <span class="preview-dot"></span>
+          <span class="preview-label text-label">xdrive / home</span>
+        </div>
+        <div class="landing-preview-body">
+          <div class="preview-sidebar">
+            <span class="preview-line preview-line-wide"></span>
+            <span class="preview-line"></span>
+            <span class="preview-line"></span>
+            <span class="preview-line"></span>
+          </div>
+          <div class="preview-files">
+            <div class="preview-heading">
+              <span>Home</span>
+              <span class="preview-count text-label">04 files</span>
+            </div>
+            <div class="preview-grid">
+              <span class="preview-file preview-file-image"></span>
+              <span class="preview-file preview-file-doc"></span>
+              <span class="preview-file preview-file-folder"></span>
+              <span class="preview-file preview-file-code"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="landing-footer text-label">
+      <span>Private storage</span>
+      <span>Simple sharing</span>
+      <span>Built for the everyday</span>
+    </footer>
+  </main>
+</body>
+
+</html>
