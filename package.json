@@ -6,7 +6,12 @@
 	"author": "Hamza Chera",
 	"type": "module",
 	"main": "app.js",
+	"engines": {
+		"node": "23.10.0"
+	},
 	"scripts": {
+		"start": "node app.js",
+		"heroku-postbuild": "npx prisma generate",
 		"sass": "sass --watch sass:public/css"
 	},
 	"dependencies": {
