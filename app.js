@@ -57,6 +57,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use(express.json());
+app.set("trust proxy", 1);
 app.use("/", router);
 
 app.use((req, res, next) => {
