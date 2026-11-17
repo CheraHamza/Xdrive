@@ -2,16 +2,21 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: "0 0 */3 * *"
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Write heartbeat to Supabase
         run: |
-          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
-            -H "apikey: ${{ secrets.SUPABASE_SECRET_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SECRET_KEY }}" \
-            --fail --silent --show-error
+          TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          BODY=$(printf '{"pinged_at":"%s"}' "$TS")
+          curl -X PATCH "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive?id=eq.1" \
+          -H "apikey: ${{ secrets.SUPABASE_SECRET_KEY }}" \
+          -H "Content-Type: application/json" \
+          -H "Prefer: return=representation" \
+          -d "$BODY" \
+          --fail-with-body --show-error --retry 3 --retry-delay 10 \
+          -w "\nHTTP %{http_code}\n"
